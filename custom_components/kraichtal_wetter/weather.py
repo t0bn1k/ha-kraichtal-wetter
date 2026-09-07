@@ -21,16 +21,31 @@ _LOGGER = logging.getLogger(__name__)
 # Maps the API's icon names onto Home Assistant weather conditions. Only the
 # values in homeassistant.components.weather.ATTR_CONDITION_* are valid; an
 # unknown icon deliberately yields None ("unknown") rather than a wrong guess.
+#
+# The full set of codes below was confirmed against the icon registry the
+# public dashboard (kraichtal-wetter.de/dashboard/) embeds for rendering
+# forecast/hourly icons (`const I = {...}` in its inline <script>) — that
+# object is the complete vocabulary the API can emit, not just what we've
+# happened to observe so far.
 ICON_MAP = {
+    "sun": "sunny",
+    "moon": "clear-night",
     "suncloud": "partlycloudy",
     "mooncloud": "partlycloudy",
+    "cloud": "cloudy",
+    "ovc": "cloudy",
+    "drizzle": "rainy",
+    "rain": "rainy",
+    "sunrain": "rainy",
+    "rain-hvy": "pouring",
     "storm": "lightning",
     "sunstorm": "lightning-rainy",
     "storm-rain": "pouring",
-    "cloud": "cloudy",
-    "ovc": "cloudy",
-    "rain": "rainy",
-    "rain-hvy": "pouring",
+    "storm-svr": "lightning-rainy",
+    "snow-lgt": "snowy",
+    "snow": "snowy",
+    "snow-hvy": "snowy",
+    "sunsnow": "snowy-rainy",
 }
 
 # Icons we've already warned about, so a persistently unmapped icon (e.g. one

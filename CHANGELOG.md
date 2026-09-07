@@ -2,6 +2,25 @@
 
 Alle signifikanten Änderungen an dieser Integration werden hier festgehalten.
 
+## [0.5.3] - 2026-09-07
+### Behoben
+- `ICON_MAP` in `weather.py` deckte nur 9 der tatsächlich möglichen API-Icons
+  ab, u. a. fehlten `sun` und `moon` für klaren Himmel — dadurch stand die
+  aktuelle Wetterlage bei Sonnenschein bzw. klarer Nacht auf `unknown`
+  (in der UI „Unbekannt"), genau wie im „Bekannt"-Abschnitt von 0.5.2
+  angekündigt. Die vollständige Icon-Liste wurde gegen das SVG-Icon-Register
+  des öffentlichen Dashboards (`const I = {...}` auf
+  kraichtal-wetter.de/dashboard/) verifiziert und deckt jetzt alle 18 dort
+  registrierten Codes ab: neu hinzugekommen sind `sun` → `sunny`,
+  `moon` → `clear-night`, `drizzle` und `sunrain` → `rainy`,
+  `storm-svr` → `lightning-rainy`, `snow-lgt`/`snow`/`snow-hvy` → `snowy`
+  sowie `sunsnow` → `snowy-rainy`.
+
+### Bekannt
+- Nebel, Hagel und Wind haben im Dashboard-Icon-Register kein eigenes Icon
+  und bleiben daher weiterhin unabgedeckt — dafür existiert offenbar kein
+  API-Icon-Code, keine geratene Bedingung.
+
 ## [0.5.2] - 2026-08-28
 ### Behoben
 - Wetterlage stand nachts sowie an einzelnen Vorhersagetagen auf `unknown`
