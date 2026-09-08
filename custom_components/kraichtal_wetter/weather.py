@@ -22,18 +22,25 @@ _LOGGER = logging.getLogger(__name__)
 # values in homeassistant.components.weather.ATTR_CONDITION_* are valid; an
 # unknown icon deliberately yields None ("unknown") rather than a wrong guess.
 #
-# The full set of codes below was confirmed against the icon registry the
-# public dashboard (kraichtal-wetter.de/dashboard/) embeds for rendering
-# forecast/hourly icons (`const I = {...}` in its inline <script>) — that
-# object is the complete vocabulary the API can emit, not just what we've
-# happened to observe so far.
+# This table is authoritative: the API author confirmed it against the function
+# that emits the codes, not against the dashboard's SVG registry we previously
+# reverse-engineered. Do not "correct" an entry from what its icon draws — that
+# is what produced the wrong sunstorm/storm mapping this replaces.
 #
-# One rule throughout, derived from what each icon actually draws: the sun or
-# moon half of a `sun*`/`moon*` code carries no weather of its own, so it is
-# dropped and the precipitation kind decides (sunrain → rainy, sunsnow →
-# snowy, sunstorm → lightning). Where an icon draws both a bolt and drops, the
-# condition keeps both (storm-rain, storm-svr → lightning-rainy). Deviating
-# from that means claiming weather the source never reported.
+# All four storm codes carry rain. `storm` is the *weakest* thunderstorm, not
+# the dry one; `storm-rain` is simply the normal case. A thunderstorm without
+# precipitation has no code at all, so ATTR_CONDITION_LIGHTNING is unreachable
+# from this source and deliberately absent below.
+#
+# Day/night variants exist only for clear and light cloud (sun/moon,
+# suncloud/mooncloud); rain, snow, storm and fog use one code around the clock.
+# `mooncloud` is the broader of its pair — an overcast night arrives as
+# `mooncloud` too, since there is no night counterpart to `ovc`, so
+# partlycloudy occasionally understates it. There is no better option.
+#
+# Unreachable for the same reason (no code exists): `hail` and `windy` live in
+# the alert and wind fields rather than in `icon`, sleet/freezing rain is
+# folded into `snow`, and nothing maps to `exceptional`.
 ICON_MAP = {
     "sun": "sunny",
     "moon": "clear-night",
@@ -41,12 +48,13 @@ ICON_MAP = {
     "mooncloud": "partlycloudy",
     "cloud": "cloudy",
     "ovc": "cloudy",
+    "fog": "fog",
     "drizzle": "rainy",
     "rain": "rainy",
     "sunrain": "rainy",
     "rain-hvy": "pouring",
-    "storm": "lightning",
-    "sunstorm": "lightning",
+    "storm": "lightning-rainy",
+    "sunstorm": "lightning-rainy",
     "storm-rain": "lightning-rainy",
     "storm-svr": "lightning-rainy",
     "snow-lgt": "snowy",

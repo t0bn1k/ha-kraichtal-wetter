@@ -2,6 +2,31 @@
 
 Alle signifikanten Änderungen an dieser Integration werden hier festgehalten.
 
+## [0.5.6] - 2026-09-08
+### Hinzugefügt
+- Neuer Icon-Code `fog` → `fog`. Nebel wurde bei der Quelle bisher vor der
+  Ausgabe auf `cloud` reduziert und ist ab deren nächstem Deploy ein eigener
+  Code. Die Zuordnung ist vorab ergänzt, damit der Übergang ohne
+  „Unbekannt"-Phase verläuft.
+
+### Behoben
+- `storm` und `sunstorm` standen auf `lightning` (Gewitter ohne Niederschlag),
+  liefern aber beide Regen — jetzt `lightning-rainy`. Damit landen alle vier
+  Gewittercodes auf `lightning-rainy`.
+
+### Geändert
+- `ICON_MAP` beruht nicht mehr auf dem aus dem Dashboard rekonstruierten
+  SVG-Register, sondern auf der vom API-Autor bestätigten Zuordnung, abgeglichen
+  gegen die erzeugende Funktion. Die bisherige Herleitung „so wie das Icon
+  gezeichnet ist" war genau die Ursache der beiden obigen Fehlzuordnungen:
+  `storm` ist nicht das trockene, sondern das *schwächste* Gewitter, und
+  `storm-rain` ist der Normalfall. Der Kommentar über der Tabelle warnt jetzt
+  ausdrücklich davor, Einträge wieder aus dem Symbol abzuleiten.
+- README hält fest, welche HA-Wetterlagen diese Quelle grundsätzlich nicht
+  liefern kann (`hail`, `windy`, `windy-variant`, `snowy-rainy`, `lightning`,
+  `exceptional`), damit ein fehlender Zustand nicht für einen Integrationsfehler
+  gehalten wird.
+
 ## [0.5.5] - 2026-09-08
 ### Hinzugefügt
 - `wind_dir` hat jetzt `device_class: wind_direction` und

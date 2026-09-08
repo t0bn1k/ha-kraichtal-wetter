@@ -120,6 +120,13 @@ refresh_interval: 300
 - Alle Entitäten werden als Teil desselben Geräts in der Integrationen-Ansicht angezeigt.
 - Der API-Key kann jederzeit über Einstellungen → Geräte & Dienste → Kraichtal Wetter → Konfiguration geändert werden.
 - Das Abfrageintervall kann über die Optionen (Drei-Punkte-Menü → Optionen) angepasst werden.
+- **Nicht jede Wetterlage, die Home Assistant kennt, kann diese Station liefern.**
+  Hagel und Sturm stecken bei der Quelle in den Warn- bzw. Windfeldern und nicht
+  in der Wetterlage, Schneeregen und gefrierender Regen laufen dort unter
+  Schneefall, und ein Gewitter ohne Niederschlag gibt es nicht. Die Zustände
+  `hail`, `windy`, `windy-variant`, `snowy-rainy`, `lightning` und `exceptional`
+  treten deshalb nie auf — das ist eine Eigenschaft der Datenquelle, kein Fehler
+  der Integration. Nebel (`fog`) wird dagegen unterstützt.
 
 ## Repository
 
