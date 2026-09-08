@@ -2,6 +2,23 @@
 
 Alle signifikanten Änderungen an dieser Integration werden hier festgehalten.
 
+## [0.5.7] - 2026-09-08
+### Hinzugefügt
+- README erklärt, wo es einen API-Key gibt
+  (https://kraichtal-wetter.de/dashboard/apply.php), inklusive der drei
+  Formularfelder und wofür sie da sind.
+- Der Einrichtungsdialog verlinkt das Antragsformular jetzt direkt — dort, wo
+  nach dem Key gefragt wird, statt nur in einer README, die viele nie öffnen.
+  Der Reauth-Dialog ebenfalls: Wer dort landet, braucht unter Umständen genau
+  einen neuen Schlüssel.
+
+### Geändert
+- **Das API-Key-Feld ist bei der Einrichtung nicht mehr optional.** Die
+  Beschriftung „(optional)" war irreführend: Ohne Key antwortet die API mit
+  401, was `ConfigEntryAuthFailed` auslöst — eine Einrichtung ohne Key war
+  also abgeschlossen und landete unmittelbar im Reauth-Dialog. Bestehende
+  Einträge sind nicht betroffen, das Schema greift nur bei Neueinrichtung.
+
 ## [0.5.6] - 2026-09-08
 ### Hinzugefügt
 - Neuer Icon-Code `fog` → `fog`. Nebel wurde bei der Quelle bisher vor der

@@ -3,13 +3,15 @@
     "step": {
       "user": {
         "title": "Kraichtal Wetter configuration",
+        "description": "This integration requires an API key. You can request a free key using the form at [kraichtal-wetter.de/dashboard/apply.php](https://kraichtal-wetter.de/dashboard/apply.php).",
         "data": {
-          "key": "API key (optional)",
+          "key": "API key",
           "scan_interval": "Polling interval in seconds"
         }
       },
       "reauth_confirm": {
         "title": "Kraichtal Wetter – update API key",
+        "description": "The stored API key was rejected by the Kraichtal Wetter API. Enter a valid key — you can request a new one at [kraichtal-wetter.de/dashboard/apply.php](https://kraichtal-wetter.de/dashboard/apply.php).",
         "data": {
           "key": "New API key"
         }
@@ -33,28 +35,72 @@
   },
   "entity": {
     "sensor": {
-      "temp": { "name": "Outdoor temperature" },
-      "feels_like": { "name": "Feels like" },
-      "dewpoint": { "name": "Dew point" },
-      "humidity": { "name": "Humidity" },
-      "pressure": { "name": "Pressure" },
-      "wind": { "name": "Wind speed" },
-      "wind_dir": { "name": "Wind direction" },
-      "gust_max": { "name": "Max gust" },
-      "solar": { "name": "Solar irradiance" },
-      "rain": { "name": "Precipitation" },
-      "tmax_today": { "name": "Max temperature today" },
-      "tmin_today": { "name": "Min temperature today" },
-      "rain_today": { "name": "Precipitation today" },
-      "warnings": { "name": "Warnings" },
-      "obs_date": { "name": "Observation date" },
-      "obs_time": { "name": "Observation time" },
-      "realtime": { "name": "Realtime data" },
-      "station_today_tmax": { "name": "Station max temperature today" },
-      "station_today_tmin": { "name": "Station min temperature today" },
-      "station_today_gust": { "name": "Station max gust today" },
-      "station_today_press_max": { "name": "Station max pressure today" },
-      "station_today_press_min": { "name": "Station min pressure today" }
+      "temp": {
+        "name": "Outdoor temperature"
+      },
+      "feels_like": {
+        "name": "Feels like"
+      },
+      "dewpoint": {
+        "name": "Dew point"
+      },
+      "humidity": {
+        "name": "Humidity"
+      },
+      "pressure": {
+        "name": "Pressure"
+      },
+      "wind": {
+        "name": "Wind speed"
+      },
+      "wind_dir": {
+        "name": "Wind direction"
+      },
+      "gust_max": {
+        "name": "Max gust"
+      },
+      "solar": {
+        "name": "Solar irradiance"
+      },
+      "rain": {
+        "name": "Precipitation"
+      },
+      "tmax_today": {
+        "name": "Max temperature today"
+      },
+      "tmin_today": {
+        "name": "Min temperature today"
+      },
+      "rain_today": {
+        "name": "Precipitation today"
+      },
+      "warnings": {
+        "name": "Warnings"
+      },
+      "obs_date": {
+        "name": "Observation date"
+      },
+      "obs_time": {
+        "name": "Observation time"
+      },
+      "realtime": {
+        "name": "Realtime data"
+      },
+      "station_today_tmax": {
+        "name": "Station max temperature today"
+      },
+      "station_today_tmin": {
+        "name": "Station min temperature today"
+      },
+      "station_today_gust": {
+        "name": "Station max gust today"
+      },
+      "station_today_press_max": {
+        "name": "Station max pressure today"
+      },
+      "station_today_press_min": {
+        "name": "Station min pressure today"
+      }
     }
   }
 }

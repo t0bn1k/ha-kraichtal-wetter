@@ -9,6 +9,22 @@ Kraichtal Wetter ist eine Home Assistant Custom Integration, die aktuelle Wetter
 
 Datenquelle: https://kraichtal-wetter.de
 
+## API-Key beantragen
+
+Die Integration benötigt einen eigenen API-Key — ohne Key beantwortet die API keine Anfrage. Der Schlüssel ist kostenlos und wird über ein kurzes Formular ausgestellt:
+
+**→ https://kraichtal-wetter.de/dashboard/apply.php**
+
+Auszufüllen sind drei Felder:
+
+| Feld | Was hineingehört |
+| --- | --- |
+| Name oder Verwendungszweck | Damit der Betreiber Zugriffe zuordnen kann, z. B. `Home-Assistant Müller` |
+| Kontakt-E-Mail | Nur für Rückfragen, falls es Probleme mit dem Zugang gibt |
+| Sicherheitsfrage | Eine einfache Rechenaufgabe als Schutz gegen automatisierte Anfragen |
+
+Den Schlüssel gibst du anschließend beim Einrichten der Integration ein. Er lässt sich jederzeit über `Einstellungen → Geräte & Dienste → Kraichtal Wetter → Konfiguration` ändern.
+
 ## Installation
 
 ### Installation über HACS

@@ -65,7 +65,11 @@ class KraichtalWetterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     def _get_schema(self) -> vol.Schema:
         return vol.Schema(
             {
-                vol.Optional(CONF_API_KEY): cv.string,
+                # Required, not optional: the API answers 401 without a key, so
+                # a setup without one would complete and land the user straight
+                # in the reauth dialog. Existing entries keep working — the
+                # schema only applies to a new setup.
+                vol.Required(CONF_API_KEY): cv.string,
                 vol.Optional(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL): cv.positive_int,
             }
         )
