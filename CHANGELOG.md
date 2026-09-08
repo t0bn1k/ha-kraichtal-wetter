@@ -2,6 +2,26 @@
 
 Alle signifikanten Änderungen an dieser Integration werden hier festgehalten.
 
+## [0.5.4] - 2026-09-08
+### Behoben
+- `ICON_MAP` folgt jetzt durchgehend einer Regel, statt drei Einträge
+  abweichen zu lassen. Maßgeblich ist, was das jeweilige Icon tatsächlich
+  zeichnet: Der Sonnen-/Mondanteil eines `sun*`/`moon*`-Codes ist kein
+  eigenes Wetter und entfällt, die Niederschlagsart entscheidet; zeichnet ein
+  Icon Blitz *und* Tropfen, behält die Bedingung beides. Konkret geändert:
+  - `sunsnow`: `snowy-rainy` → `snowy` (in 0.5.3 falsch ergänzt — das Icon
+    enthält ausschließlich Schneeflocken, keinen Regentropfen; `snowy-rainy`
+    bedeutet in HA Schneeregen).
+  - `sunstorm`: `lightning-rainy` → `lightning` (Icon zeigt Sonne, Wolke und
+    Blitz, aber keine Tropfen).
+  - `storm-rain`: `pouring` → `lightning-rainy` (Icon zeigt Blitz *und*
+    Tropfen; der Blitz ging in der Bedingung bisher verloren).
+  Die beiden letzten Einträge stammen aus der Zeit vor 0.5.3 und waren mit
+  `storm` → `lightning` bzw. `storm-svr` → `lightning-rainy` nicht vereinbar:
+  gleiche Bildzusammensetzung, unterschiedliche Bedingung. Die Regel steht
+  jetzt als Kommentar über `ICON_MAP`, damit sie bei künftigen Ergänzungen
+  nicht wieder auseinanderläuft.
+
 ## [0.5.3] - 2026-09-07
 ### Behoben
 - `ICON_MAP` in `weather.py` deckte nur 9 der tatsächlich möglichen API-Icons

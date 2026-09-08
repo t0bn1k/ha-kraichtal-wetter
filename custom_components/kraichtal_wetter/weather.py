@@ -27,6 +27,13 @@ _LOGGER = logging.getLogger(__name__)
 # forecast/hourly icons (`const I = {...}` in its inline <script>) — that
 # object is the complete vocabulary the API can emit, not just what we've
 # happened to observe so far.
+#
+# One rule throughout, derived from what each icon actually draws: the sun or
+# moon half of a `sun*`/`moon*` code carries no weather of its own, so it is
+# dropped and the precipitation kind decides (sunrain → rainy, sunsnow →
+# snowy, sunstorm → lightning). Where an icon draws both a bolt and drops, the
+# condition keeps both (storm-rain, storm-svr → lightning-rainy). Deviating
+# from that means claiming weather the source never reported.
 ICON_MAP = {
     "sun": "sunny",
     "moon": "clear-night",
@@ -39,13 +46,13 @@ ICON_MAP = {
     "sunrain": "rainy",
     "rain-hvy": "pouring",
     "storm": "lightning",
-    "sunstorm": "lightning-rainy",
-    "storm-rain": "pouring",
+    "sunstorm": "lightning",
+    "storm-rain": "lightning-rainy",
     "storm-svr": "lightning-rainy",
     "snow-lgt": "snowy",
     "snow": "snowy",
     "snow-hvy": "snowy",
-    "sunsnow": "snowy-rainy",
+    "sunsnow": "snowy",
 }
 
 # Icons we've already warned about, so a persistently unmapped icon (e.g. one
