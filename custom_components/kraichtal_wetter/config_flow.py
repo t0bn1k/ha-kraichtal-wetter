@@ -10,7 +10,14 @@ from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import config_validation as cv
 
-from .const import CONF_API_URL, CONF_API_KEY, DEFAULT_SCAN_INTERVAL, DEFAULT_API_URL, DOMAIN
+from .const import (
+    APPLY_URL,
+    CONF_API_KEY,
+    CONF_API_URL,
+    DEFAULT_API_URL,
+    DEFAULT_SCAN_INTERVAL,
+    DOMAIN,
+)
 
 
 class KraichtalWetterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -29,6 +36,7 @@ class KraichtalWetterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user",
             data_schema=self._get_schema(),
+            description_placeholders={"apply_url": APPLY_URL},
         )
 
     async def async_step_reauth(self, entry_data: dict[str, Any]) -> FlowResult:
@@ -55,6 +63,7 @@ class KraichtalWetterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Required(CONF_API_KEY): cv.string,
                 }
             ),
+            description_placeholders={"apply_url": APPLY_URL},
         )
 
     @staticmethod

@@ -2,6 +2,19 @@
 
 Alle signifikanten Änderungen an dieser Integration werden hier festgehalten.
 
+## [0.5.8] - 2026-09-08
+### Behoben
+- **Hassfest-Validierung schlug in 0.5.7 fehl.** Die in 0.5.7 ergänzten
+  Dialogtexte enthielten die Antrags-URL als Literal; Hassfest lehnt URLs in
+  Übersetzungsstrings ab und verlangt stattdessen `description_placeholders`.
+  Die Texte enthalten jetzt nur noch den Platzhalter `{apply_url}`, den der
+  Config-Flow aus `APPLY_URL` (neu in `const.py`) füllt. Der Link im Dialog
+  bleibt unverändert sichtbar und klickbar.
+
+  Für Nutzer war 0.5.7 zur Laufzeit unauffällig — Home Assistant hätte den Link
+  normal dargestellt. Betroffen war die Konformitätsprüfung, die Voraussetzung
+  für die Aufnahme in den HACS-Standardkatalog ist.
+
 ## [0.5.7] - 2026-09-08
 ### Hinzugefügt
 - README erklärt, wo es einen API-Key gibt

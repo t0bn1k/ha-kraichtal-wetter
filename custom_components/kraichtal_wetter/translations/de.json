@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Kraichtal Wetter Konfiguration",
-        "description": "Diese Integration benötigt einen API-Key. Einen kostenlosen Schlüssel erhältst du über das Antragsformular unter [kraichtal-wetter.de/dashboard/apply.php](https://kraichtal-wetter.de/dashboard/apply.php).",
+        "description": "Diese Integration benötigt einen API-Key. Einen kostenlosen Schlüssel erhältst du über das [Antragsformular]({apply_url}).",
         "data": {
           "key": "API-Key",
           "scan_interval": "Abfrageintervall in Sekunden"
@@ -11,7 +11,7 @@
       },
       "reauth_confirm": {
         "title": "Kraichtal Wetter – API-Key aktualisieren",
-        "description": "Der hinterlegte API-Key wurde von der Kraichtal-Wetter-API abgelehnt. Trage einen gültigen Schlüssel ein — einen neuen kannst du unter [kraichtal-wetter.de/dashboard/apply.php](https://kraichtal-wetter.de/dashboard/apply.php) beantragen.",
+        "description": "Der hinterlegte API-Key wurde von der Kraichtal-Wetter-API abgelehnt. Einen neuen Schlüssel kannst du über das [Antragsformular]({apply_url}) beantragen.",
         "data": {
           "key": "Neuer API-Key"
         }

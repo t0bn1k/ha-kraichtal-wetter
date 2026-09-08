@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "Kraichtal Wetter configuration",
-        "description": "This integration requires an API key. You can request a free key using the form at [kraichtal-wetter.de/dashboard/apply.php](https://kraichtal-wetter.de/dashboard/apply.php).",
+        "description": "This integration requires an API key. You can request a free key using the [application form]({apply_url}).",
         "data": {
           "key": "API key",
           "scan_interval": "Polling interval in seconds"
@@ -11,7 +11,7 @@
       },
       "reauth_confirm": {
         "title": "Kraichtal Wetter – update API key",
-        "description": "The stored API key was rejected by the Kraichtal Wetter API. Enter a valid key — you can request a new one at [kraichtal-wetter.de/dashboard/apply.php](https://kraichtal-wetter.de/dashboard/apply.php).",
+        "description": "The stored API key was rejected by the Kraichtal Wetter API. You can request a new one using the [application form]({apply_url}).",
         "data": {
           "key": "New API key"
         }
