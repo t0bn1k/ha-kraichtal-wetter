@@ -7,6 +7,9 @@
         "data": {
           "key": "API key",
           "scan_interval": "Polling interval in seconds"
+        },
+        "data_description": {
+          "scan_interval": "At least 300 seconds. The API caches its response for five minutes server-side — polling more often returns the same data and only burdens the operator."
         }
       },
       "reauth_confirm": {
@@ -29,6 +32,9 @@
         "title": "Kraichtal Wetter settings",
         "data": {
           "scan_interval": "Polling interval in seconds"
+        },
+        "data_description": {
+          "scan_interval": "At least 300 seconds. The API caches its response for five minutes server-side — polling more often returns the same data and only burdens the operator."
         }
       }
     }

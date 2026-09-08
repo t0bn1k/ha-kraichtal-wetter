@@ -7,6 +7,9 @@
         "data": {
           "key": "API-Key",
           "scan_interval": "Abfrageintervall in Sekunden"
+        },
+        "data_description": {
+          "scan_interval": "Mindestens 300 Sekunden. Die API hält ihre Antwort serverseitig fünf Minuten vor — häufigere Abfragen liefern dieselben Daten und belasten nur den Betreiber."
         }
       },
       "reauth_confirm": {
@@ -29,6 +32,9 @@
         "title": "Kraichtal Wetter Einstellungen",
         "data": {
           "scan_interval": "Abfrageintervall in Sekunden"
+        },
+        "data_description": {
+          "scan_interval": "Mindestens 300 Sekunden. Die API hält ihre Antwort serverseitig fünf Minuten vor — häufigere Abfragen liefern dieselben Daten und belasten nur den Betreiber."
         }
       }
     }

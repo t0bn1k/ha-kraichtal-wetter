@@ -2,6 +2,24 @@
 
 Alle signifikanten Änderungen an dieser Integration werden hier festgehalten.
 
+## [0.5.9] - 2026-09-08
+### Geändert
+- **Das Abfrageintervall hat jetzt eine Untergrenze von 300 Sekunden.** Die
+  API-Dokumentation stellt klar, dass die Antwort serverseitig fünf Minuten
+  zwischengespeichert wird — häufigere Abfragen liefern nachweislich dieselben
+  Daten (`meta.cached: true`) und belasten nur den Betreiber. Bisher ließ
+  `cv.positive_int` jeden Wert ab 1 Sekunde zu.
+  - Einrichtungs- und Optionsdialog lehnen kleinere Werte ab, statt sie
+    stillschweigend anzuheben, und erklären den Grund als Feldhinweis.
+  - Bestandseinträge, die vor dieser Version einen kleineren Wert gespeichert
+    haben, werden beim Start auf 300 Sekunden angehoben — mit einem
+    entsprechenden Log-Eintrag. Das Schema erreicht einen bereits
+    gespeicherten Wert sonst nie.
+
+### Bestätigt
+- Die `ICON_MAP` stimmt exakt mit der Symboltabelle der offiziellen
+  API-Dokumentation überein (19 von 19 Codes, keine Abweichung).
+
 ## [0.5.8] - 2026-09-08
 ### Behoben
 - **Hassfest-Validierung schlug in 0.5.7 fehl.** Die in 0.5.7 ergänzten

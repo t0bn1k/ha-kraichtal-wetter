@@ -17,7 +17,12 @@ from .const import (
     DEFAULT_API_URL,
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
+    MIN_SCAN_INTERVAL,
 )
+
+# Rejects anything below the API's five-minute server-side cache instead of
+# silently raising it, so the user sees why the value was not accepted.
+SCAN_INTERVAL_SELECTOR = vol.All(cv.positive_int, vol.Range(min=MIN_SCAN_INTERVAL))
 
 
 class KraichtalWetterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -79,7 +84,9 @@ class KraichtalWetterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 # in the reauth dialog. Existing entries keep working — the
                 # schema only applies to a new setup.
                 vol.Required(CONF_API_KEY): cv.string,
-                vol.Optional(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL): cv.positive_int,
+                vol.Optional(
+                    CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL
+                ): SCAN_INTERVAL_SELECTOR,
             }
         )
 
@@ -99,8 +106,15 @@ class KraichtalWetterOptionsFlow(config_entries.OptionsFlow):
                 {
                     vol.Optional(
                         CONF_SCAN_INTERVAL,
-                        default=current.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL),
-                    ): cv.positive_int,
+                        # An entry stored below the minimum before it was
+                        # enforced would otherwise pre-fill a value the schema
+                        # then rejects, leaving the user with an error and no
+                        # obvious cause.
+                        default=max(
+                            current.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL),
+                            MIN_SCAN_INTERVAL,
+                        ),
+                    ): SCAN_INTERVAL_SELECTOR,
                 }
             ),
         )

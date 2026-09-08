@@ -8,7 +8,15 @@ from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .const import CONF_API_KEY, CONF_API_URL, DEFAULT_API_URL, DEFAULT_SCAN_INTERVAL, DOMAIN, PLATFORMS
+from .const import (
+    CONF_API_KEY,
+    CONF_API_URL,
+    DEFAULT_API_URL,
+    DEFAULT_SCAN_INTERVAL,
+    DOMAIN,
+    MIN_SCAN_INTERVAL,
+    PLATFORMS,
+)
 from .coordinator import KraichtalWetterClient
 
 _LOGGER = logging.getLogger(__name__)
@@ -116,7 +124,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Backwards compatibility: older installs may have stored the API key as
     # 'api_key' or 'apikey'. Prefer the configured `CONF_API_KEY` (now 'key').
     api_key = entry.data.get(CONF_API_KEY) or entry.data.get("api_key") or entry.data.get("apikey")
-    scan_interval = entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
+    # The flows reject anything below MIN_SCAN_INTERVAL, but an entry
+    # configured before that was enforced still carries its old value — the
+    # schema never sees it again. Lift it here so no install keeps polling
+    # faster than the API's five-minute cache can answer.
+    stored_interval = entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
+    scan_interval = max(stored_interval, MIN_SCAN_INTERVAL)
+    if scan_interval != stored_interval:
+        _LOGGER.warning(
+            "Configured scan interval of %s s is below the %s s minimum "
+            "(the API caches for five minutes); using %s s instead",
+            stored_interval,
+            MIN_SCAN_INTERVAL,
+            scan_interval,
+        )
 
     session = async_get_clientsession(hass)
     client = KraichtalWetterClient(api_url, api_key, session)

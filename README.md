@@ -135,7 +135,7 @@ refresh_interval: 300
 - Nutzer geben nur einen API-Key ein; die API-URL ist fest in der Integration hinterlegt.
 - Alle Entitäten werden als Teil desselben Geräts in der Integrationen-Ansicht angezeigt.
 - Der API-Key kann jederzeit über Einstellungen → Geräte & Dienste → Kraichtal Wetter → Konfiguration geändert werden.
-- Das Abfrageintervall kann über die Optionen (Drei-Punkte-Menü → Optionen) angepasst werden.
+- Das Abfrageintervall kann über die Optionen (Drei-Punkte-Menü → Optionen) angepasst werden — **mindestens 300 Sekunden**. Die API hält ihre Antwort serverseitig fünf Minuten vor; häufigere Abfragen liefern dieselben Daten und belasten nur den Betreiber. Ein niedrigerer Wert wird abgelehnt, ein früher gespeicherter beim Start auf 300 Sekunden angehoben.
 - **Nicht jede Wetterlage, die Home Assistant kennt, kann diese Station liefern.**
   Hagel und Sturm stecken bei der Quelle in den Warn- bzw. Windfeldern und nicht
   in der Wetterlage, Schneeregen und gefrierender Regen laufen dort unter
