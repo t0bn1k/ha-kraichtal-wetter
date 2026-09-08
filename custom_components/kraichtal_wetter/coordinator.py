@@ -19,6 +19,23 @@ AUTH_ERROR_STATUSES = (401, 403)
 # Query parameter names the API historically accepted for the key.
 KEY_PARAM_NAMES = ("key", "api_key", "apikey")
 
+# Sections this integration actually reads. Without a `section` parameter the
+# API returns all eleven — including climate statistics, model comparisons and
+# hourly series we never touch. `meta` is always included and must not be
+# requested. Extend this tuple when a new feature needs another section; see
+# docs/API.md for what each one carries.
+REQUESTED_SECTIONS = ("current", "days")
+
+# Documented meanings for the status codes the API uses, so a failure says what
+# went wrong instead of only carrying a number. 401/403 never reach this map —
+# they are handled as an auth failure before it.
+HTTP_STATUS_MEANINGS = {
+    400: "malformed request",
+    404: "unknown section requested",
+    405: "method not allowed (the API only accepts GET)",
+    500: "server-side problem at the API",
+}
+
 
 def _split_api_key(api_url: str) -> tuple[str, str | None]:
     """Split a key carried in the URL off into a separate value.
@@ -40,11 +57,20 @@ def _split_api_key(api_url: str) -> tuple[str, str | None]:
     return urlunparse(parsed._replace(query=urlencode(flat))), key
 
 
+def _with_sections(api_url: str) -> str:
+    """Pin the request to the sections we read (see REQUESTED_SECTIONS)."""
+    parsed = urlparse(api_url)
+    params = {k: v[0] for k, v in parse_qs(parsed.query).items()}
+    params["section"] = ",".join(REQUESTED_SECTIONS)
+    return urlunparse(parsed._replace(query=urlencode(params)))
+
+
 class KraichtalWetterClient:
     def __init__(self, api_url: str, api_key: str | None, session) -> None:
         # Any key configured into the URL is moved to the header too, so no
         # code path can put it back into a request URL.
-        self._api_url, url_key = _split_api_key(api_url)
+        stripped_url, url_key = _split_api_key(api_url)
+        self._api_url = _with_sections(stripped_url)
         self._api_key = api_key or url_key
         self._session = session
 
@@ -63,7 +89,11 @@ class KraichtalWetterClient:
             raise UpdateFailed("API returned an unexpected payload")
 
         if not data.get("ok", True):
-            raise UpdateFailed("API returned an unsuccessful response")
+            # The API explains itself in `error` ("Unbekannte Sektion: …").
+            # Passing that through is what makes the failure diagnosable in the
+            # UI instead of a bare "unsuccessful response".
+            reason = data.get("error")
+            raise UpdateFailed(str(reason) if reason else "API returned an unsuccessful response")
 
         return data
 
@@ -84,8 +114,13 @@ class KraichtalWetterClient:
                 )
                 raise ConfigEntryAuthFailed("Invalid API key") from None
 
-            _LOGGER.error("Kraichtal Wetter HTTP error: %s %s", err.status, err.message)
-            raise UpdateFailed(f"HTTP error {err.status}") from None
+            meaning = HTTP_STATUS_MEANINGS.get(err.status)
+            _LOGGER.error(
+                "Kraichtal Wetter HTTP error: %s %s", err.status, meaning or err.message
+            )
+            raise UpdateFailed(
+                f"HTTP {err.status}: {meaning}" if meaning else f"HTTP error {err.status}"
+            ) from None
         except Exception as err:  # noqa: BLE001
             _LOGGER.error("Kraichtal Wetter update failed: %s", err)
             raise UpdateFailed(f"Update failed: {err}") from None

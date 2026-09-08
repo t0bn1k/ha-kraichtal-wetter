@@ -106,6 +106,9 @@
       },
       "station_today_press_min": {
         "name": "Station heute Luftdruck min"
+      },
+      "api_status": {
+        "name": "API-Status"
       }
     }
   }

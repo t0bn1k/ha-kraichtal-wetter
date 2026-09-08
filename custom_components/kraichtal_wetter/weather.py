@@ -8,7 +8,12 @@ from homeassistant.components.weather import (
     WeatherEntity,
     WeatherEntityFeature,
 )
-from homeassistant.const import UnitOfPressure, UnitOfSpeed, UnitOfTemperature
+from homeassistant.const import (
+    UnitOfPrecipitationDepth,
+    UnitOfPressure,
+    UnitOfSpeed,
+    UnitOfTemperature,
+)
 from homeassistant.core import callback
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -99,6 +104,7 @@ class KraichtalWetterWeather(CoordinatorEntity, WeatherEntity):
     _attr_native_wind_speed_unit = UnitOfSpeed.KILOMETERS_PER_HOUR
     _attr_native_temperature_unit = UnitOfTemperature.CELSIUS
     _attr_native_pressure_unit = UnitOfPressure.HPA
+    _attr_native_precipitation_unit = UnitOfPrecipitationDepth.MILLIMETERS
     _attr_supported_features = WeatherEntityFeature.FORECAST_DAILY
 
     def __init__(self, coordinator, entry) -> None:
@@ -123,6 +129,14 @@ class KraichtalWetterWeather(CoordinatorEntity, WeatherEntity):
     @property
     def native_temperature(self) -> float | None:
         return self._current().get("temp")
+
+    @property
+    def native_apparent_temperature(self) -> float | None:
+        return self._current().get("feels_like")
+
+    @property
+    def native_dew_point(self) -> float | None:
+        return self._current().get("dewpoint")
 
     @property
     def humidity(self) -> float | None:
@@ -182,7 +196,9 @@ class KraichtalWetterWeather(CoordinatorEntity, WeatherEntity):
                     "native_temperature": day.get("tmax"),
                     "native_templow": day.get("tmin"),
                     "precipitation_probability": day.get("pop"),
+                    "native_precipitation": day.get("rain"),
                     "native_wind_speed": day.get("wind"),
+                    # null when the day is forecast windstill, per the API docs.
                     "wind_bearing": day.get("wind_dir"),
                 }
             )

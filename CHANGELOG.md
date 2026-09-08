@@ -2,6 +2,39 @@
 
 Alle signifikanten Änderungen an dieser Integration werden hier festgehalten.
 
+## [0.6.0] - 2026-09-08
+### Hinzugefügt
+- **Diagnose-Sensor „API-Status"** am Gerät. Steht bei erfolgreichem Abruf auf
+  `ok`, sonst auf dem Grund des Fehlschlags; der vollständige Text liegt im
+  Attribut `last_error`. Er bleibt bewusst verfügbar, während alle anderen
+  Entitäten bei einem Ausfall auf „nicht verfügbar" gehen — genau dann ist die
+  Ursache gefragt.
+- Die Wetter-Entität liefert jetzt zusätzlich **Taupunkt** und **gefühlte
+  Temperatur** (`native_dew_point`, `native_apparent_temperature`). Beide Werte
+  kamen längst in `current` an und wurden nur nicht durchgereicht.
+- Die Tagesvorhersage enthält die **erwartete Regenmenge**
+  (`native_precipitation` aus `days[].rain`), passend zur Anzeige in den
+  Vorhersagekarten.
+- `docs/API.md` dokumentiert, was die Integration von der API nutzt, was
+  bewusst nicht — und führt den Backlog (`hours` für eine stündliche
+  Vorhersage, `alerts` für ausführliche Warnungen, `temp_source`,
+  ETag/`If-None-Match`, weitere `station_today`-Felder).
+
+### Geändert
+- **Der Abruf ist auf die tatsächlich benötigten Sektionen eingegrenzt**
+  (`?section=current,days`). Ohne diesen Parameter liefert die API alle elf
+  Sektionen, darunter Klimastatistik, Modellvergleiche und Stundenreihen, die
+  die Integration nie ausgewertet hat. `meta` ist immer enthalten, der Anker
+  `meta.generated` für die Vorhersagedaten bleibt also verfügbar.
+- **Fehlermeldungen der API werden durchgereicht statt verworfen.** Bisher
+  wurde jeder `ok: false`-Fall zu „API returned an unsuccessful response"
+  verallgemeinert; jetzt steht der Klartext der API (`error`) im Fehler. Für
+  die dokumentierten Status-Codes 400/404/405/500 wird zusätzlich die
+  Bedeutung ergänzt statt nur der nackten Zahl.
+- `AGENTS.md` hält fest, dass Neuerungen **vorab gegen die API-Dokumentation**
+  zu prüfen sind — mit der Icon-Fehlzuordnung aus 0.5.4 als Beispiel, wohin
+  das Ableiten aus dem Augenschein führt.
+
 ## [0.5.9] - 2026-09-08
 ### Geändert
 - **Das Abfrageintervall hat jetzt eine Untergrenze von 300 Sekunden.** Die

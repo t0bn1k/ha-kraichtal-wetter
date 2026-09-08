@@ -9,6 +9,7 @@ from homeassistant.components.sensor import (
 from homeassistant.const import (
     DEGREE,
     PERCENTAGE,
+    EntityCategory,
     UnitOfIrradiance,
     UnitOfPrecipitationDepth,
     UnitOfPressure,
@@ -217,10 +218,11 @@ SENSOR_TYPES = [
 async def async_setup_entry(hass, entry, async_add_entities):
     data = hass.data[DOMAIN][entry.entry_id]
     coordinator = data["coordinator"]
-    async_add_entities(
-        [KraichtalWetterSensor(coordinator, entry, description) for description in SENSOR_TYPES],
-        True,
-    )
+    entities: list[SensorEntity] = [
+        KraichtalWetterSensor(coordinator, entry, description) for description in SENSOR_TYPES
+    ]
+    entities.append(KraichtalWetterApiStatusSensor(coordinator, entry))
+    async_add_entities(entities, True)
 
 
 def _resolve_current_value(data: object, key: str):
@@ -261,3 +263,56 @@ class KraichtalWetterSensor(CoordinatorEntity, SensorEntity):
     @property
     def native_value(self):
         return _resolve_current_value(self.coordinator.data, self.entity_description.key)
+
+
+class KraichtalWetterApiStatusSensor(CoordinatorEntity, SensorEntity):
+    """Surfaces the last API failure on the device page.
+
+    Everything else in this integration goes unavailable when an update fails,
+    which is precisely when the reason matters — so this entity deliberately
+    stays available and reports what went wrong instead.
+    """
+
+    _attr_has_entity_name = True
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_icon = "mdi:api"
+    _attr_translation_key = "api_status"
+
+    # A sensor state longer than this is rejected by the state machine, and the
+    # API's message is free text — so the state is truncated and the full text
+    # kept as an attribute.
+    _MAX_STATE_LENGTH = 255
+
+    def __init__(self, coordinator, entry) -> None:
+        super().__init__(coordinator)
+        self._attr_unique_id = "kraichtal_wetter_api_status"
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, entry.entry_id)},
+            name="Kraichtal Wetter",
+            manufacturer="Kraichtal Wetter",
+            model="Kraichtal Wetter Station",
+            configuration_url=entry.data.get(CONF_API_URL, ""),
+        )
+
+    @property
+    def available(self) -> bool:
+        """Always available — reporting the outage is this entity's job."""
+        return True
+
+    def _error(self) -> str | None:
+        if self.coordinator.last_update_success:
+            return None
+        error = self.coordinator.last_exception
+        return str(error) if error else "unknown error"
+
+    @property
+    def native_value(self) -> str:
+        error = self._error()
+        if error is None:
+            return "ok"
+        return error[: self._MAX_STATE_LENGTH]
+
+    @property
+    def extra_state_attributes(self) -> dict[str, str] | None:
+        error = self._error()
+        return {"last_error": error} if error else None

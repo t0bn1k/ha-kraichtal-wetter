@@ -106,6 +106,9 @@
       },
       "station_today_press_min": {
         "name": "Station min pressure today"
+      },
+      "api_status": {
+        "name": "API status"
       }
     }
   }

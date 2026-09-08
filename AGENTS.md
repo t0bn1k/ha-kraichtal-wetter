@@ -10,6 +10,17 @@ Home-Assistant-Custom-Integration für die Kraichtal-Wetter-API. Kein Build-Syst
 - Plattformen: `sensor`, `weather`
 - Keine externen Abhängigkeiten (`requirements: []`)
 
+## Die API ist die Referenz — vorab prüfen
+
+**Bevor du etwas hinzufügst oder änderst, das API-Daten betrifft, prüfe es gegen die API-Dokumentation** — nicht gegen das Dashboard, den Augenschein eines Symbols oder eine Vermutung darüber, was ein Feld wohl bedeutet.
+
+- Offizielle Doku: <https://kraichtal-wetter.de/dashboard/api-doku.html>
+- Was die Integration davon nutzt, bewusst nicht nutzt und was vorgemerkt ist: [`docs/API.md`](docs/API.md) — dort steht auch der Backlog (`hours`, `alerts`, `temp_source`, ETag …).
+
+Das ist keine Formalie, sondern aus Schaden gelernt: Die Icon-Zuordnung wurde einmal aus den SVG-Zeichnungen des Dashboards abgeleitet. Das ergab plausible, aber falsche Werte — `storm` zeichnet nur einen Blitz, ist laut Doku aber das *schwache Gewitter* und führt Regen. Aus einem Symbol lässt sich die Semantik nicht ablesen.
+
+Wenn eine neue Funktion eine bisher ungenutzte Sektion braucht, gehört sie in `REQUESTED_SECTIONS` (`coordinator.py`) — ohne das kommt sie schlicht nicht in der Antwort an.
+
 ## Wichtige Konventionen
 
 - **API-Key-Feldname**: `key` (nicht `api_key`). Rückwärtskompatibel: `async_setup_entry` in `__init__.py` akzeptiert auch `api_key` / `apikey` aus alten Installationen.
@@ -20,11 +31,13 @@ Home-Assistant-Custom-Integration für die Kraichtal-Wetter-API. Kein Build-Syst
 - **Sensoren** nutzen Dot-Notation in `sensor.py` um verschachtelte API-Felder aufzulösen (z.B. `station_today.tmax` → `data["current"]["station_today"]["tmax"]`).
 - **Forecast-Datum** wird aus `meta.generated` + Tages-Index berechnet (API liefert kein `date` pro Tag); Umrechnung über `dt_util.start_of_local_day()` pro Tag, damit DST-Wechsel korrekt bleiben.
 - **Forecast-Caching**: `async_forecast_daily()` cached, `_handle_coordinator_update()` invalidiert. Nicht `async_update()` verwenden — `CoordinatorEntity` setzt `should_poll = False`, die Methode würde nie aufgerufen.
-- **ICON_MAP** in `weather.py` übersetzt API-Icon-Namen in HA-Wetterbedingungen. Nur Werte aus `ATTR_CONDITION_*` sind gültig; unbekannte Icons ergeben bewusst `None` statt einer falschen Bedingung.
+- **ICON_MAP** in `weather.py` übersetzt API-Icon-Namen in HA-Wetterbedingungen. Nur Werte aus `ATTR_CONDITION_*` sind gültig; unbekannte Icons ergeben bewusst `None` statt einer falschen Bedingung. Die Tabelle deckt alle 19 dokumentierten Codes ab und ist gegen die Doku bestätigt — **nicht aus Icons neu herleiten** (siehe oben).
 - **Auth-Fehler**: 401/403 → `ConfigEntryAuthFailed` (startet Reauth), alles andere → `UpdateFailed`. Setzt voraus, dass der Coordinator mit `config_entry=entry` erzeugt wird.
+- **Sektionen**: `REQUESTED_SECTIONS` in `coordinator.py` grenzt den Abruf auf `current,days` ein — ohne `section` liefert die API alle elf. `meta` kommt immer mit und darf nicht angefordert werden.
+- **Fehlertexte sichtbar machen**: Der Sensor **API-Status** (`EntityCategory.DIAGNOSTIC`) zeigt den letzten Fehler am Gerät. Er überschreibt `available` bewusst mit `True` — sonst wäre er genau dann nicht sichtbar, wenn er gebraucht wird.
 - **API-Key gehört in den `X-API-Key`-Header, nie in die URL.** `aiohttp.ClientResponseError` bettet die Request-URL in seine String-Repräsentation ein — ein Key im Query-String erreicht darüber jedes Log. `_split_api_key()` in `coordinator.py` zieht einen in der URL konfigurierten Key heraus und bereinigt die URL; kein Codepfad darf ihn zurückschreiben. Zusätzlich als zweite Ebene: nur Status/`err.message` loggen, `from None` statt `from err`.
 - **Auth-Semantik der API**: 401 = Key fehlt, 403 = Key ungültig (beides verifiziert). Beide in `AUTH_ERROR_STATUSES`.
-- **Default `scan_interval`**: 300 s (konfigurierbar via Options-Flow)
+- **`scan_interval`**: Default 300 s, **Minimum 300 s** (`MIN_SCAN_INTERVAL`). Die API cached serverseitig fünf Minuten — häufiger abzufragen liefert dieselbe Antwort. Beide Flows lehnen kleinere Werte ab; `async_setup_entry` hebt zusätzlich Bestandseinträge an, die das Schema nie wieder sieht.
 - **hass.data**: `hass.data[DOMAIN][entry.entry_id]` speichert `{"coordinator", "client", "entry"}`.
 - **UI-Sprache**: Deutsch. `strings.json` ist nur Quelle — zur Laufzeit lädt HA `translations/de.json` / `translations/en.json`; beide müssen mitgepflegt werden.
 
@@ -51,12 +64,13 @@ custom_components/kraichtal_wetter/
 ├── config_flow.py       # Config-Flow, Reauth, Options
 ├── const.py             # DOMAIN, Konstanten
 ├── coordinator.py       # KraichtalWetterClient (HTTP)
-├── sensor.py            # 22 Sensoren
+├── sensor.py            # 22 Messwert-Sensoren + Diagnose-Sensor API-Status
 ├── weather.py           # WeatherEntity + Forecast
 ├── strings.json         # Quelle der UI-Texte (nicht zur Laufzeit geladen)
 ├── translations/        # de.json + en.json — das lädt HA tatsächlich
 └── brand/               # 8 Brand-Bilder (icon/logo + @2x + dark_*), lokale Auslieferung seit HA 2026.3
 hacs.json                # HACS-Metadaten
+docs/API.md              # Was die Integration von der API nutzt — und der Backlog
 lovelace/                # Beispiel-Dashboards
 ```
 

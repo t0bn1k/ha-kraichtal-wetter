@@ -82,6 +82,9 @@ Die Entity-IDs sind sprachunabhängig (englisch), die Anzeigenamen folgen der ei
 | `sensor.kraichtal_wetter_station_max_gust_today` | Station heute Böe | `station_today.gust` |
 | `sensor.kraichtal_wetter_station_max_pressure_today` | Station heute Luftdruck max | `station_today.press_max` |
 | `sensor.kraichtal_wetter_station_min_pressure_today` | Station heute Luftdruck min | `station_today.press_min` |
+| `sensor.kraichtal_wetter_api_status` | API-Status (Diagnose) | – |
+
+Der **API-Status** ist als Diagnose-Entität eingestuft und steht bei einem erfolgreichen Abruf auf `ok`. Schlägt ein Abruf fehl, zeigt er stattdessen den Grund — etwa den Klartext der API oder die Bedeutung des HTTP-Status. Er bleibt dabei bewusst verfügbar, während die übrigen Entitäten auf „nicht verfügbar" gehen: Genau dann ist die Ursache interessant. Zu finden unter `Einstellungen → Geräte & Dienste → Kraichtal Wetter → Gerät`.
 
 > **Upgrade von 0.4.x:** In 0.5.0 wurden die Entity-IDs von den deutschen Namen (`sensor.kraichtal_wetter_boen_max`) auf sprachunabhängige englische umgestellt. Die Integration benennt bestehende Entitäten beim ersten Start automatisch um, sodass die Recorder-Historie erhalten bleibt. Eigene Dashboards und Automationen müssen dagegen von Hand angepasst werden — Home Assistant schreibt Verweise dort nicht mit um.
 
