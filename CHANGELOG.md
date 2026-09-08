@@ -2,6 +2,33 @@
 
 Alle signifikanten Änderungen an dieser Integration werden hier festgehalten.
 
+## [0.5.5] - 2026-09-08
+### Hinzugefügt
+- `wind_dir` hat jetzt `device_class: wind_direction` und
+  `state_class: measurement_angle`. Der Grund, aus dem der Sensor bisher ohne
+  State-Class blieb — der Mittelwert einer zirkulären Größe über 0°/360° ist
+  sinnlos — ist genau das, was `measurement_angle` löst: Home Assistant
+  bildet einen zirkulären Mittelwert, ein um Nord pendelnder Wind mittelt
+  also nicht mehr auf Süd. Damit entsteht für die Windrichtung erstmals eine
+  brauchbare Langzeitstatistik. HA erzwingt diese Kombination: zu
+  `wind_direction` ist keine andere State-Class und keine andere Einheit als
+  `°` zulässig.
+
+### Geändert
+- Nur Kommentar, kein Verhalten: an `rain_today` steht jetzt, warum
+  `total_increasing` dort korrekt ist und die Recorder-Warnung „state is not
+  strictly increasing" kein Grund ist, das zu ändern.
+
+### Bekannt
+- Die übrigen „today"-Sensoren (`tmax_today`, `tmin_today`,
+  `station_today.*`) sind Tagesaggregate und damit streng genommen keine
+  Messwerte „in present time", wie es die Definition von `measurement`
+  verlangt. Die HA-Doku nennt für Tages-Min/Max keine Alternative, und ein
+  Entfernen der State-Class würde die bereits aufgezeichnete
+  Langzeitstatistik dieser Entitäten entwerten. Sie bleiben daher auf
+  `measurement`; der einzige praktische Nachteil ist eine wenig aussagekräftige
+  `mean`-Statistik.
+
 ## [0.5.4] - 2026-09-08
 ### Behoben
 - `ICON_MAP` folgt jetzt durchgehend einer Regel, statt drei Einträge

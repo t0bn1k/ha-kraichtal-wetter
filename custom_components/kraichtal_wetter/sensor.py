@@ -78,12 +78,17 @@ SENSOR_TYPES = [
         state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
-        # No state_class: averaging a circular quantity across 0°/360° would
-        # produce meaningless long-term statistics.
+        # The circular-averaging problem that previously kept this sensor
+        # without a state class is what MEASUREMENT_ANGLE solves: the recorder
+        # computes a circular mean, so a wind oscillating either side of north
+        # no longer averages to south. Home Assistant enforces this pairing —
+        # WIND_DIRECTION accepts no other state class, and no unit but DEGREE.
         key="wind_dir",
         translation_key="wind_dir",
         native_unit_of_measurement=DEGREE,
         icon="mdi:compass",
+        device_class=SensorDeviceClass.WIND_DIRECTION,
+        state_class=SensorStateClass.MEASUREMENT_ANGLE,
     ),
     SensorEntityDescription(
         key="gust_max",
@@ -126,7 +131,19 @@ SENSOR_TYPES = [
         state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
-        # Daily accumulating total that resets at midnight.
+        # Daily accumulating total that resets at midnight — the case the HA
+        # docs name for TOTAL_INCREASING ("a daily amount of consumed gas").
+        # TOTAL without last_reset, which the docs prefer wherever it works,
+        # does not work here: with no reset marker the recorder just sums
+        # deltas, so the drop to 0 at midnight would subtract the day's rain
+        # from the long-term total instead of starting a new cycle.
+        #
+        # A recorder warning that the state "is not strictly increasing" does
+        # not contradict this and is not a reason to change the state class.
+        # The API occasionally corrects the value down by a few percent; a dip
+        # to >= 90% of the previous value is treated as noise, logged once per
+        # restart, and explicitly does NOT start a new cycle, so the sum stays
+        # intact. Only a drop below 90% counts as a reset — which is midnight.
         key="rain_today",
         translation_key="rain_today",
         native_unit_of_measurement=UnitOfPrecipitationDepth.MILLIMETERS,
