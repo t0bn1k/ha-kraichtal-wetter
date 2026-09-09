@@ -88,4 +88,15 @@ lovelace/                # Beispiel-Dashboards
 
 Die früheren `logo*.png` waren quadratische Kopien der Icons in 512/1024 px und verletzten die Logo-Vorgabe (Querformat, kürzeste Seite 128–256 px bzw. 256–512 px). Ein echtes Logo müsste diesen Maßen entsprechen — keine Icon-Kopie.
 
+### Das Icon fehlt in HACS — bekannt, nicht unser Fehler
+
+**Nicht erneut untersuchen und keinen PR gegen `home-assistant/brands` öffnen.** Beides wurde bereits erledigt; hier das Ergebnis:
+
+- Unter *Einstellungen → Geräte & Dienste* erscheint das Icon korrekt. Home Assistant liefert seit 2026.3 lokale Brand-Bilder über `/api/brands/integration/{domain}/{image}` aus, lokale Dateien haben Vorrang vor dem CDN ([Ankündigung](https://developers.home-assistant.io/blog/2026/02/24/brands-proxy-api)). Der `brand/`-Ordner ist damit der aktuelle und richtige Mechanismus.
+- **In der HACS-Oberfläche fehlt es trotzdem.** HACS nutzt diesen Endpunkt nirgends: Im gesamten Python-Code gibt es genau eine Icon-URL, fest verdrahtet auf `https://brands.home-assistant.io/_/{domain}/icon.png` (`update.py`, `entity_picture`). Das CDN kennt unsere Domain nicht und liefert einen Platzhalter „icon not available".
+- **Ein Brands-PR behebt das nicht.** `home-assistant/brands` nimmt seit 2026.3 keine Icons für Custom-Integrationen mehr an — unser PR dort ([#10964](https://github.com/home-assistant/brands/pull/10964), 13.08.2026) wurde eine Minute nach dem Öffnen automatisch geschlossen.
+- **Ein Issue anzulegen ist ebenfalls überflüssig.** Vier offene Meldungen decken den Fall bereits ab: hacs/integration [#5171](https://github.com/hacs/integration/issues/5171), [#5179](https://github.com/hacs/integration/issues/5179), [#5223](https://github.com/hacs/integration/issues/5223), [#5402](https://github.com/hacs/integration/issues/5402) (letzteres mit Label `issue:frontend`). Alle seit März bzw. Juli 2026 offen, bislang ohne Reaktion der Maintainer.
+
+Fazit: Am Repo ist nichts zu tun. Sobald HACS die lokale Brands-API übernimmt, erscheint das Icon ohne Zutun. Auch die Aufnahme in den HACS-Standardkatalog ändert daran nichts — Icon-Auslieferung und Katalogliste sind getrennte Systeme.
+
 Dokumentation nur im Root-`README.md` pflegen; im Integrationsordner liegt bewusst keine zweite README mehr.
