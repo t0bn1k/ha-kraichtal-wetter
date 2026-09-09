@@ -2,6 +2,22 @@
 
 Alle signifikanten Änderungen an dieser Integration werden hier festgehalten.
 
+## [0.6.1] - 2026-09-09
+### Geändert
+- **Das Repository heißt jetzt `ha-kraichtal-wetter` (vorher
+  `kraichtal-wetter-hacs`).** HACS lässt „HACS" im Repository-Namen nicht zu,
+  um Verwechslungen mit dem offiziellen Projekt zu vermeiden — die
+  Einreichung für den Standardkatalog wurde deshalb zurückgewiesen.
+  - **Für bestehende Installationen ändert sich nichts:** Domain
+    (`kraichtal_wetter`), Ordnername, Entity-IDs, Config-Entry, API-Key und
+    Recorder-Historie sind unberührt. GitHub leitet die alte Adresse dauerhaft
+    weiter (verifiziert: HTTP 301 auf den neuen Namen).
+  - Findet HACS keine Updates mehr, hilft es, das benutzerdefinierte
+    Repository einmal zu entfernen und unter der neuen URL wieder
+    hinzuzufügen. Die Integration bleibt dabei installiert.
+- `documentation` und `issue_tracker` im Manifest sowie die Badges und die
+  Installationsanleitung in der README zeigen auf die neue Adresse.
+
 ## [0.6.0] - 2026-09-08
 ### Hinzugefügt
 - **Diagnose-Sensor „API-Status"** am Gerät. Steht bei erfolgreichem Abruf auf

@@ -1,9 +1,9 @@
 # Kraichtal Wetter
 
 [![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
-[![Release](https://img.shields.io/github/v/release/t0bn1k/kraichtal-wetter-hacs?style=for-the-badge)](https://github.com/t0bn1k/kraichtal-wetter-hacs/releases)
-[![Lizenz](https://img.shields.io/github/license/t0bn1k/kraichtal-wetter-hacs?style=for-the-badge)](LICENSE)
-[![Validate](https://img.shields.io/github/actions/workflow/status/t0bn1k/kraichtal-wetter-hacs/validate.yml?style=for-the-badge&label=validate)](https://github.com/t0bn1k/kraichtal-wetter-hacs/actions/workflows/validate.yml)
+[![Release](https://img.shields.io/github/v/release/t0bn1k/ha-kraichtal-wetter?style=for-the-badge)](https://github.com/t0bn1k/ha-kraichtal-wetter/releases)
+[![Lizenz](https://img.shields.io/github/license/t0bn1k/ha-kraichtal-wetter?style=for-the-badge)](LICENSE)
+[![Validate](https://img.shields.io/github/actions/workflow/status/t0bn1k/ha-kraichtal-wetter/validate.yml?style=for-the-badge&label=validate)](https://github.com/t0bn1k/ha-kraichtal-wetter/actions/workflows/validate.yml)
 
 Kraichtal Wetter ist eine Home Assistant Custom Integration, die aktuelle Wetterdaten aus der Kraichtal Wetter API als Sensoren und als `weather`-Entität bereitstellt.
 
@@ -34,9 +34,11 @@ Den Schlüssel gibst du anschließend beim Einrichten der Integration ein. Er l�
 > **Hinweis:** Der Button merkt sich deine Home-Assistant-Instanz-URL im Browser. Läuft deine Instanz über einen anderen Port als zuvor (z. B. Standard-Port 80 statt `:8123`), öffnet der Button eine veraltete URL. Korrigiere sie dann über das Stift-Symbol auf der geöffneten my.home-assistant.io-Seite.
 
 1. Öffne in Home Assistant `HACS → Integrationen`.
-2. Füge über `⋯ → Benutzerdefinierte Repositorys` die URL `https://github.com/t0bn1k/kraichtal-wetter-hacs` mit Kategorie `Integration` hinzu.
+2. Füge über `⋯ → Benutzerdefinierte Repositorys` die URL `https://github.com/t0bn1k/ha-kraichtal-wetter` mit Kategorie `Integration` hinzu.
 3. Suche nach `Kraichtal Wetter`, lade die Integration herunter und starte Home Assistant neu.
 4. Füge die Integration über den Button unten oder `Einstellungen → Geräte & Dienste → Integration hinzufügen` hinzu:
+
+> **Hinweis für bestehende Installationen:** Das Repository hieß bis 0.6.1 `kraichtal-wetter-hacs`. HACS verlangt für die Aufnahme in den Standardkatalog, dass „HACS" nicht im Repository-Namen vorkommt. GitHub leitet die alte Adresse automatisch weiter, installierte Integrationen laufen unverändert weiter — an Entitäten, Konfiguration und Historie ändert sich nichts. Sollte HACS für dich keine Updates mehr finden, entferne das benutzerdefinierte Repository einmal und füge es unter der neuen URL wieder hinzu; die Integration bleibt dabei installiert.
 
 ### Manuelle Installation
 
