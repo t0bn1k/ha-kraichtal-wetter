@@ -13,7 +13,7 @@ Datenquelle: https://kraichtal-wetter.de
 
 Die Integration benötigt einen eigenen API-Key — ohne Key beantwortet die API keine Anfrage. Der Schlüssel ist kostenlos und wird über ein kurzes Formular ausgestellt:
 
-**→ https://kraichtal-wetter.de/dashboard/apply.php**
+→ https://kraichtal-wetter.de/dashboard/apply.php
 
 Auszufüllen sind drei Felder:
 
