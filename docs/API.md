@@ -32,18 +32,25 @@ Ohne `section`-Parameter liefert die API **alle elf** Sektionen. Wir fordern gez
 | --- | --- |
 | `temp`, `feels_like`, `dewpoint`, `humidity`, `pressure` | Sensoren; zusätzlich an der Wetter-Entität |
 | `wind`, `wind_dir`, `gust_max` | Sensoren; Wind auch an der Wetter-Entität |
-| `solar`, `rain`, `rain_today` | Sensoren |
-| `tmin_today`, `tmax_today` | Sensoren (**Prognose** für heute, nicht gemessen) |
+| `solar` | Sensor |
+| `rain` | Sensor „Station heute Niederschlag" — die **gemessene** Tagessumme, `total_increasing` |
+| `tmin_today`, `tmax_today`, `rain_today` | Sensoren „Prognose Resttag …" — **Prognose**, nicht gemessen; ohne State-Class |
 | `obs_date`, `obs_time`, `realtime` | Sensoren |
 | `warnings` | Sensor (nur die Anzahl — siehe Backlog) |
 | `icon` | Wetterlage der `weather`-Entität, über `ICON_MAP` |
-| `station_today.*` | Sensoren für die **gemessenen** Tagesextreme |
+| `station_today.tmax`, `.tmin`, `.gust`, `.press_max`, `.press_min` | Sensoren für die **gemessenen** Tagesextreme |
 
-Wichtig: `tmax_today` ist der *erwartete*, `station_today.tmax` der *gemessene* Höchstwert. Dass beide abweichen, ist normal.
+#### Messung oder Prognose — die Namen führen in die Irre
+
+- **`rain` ist gemessen**, und zwar die Tagessumme seit Mitternacht („Niederschlag heute (Station)" laut Doku) — kein Momentanwert. Sie steigt in den 0,2-mm-Schritten des Regenmessers und fällt um Mitternacht auf 0.
+- **`rain_today`, `tmax_today` und `tmin_today` sind Prognosen** („Prognose für heute" laut Doku) — und zwar, wie eine echte Antwort zeigt, nur für die **verbleibenden** Stunden des Tages. Am 11.09.2026 um 23:00 enthielt `today.temp` nur noch Werte für 22 und 23 Uhr (13,5 und 12,4 °C); genau das waren `tmax_today` und `tmin_today`, während die Station 24,4 °C gemessen hatte und `days[0]` 24 °C vorhersagte. Die Doku sagt das nicht ausdrücklich — beobachtet, nicht dokumentiert.
+- Die Prognose für den **ganzen** Tag steht in `days[0]`, die Messwerte in `station_today.*` und `rain`.
+
+Bis 0.6.x hat die Integration `rain` und `rain_today` genau andersherum behandelt. Home Assistant schließt Prognosen ausdrücklich von `measurement` aus („not … a prediction of the future"), deshalb tragen die drei Prognose-Sensoren keine State-Class.
 
 ### `days` → Tagesvorhersage
 
-Array mit 8 Einträgen, Index 0 = heute. Genutzt: `icon`, `tmax`, `tmin`, `pop`, `rain`, `wind`, `wind_dir`.
+Array mit 8 Einträgen, Index 0 = heute. Genutzt: `icon`, `tmax`, `tmin`, `pop`, `rain`, `wind`, `wind_dir`. Nicht genutzt: `gust` (erwartete Spitzenböe — vorgemerkt, siehe [`Plan.md`](../Plan.md)), `confidence`, `label`, `spark`.
 
 Zwei dokumentierte Eigenheiten, die kein Bug sind:
 
@@ -84,21 +91,21 @@ Die Integration erzwingt deshalb ein Mindestintervall von **300 Sekunden** (`MIN
 
 ## Nicht genutzte Sektionen — Backlog
 
-Bewusst nicht angefordert. Wer eine davon braucht, muss sie zu `REQUESTED_SECTIONS` hinzufügen.
+Bewusst nicht angefordert. Wer eine davon braucht, muss sie zu `REQUESTED_SECTIONS` hinzufügen. Reihenfolge, Stand und Entscheidungen stehen in [`Plan.md`](../Plan.md); hier nur, was die API dazu hergibt.
 
 | Sektion | Inhalt | Einschätzung |
 | --- | --- | --- |
-| `hours` | Nächste 12 Stunden mit `temp`, `pop`, `wind`, `icon` | **Vorgemerkt:** Grundlage für `FORECAST_HOURLY`. Haken: Die Einträge tragen nur ein `label` („Jetzt", „15:00"), keinen Zeitstempel — die Zeit müsste wie bei `days` aus `meta.generated` rekonstruiert werden, inklusive Mitternachtswechsel und Sommerzeitumstellung. |
+| `hours` | Nächste 12 Stunden mit `temp`, `pop`, `wind`, `icon` | **Vorgemerkt:** Grundlage für `FORECAST_HOURLY`. Haken: Die Einträge tragen nur ein `label` („Jetzt", „15:00"), keinen Zeitstempel — die Zeit müsste wie bei `days` aus `meta.generated` rekonstruiert werden, inklusive Mitternachtswechsel und Sommerzeitumstellung. Beobachtet: Eintrag 0 heißt „Jetzt" (laufende Stunde), danach folgen lückenlos volle Stunden (`"00:00"`, `"01:00"` …) über Mitternacht hinweg. Keine Regenmenge, keine Windrichtung. |
 | `alerts` | DWD-Warnungen mit `title`, `event`, `sev`, `level`, `active`, `desc`, `time` | **Vorgemerkt:** Unser `warnings`-Sensor liefert bisher nur die Anzahl aus `current.warnings`. Die Einzelwarnungen als Attribute daran wären deutlich nützlicher. Fair-use-Intervall: 15–30 Minuten. |
 | `today` | 24 Stundenwerte des heutigen Tages (`temp`, `rain`, `snow`, `wind`, `gust`) | Für Diagramme gedacht; in HA über die Sensorhistorie bereits abgedeckt. |
 | `trend` | Wie `days`, aber mit Modellspannbreite (`lo`/`avg`/`hi`) | Kein HA-Gegenstück im Wetter-Modell. |
 | `models` | Einzelmodelle, Streuung, `confidence` | Nische. |
 | `astro` | Sonnenauf-/-untergang, Mondphase | Deckt HA über `sun.sun` und die Mond-Integration bereits ab. |
 | `climate` | Kenntage, Jahresextreme, Stationsrekorde | Umfangreich; ein- bis zweimal täglich abzurufen, passt nicht zum Poll-Intervall der Integration. |
-| `rain` | Bilanz heute/gestern/Monat/Jahr inkl. Abweichung vom Klimamittel | Denkbar als zusätzliche Sensoren (Monats-/Jahressumme). |
+| `rain` | Bilanz heute/gestern/Monat/Jahr inkl. Abweichung vom Klimamittel | Denkbar als zusätzliche Sensoren. Monats-/Jahressummen bildet Home Assistant seit 0.7.0 aber auch selbst aus `rain` (`total_increasing`); eigenständig wären nur `expected`, `annual_avg`, `delta` und Werte aus der Zeit vor der Installation. Unter `station` steht zusätzlich `h24` (letzte 24 Stunden) — beobachtet, nicht dokumentiert. Fair use: ein- bis zweimal täglich, bräuchte also einen eigenen Abruf. |
 
 ## Weitere vorgemerkte Punkte
 
 - **`current.temp_source`** unterscheidet `live` (echter Messwert) von `forecast` (Ersatzwert aus der Prognose). Unser Temperatursensor macht diesen Unterschied bisher nicht sichtbar — als Attribut wäre er ehrlicher.
-- **`station_today` hat mehr Felder als wir nutzen:** `wind_max` (höchster Wind), die Uhrzeiten zu den Extremwerten (`tmax_time`, `tmin_time`, `gust_time`) und die Böe in Beaufort (`gust_bft`).
-- **ETag / `If-None-Match`:** Jede Antwort trägt ein ETag; mit `If-None-Match` gäbe es bei unveränderten Daten ein `304` ohne Inhalt. Spart Übertragung, erfordert aber, den letzten Datenstand über den Fehlerfall hinweg zu halten.
+- **`station_today` hat mehr Felder als wir nutzen:** `wind_max` (höchster Wind), die Uhrzeiten zu den Extremwerten (`tmax_time`, `tmin_time`, `gust_time`) und die Böe in Beaufort (`gust_bft`). Beobachtet: Uhrzeiten als `"HH:MM"` in Ortszeit (`"tmax_time": "15:53"`), `gust_bft` als Ganzzahl.
+- **ETag / `If-None-Match` — geprüft und verworfen:** Jede Antwort trägt ein ETag; mit `If-None-Match` gäbe es bei unveränderten Daten ein `304` ohne Inhalt. Bei unserem Takt kommt das praktisch nie vor: Die Station liefert alle paar Minuten neue Werte, der Server cached fünf Minuten, und wir fragen frühestens alle fünf Minuten. Kein Gewinn für zusätzliche Fehlerpfade.

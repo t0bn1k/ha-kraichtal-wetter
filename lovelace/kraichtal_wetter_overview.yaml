@@ -24,29 +24,34 @@ views:
           - entity: sensor.kraichtal_wetter_wind_direction
           - entity: sensor.kraichtal_wetter_max_gust
           - entity: sensor.kraichtal_wetter_solar_irradiance
-          - entity: sensor.kraichtal_wetter_precipitation
 
       - type: entities
-        title: Tageswerte
+        title: Station heute (gemessen)
+        show_header_toggle: false
+        entities:
+          - entity: sensor.kraichtal_wetter_station_max_temperature_today
+          - entity: sensor.kraichtal_wetter_station_min_temperature_today
+          - entity: sensor.kraichtal_wetter_precipitation
+          - entity: sensor.kraichtal_wetter_station_max_gust_today
+          - entity: sensor.kraichtal_wetter_station_max_pressure_today
+          - entity: sensor.kraichtal_wetter_station_min_pressure_today
+
+      - type: entities
+        title: Prognose für den Rest des Tages
         show_header_toggle: false
         entities:
           - entity: sensor.kraichtal_wetter_max_temperature_today
           - entity: sensor.kraichtal_wetter_min_temperature_today
           - entity: sensor.kraichtal_wetter_precipitation_today
+
+      - type: entities
+        title: Status
+        show_header_toggle: false
+        entities:
           - entity: sensor.kraichtal_wetter_warnings
           - entity: sensor.kraichtal_wetter_observation_date
           - entity: sensor.kraichtal_wetter_observation_time
           - entity: sensor.kraichtal_wetter_realtime_data
-
-      - type: entities
-        title: Station heute
-        show_header_toggle: false
-        entities:
-          - entity: sensor.kraichtal_wetter_station_max_temperature_today
-          - entity: sensor.kraichtal_wetter_station_min_temperature_today
-          - entity: sensor.kraichtal_wetter_station_max_gust_today
-          - entity: sensor.kraichtal_wetter_station_max_pressure_today
-          - entity: sensor.kraichtal_wetter_station_min_pressure_today
 
       - type: history-graph
         title: Verlauf der wichtigsten Werte

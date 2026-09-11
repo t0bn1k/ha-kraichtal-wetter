@@ -69,10 +69,10 @@ Die Entity-IDs sind sprachunabhängig (englisch), die Anzeigenamen folgen der ei
 | `sensor.kraichtal_wetter_wind_direction` | Windrichtung | `wind_dir` |
 | `sensor.kraichtal_wetter_max_gust` | Böen max | `gust_max` |
 | `sensor.kraichtal_wetter_solar_irradiance` | Solarstrahlung | `solar` |
-| `sensor.kraichtal_wetter_precipitation` | Niederschlag aktuell | `rain` |
-| `sensor.kraichtal_wetter_max_temperature_today` | Maximale Temperatur heute | `tmax_today` |
-| `sensor.kraichtal_wetter_min_temperature_today` | Minimale Temperatur heute | `tmin_today` |
-| `sensor.kraichtal_wetter_precipitation_today` | Niederschlag heute | `rain_today` |
+| `sensor.kraichtal_wetter_precipitation` | Station heute Niederschlag | `rain` |
+| `sensor.kraichtal_wetter_max_temperature_today` | Prognose Resttag Tmax | `tmax_today` |
+| `sensor.kraichtal_wetter_min_temperature_today` | Prognose Resttag Tmin | `tmin_today` |
+| `sensor.kraichtal_wetter_precipitation_today` | Prognose Resttag Niederschlag | `rain_today` |
 | `sensor.kraichtal_wetter_warnings` | Warnungen | `warnings` |
 | `sensor.kraichtal_wetter_observation_date` | Beobachtungsdatum | `obs_date` |
 | `sensor.kraichtal_wetter_observation_time` | Beobachtungszeit | `obs_time` |
@@ -84,7 +84,11 @@ Die Entity-IDs sind sprachunabhängig (englisch), die Anzeigenamen folgen der ei
 | `sensor.kraichtal_wetter_station_min_pressure_today` | Station heute Luftdruck min | `station_today.press_min` |
 | `sensor.kraichtal_wetter_api_status` | API-Status (Diagnose) | – |
 
+**Gemessen oder vorhergesagt?** Alles mit **„Station heute“** hat die Station tatsächlich gemessen — für „so viel hat es heute geregnet" ist `sensor.kraichtal_wetter_precipitation` der richtige Sensor. Die drei Sensoren **„Prognose Resttag“** sind dagegen Vorhersagen für die *verbleibenden* Stunden des Tages: Sie werden zum Abend hin kleiner und zeigen spät abends kaum mehr als die nächste Stunde. Die Vorhersage für den ganzen Tag steht in der Wetter-Entität.
+
 Der **API-Status** ist als Diagnose-Entität eingestuft und steht bei einem erfolgreichen Abruf auf `ok`. Schlägt ein Abruf fehl, zeigt er stattdessen den Grund — etwa den Klartext der API oder die Bedeutung des HTTP-Status. Er bleibt dabei bewusst verfügbar, während die übrigen Entitäten auf „nicht verfügbar" gehen: Genau dann ist die Ursache interessant. Zu finden unter `Einstellungen → Geräte & Dienste → Kraichtal Wetter → Gerät`.
+
+> **Upgrade auf 0.7.0:** Die Entity-IDs bleiben gleich, aber gemessener und vorhergesagter Niederschlag wurden bis dahin verwechselt. Wer `sensor.kraichtal_wetter_precipitation_today` als „Regen heute" in Automationen nutzt (etwa für die Bewässerung), hat mit einer Prognose gearbeitet und sollte auf `sensor.kraichtal_wetter_precipitation` wechseln. Unter `Entwicklerwerkzeuge → Statistik` meldet Home Assistant für die drei Prognose-Sensoren einmalig, dass sie keine Statistikklasse mehr haben — die alten Daten dort bitte löschen, sie sind nicht aussagekräftig. Details im [Changelog](CHANGELOG.md).
 
 > **Upgrade von 0.4.x:** In 0.5.0 wurden die Entity-IDs von den deutschen Namen (`sensor.kraichtal_wetter_boen_max`) auf sprachunabhängige englische umgestellt. Die Integration benennt bestehende Entitäten beim ersten Start automatisch um, sodass die Recorder-Historie erhalten bleibt. Eigene Dashboards und Automationen müssen dagegen von Hand angepasst werden — Home Assistant schreibt Verweise dort nicht mit um.
 
@@ -107,17 +111,15 @@ cards:
       - sensor.kraichtal_wetter_humidity
       - sensor.kraichtal_wetter_pressure
       - sensor.kraichtal_wetter_wind_speed
-      - sensor.kraichtal_wetter_precipitation
+      - sensor.kraichtal_wetter_warnings
 
   - type: entities
-    title: Kraichtal Wetter – Tageswerte
+    title: Kraichtal Wetter – Heute gemessen
     show_header_toggle: false
     entities:
-      - sensor.kraichtal_wetter_max_temperature_today
-      - sensor.kraichtal_wetter_min_temperature_today
-      - sensor.kraichtal_wetter_precipitation_today
-      - sensor.kraichtal_wetter_warnings
-      - sensor.kraichtal_wetter_realtime_data
+      - sensor.kraichtal_wetter_station_max_temperature_today
+      - sensor.kraichtal_wetter_station_min_temperature_today
+      - sensor.kraichtal_wetter_precipitation
 ```
 
 ### Verlauf

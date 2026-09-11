@@ -2,6 +2,49 @@
 
 Alle signifikanten Änderungen an dieser Integration werden hier festgehalten.
 
+## [0.7.0] - 2026-09-11
+### Behoben
+- **Gemessener und vorhergesagter Niederschlag waren vertauscht.** Laut
+  API-Dokumentation ist `rain` die an der Station *gemessene* Tagessumme,
+  `rain_today` dagegen eine *Prognose*. Die Integration führte `rain` als
+  „Niederschlag aktuell" und `rain_today` als aufsummierten Tageswert
+  (`total_increasing`).
+  - Folge: Jede Korrektur der Prognose nach unten wertete Home Assistant als
+    Zählerreset und zählte neu hoch. Für den 5. September 2026 stehen so
+    9,5 mm in der Langzeitstatistik von „Niederschlag heute" — gemessen
+    wurden 3,4 mm.
+  - `sensor.kraichtal_wetter_precipitation` (`rain`) ist jetzt
+    `total_increasing`. Home Assistant führt ab dem Update eine fortlaufende
+    Summe, aus der sich Monats- und Jahressummen bilden lassen; für die Zeit
+    davor gibt es nur Mittel-, Min- und Maxwerte.
+- **`tmax_today`, `tmin_today` und `rain_today` tragen keine State-Class
+  mehr.** Alle drei sind Prognosen, und zwar für die *verbleibenden* Stunden
+  des Tages — spät abends zeigen sie kaum mehr als die nächste Stunde. Home
+  Assistant schließt Vorhersagen ausdrücklich von `measurement` aus. Die in
+  0.5.5 festgehaltene Begründung, es handle sich um Tagesaggregate, war
+  falsch.
+
+### Geändert
+- Deutsche Anzeigenamen sagen jetzt, was gemessen und was vorhergesagt ist:
+  - „Niederschlag aktuell" → **„Station heute Niederschlag"**
+  - „Niederschlag heute" → **„Prognose Resttag Niederschlag"**
+  - „Maximale Temperatur heute" → **„Prognose Resttag Tmax"**
+  - „Minimale Temperatur heute" → **„Prognose Resttag Tmin"**
+
+  Entity-IDs und englische Namen bleiben unverändert — aus den englischen
+  Namen entstehen die Entity-IDs neuer Installationen.
+- Beispiel-Dashboard und README-Beispiel trennen gemessene Tageswerte und
+  Prognose.
+
+### Nach dem Update zu tun
+- **Wer `sensor.kraichtal_wetter_precipitation_today` als „Regen heute"
+  verwendet** — etwa in einer Bewässerungsautomation —, hat mit einer
+  Prognose gearbeitet und sollte auf `sensor.kraichtal_wetter_precipitation`
+  umstellen.
+- Unter *Entwicklerwerkzeuge → Statistik* meldet Home Assistant für die drei
+  Prognose-Sensoren, dass sie keine Statistikklasse mehr haben. Die alten
+  Daten dort löschen — sie sind nicht aussagekräftig.
+
 ## [0.6.2] - 2026-09-11
 ### Geändert
 - **Nur Dokumentation — die Integration selbst ist unverändert.** Das Update

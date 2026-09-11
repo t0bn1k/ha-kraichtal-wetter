@@ -108,20 +108,41 @@ SENSOR_TYPES = [
         state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
+        # Precipitation measured by the station's rain gauge since midnight
+        # (API docs: "Niederschlag heute (Station)"). It climbs in 0.2 mm steps
+        # and drops to 0 at midnight — the case the HA docs name for
+        # TOTAL_INCREASING ("a daily amount of consumed gas"). TOTAL without
+        # last_reset, which the docs prefer wherever it works, does not work
+        # here: with no reset marker the recorder just sums deltas, so the drop
+        # to 0 at midnight would subtract the day's rain from the long-term
+        # total instead of starting a new cycle.
+        #
+        # Not to be confused with `rain_today` below, which despite its name is
+        # a forecast. Before 0.7.0 the two were treated the other way round.
         key="rain",
         translation_key="rain",
         native_unit_of_measurement=UnitOfPrecipitationDepth.MILLIMETERS,
         icon="mdi:weather-rainy",
         device_class=SensorDeviceClass.PRECIPITATION,
-        state_class=SensorStateClass.MEASUREMENT,
+        state_class=SensorStateClass.TOTAL_INCREASING,
     ),
+    # tmax_today, tmin_today and rain_today are forecasts, not measurements.
+    # The API derives them from the hourly forecast for the hours still left
+    # today (past hours are null in its `today` section), so they shrink
+    # towards the evening: at 23:00, tmax_today is little more than the next
+    # hour's temperature, not the day's high. The measured counterparts are
+    # station_today.* and `rain`; the full-day forecast is days[0].
+    #
+    # Hence no state class. The HA docs exclude "a prediction of the future"
+    # from MEASUREMENT by name, and TOTAL_INCREASING on rain_today turned every
+    # downward revision of the forecast into a meter reset, inflating the
+    # long-term sum (5 Sep 2026: 9.5 mm recorded, 3.4 mm actually fell).
     SensorEntityDescription(
         key="tmax_today",
         translation_key="tmax_today",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         icon="mdi:thermometer-high",
         device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
         key="tmin_today",
@@ -129,28 +150,13 @@ SENSOR_TYPES = [
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         icon="mdi:thermometer-low",
         device_class=SensorDeviceClass.TEMPERATURE,
-        state_class=SensorStateClass.MEASUREMENT,
     ),
     SensorEntityDescription(
-        # Daily accumulating total that resets at midnight — the case the HA
-        # docs name for TOTAL_INCREASING ("a daily amount of consumed gas").
-        # TOTAL without last_reset, which the docs prefer wherever it works,
-        # does not work here: with no reset marker the recorder just sums
-        # deltas, so the drop to 0 at midnight would subtract the day's rain
-        # from the long-term total instead of starting a new cycle.
-        #
-        # A recorder warning that the state "is not strictly increasing" does
-        # not contradict this and is not a reason to change the state class.
-        # The API occasionally corrects the value down by a few percent; a dip
-        # to >= 90% of the previous value is treated as noise, logged once per
-        # restart, and explicitly does NOT start a new cycle, so the sum stays
-        # intact. Only a drop below 90% counts as a reset — which is midnight.
         key="rain_today",
         translation_key="rain_today",
         native_unit_of_measurement=UnitOfPrecipitationDepth.MILLIMETERS,
         icon="mdi:weather-rainy",
         device_class=SensorDeviceClass.PRECIPITATION,
-        state_class=SensorStateClass.TOTAL_INCREASING,
     ),
     SensorEntityDescription(
         key="warnings",

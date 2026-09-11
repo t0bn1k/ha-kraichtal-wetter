@@ -15,9 +15,13 @@ Home-Assistant-Custom-Integration für die Kraichtal-Wetter-API. Kein Build-Syst
 **Bevor du etwas hinzufügst oder änderst, das API-Daten betrifft, prüfe es gegen die API-Dokumentation** — nicht gegen das Dashboard, den Augenschein eines Symbols oder eine Vermutung darüber, was ein Feld wohl bedeutet.
 
 - Offizielle Doku: <https://kraichtal-wetter.de/dashboard/api-doku.html>
-- Was die Integration davon nutzt, bewusst nicht nutzt und was vorgemerkt ist: [`docs/API.md`](docs/API.md) — dort steht auch der Backlog (`hours`, `alerts`, `temp_source`, ETag …).
+- Was die Integration davon nutzt, bewusst nicht nutzt und was die API für Erweiterungen hergibt: [`docs/API.md`](docs/API.md).
+- Reihenfolge, Stand und Entscheidungen der geplanten Arbeiten: [`Plan.md`](Plan.md).
 
-Das ist keine Formalie, sondern aus Schaden gelernt: Die Icon-Zuordnung wurde einmal aus den SVG-Zeichnungen des Dashboards abgeleitet. Das ergab plausible, aber falsche Werte — `storm` zeichnet nur einen Blitz, ist laut Doku aber das *schwache Gewitter* und führt Regen. Aus einem Symbol lässt sich die Semantik nicht ablesen.
+Das ist keine Formalie, sondern zweimal aus Schaden gelernt:
+
+- Die Icon-Zuordnung wurde einmal aus den SVG-Zeichnungen des Dashboards abgeleitet. Das ergab plausible, aber falsche Werte — `storm` zeichnet nur einen Blitz, ist laut Doku aber das *schwache Gewitter* und führt Regen. Aus einem Symbol lässt sich die Semantik nicht ablesen.
+- `rain_today` klingt nach Tagessumme und wurde bis 0.6.x als `total_increasing` geführt. Laut Doku ist es eine *Prognose*; die gemessene Tagessumme heißt schlicht `rain`. Jede Korrektur der Prognose nach unten galt als Zählerreset, die Langzeitstatistik war damit wertlos. Aus einem Feldnamen lässt sich die Semantik genauso wenig ablesen.
 
 Wenn eine neue Funktion eine bisher ungenutzte Sektion braucht, gehört sie in `REQUESTED_SECTIONS` (`coordinator.py`) — ohne das kommt sie schlicht nicht in der Antwort an.
 
@@ -28,6 +32,7 @@ Wenn eine neue Funktion eine bisher ungenutzte Sektion braucht, gehört sie in `
 - **Entity-Namen kommen aus `translations/`**, nicht aus `name=` im Code: `SENSOR_TYPES` setzt `translation_key`, die Namen stehen unter `entity.sensor.<translation_key>.name`.
 - **Entity-IDs leiten sich vom *englischen* Namen ab** (HA generiert Object-IDs bewusst sprachunabhängig aus `en.json`): `"Max gust"` → `sensor.kraichtal_wetter_max_gust`. Die Namen in `translations/en.json` sind damit **öffentliche API** — sie zu ändern verschiebt die Entity-IDs für Neuinstallationen. `de.json` beeinflusst nur die Anzeige. Vollständige Zuordnung in `README.md`.
 - **Entity-ID-Migration**: `_SENSOR_ENTITY_ID_MIGRATION` in `__init__.py` benennt die vor 0.5.0 aus deutschen Namen erzeugten IDs um. Läuft idempotent bei jedem Setup vor `async_forward_entry_setups` und lässt selbst umbenannte Entitäten in Ruhe. Beim Hinzufügen eines Sensors ist hier nichts zu tun; beim Umbenennen eines englischen Namens schon.
+- **Messung vs. Prognose**: `rain` ist die *gemessene* Tagessumme (`total_increasing`). `rain_today`, `tmax_today` und `tmin_today` sind *Prognosen* für die restlichen Stunden des Tages und tragen deshalb keine State-Class — Home Assistant schließt Vorhersagen ausdrücklich von `measurement` aus. Im Deutschen heißen gemessene Tageswerte „Station heute …", Prognosen „Prognose Resttag …". Details in `docs/API.md`.
 - **Sensoren** nutzen Dot-Notation in `sensor.py` um verschachtelte API-Felder aufzulösen (z.B. `station_today.tmax` → `data["current"]["station_today"]["tmax"]`).
 - **Forecast-Datum** wird aus `meta.generated` + Tages-Index berechnet (API liefert kein `date` pro Tag); Umrechnung über `dt_util.start_of_local_day()` pro Tag, damit DST-Wechsel korrekt bleiben.
 - **Forecast-Caching**: `async_forecast_daily()` cached, `_handle_coordinator_update()` invalidiert. Nicht `async_update()` verwenden — `CoordinatorEntity` setzt `should_poll = False`, die Methode würde nie aufgerufen.
@@ -70,7 +75,8 @@ custom_components/kraichtal_wetter/
 ├── translations/        # de.json + en.json — das lädt HA tatsächlich
 └── brand/               # 4 Brand-Icons (icon + @2x + dark_*), lokale Auslieferung seit HA 2026.3
 hacs.json                # HACS-Metadaten
-docs/API.md              # Was die Integration von der API nutzt — und der Backlog
+docs/API.md              # Was die Integration von der API nutzt — und was die API sonst hergibt
+Plan.md                  # Umsetzungsplan: Reihenfolge, Stand, Entscheidungen
 lovelace/                # Beispiel-Dashboards
 ```
 

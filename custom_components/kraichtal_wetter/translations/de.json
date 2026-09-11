@@ -69,16 +69,16 @@
         "name": "Solarstrahlung"
       },
       "rain": {
-        "name": "Niederschlag aktuell"
+        "name": "Station heute Niederschlag"
       },
       "tmax_today": {
-        "name": "Maximale Temperatur heute"
+        "name": "Prognose Resttag Tmax"
       },
       "tmin_today": {
-        "name": "Minimale Temperatur heute"
+        "name": "Prognose Resttag Tmin"
       },
       "rain_today": {
-        "name": "Niederschlag heute"
+        "name": "Prognose Resttag Niederschlag"
       },
       "warnings": {
         "name": "Warnungen"
