@@ -2,6 +2,26 @@
 
 Alle signifikanten Änderungen an dieser Integration werden hier festgehalten.
 
+## [0.8.0] - 2026-09-11
+### ✨ Hinzugefügt
+- 💨 **Neuer Sensor „Station heute Wind max"**
+  (`sensor.kraichtal_wetter_station_max_wind_today`): der höchste an der
+  Station gemessene Wind des Tages (`station_today.wind_max`).
+- 🌬️ Die Tagesvorhersage enthält die **erwartete Spitzenböe** (`days[].gust`).
+  An der aktuellen Wetterlage bleibt die Böe bewusst leer: `gust_max` ist die
+  stärkste Böe des bisherigen Tages, keine aktuelle.
+- 🌡️ **Attribut `source` an der Außentemperatur:** `live`, wenn der Wert
+  gemessen ist, `forecast`, wenn die API mangels Messwert die Prognose
+  einsetzt. Bisher war ein solcher Ersatzwert nicht von einer Messung zu
+  unterscheiden.
+- 🕒 **Attribut `time` an „Station heute Tmax", „Tmin" und „Böe"** mit der
+  Uhrzeit des Extremwerts (`"15:53"`); an der Böe zusätzlich `beaufort`.
+- 🌐 Attributnamen und -werte sind übersetzt („Quelle: Messung", „Uhrzeit").
+
+### ✅ Getestet
+- 🧪 Gegen Home Assistant 2026.9.2 mit einer echten API-Antwort, inklusive
+  fehlender und leerer Felder, sowie mit Hassfest.
+
 ## [0.7.0] - 2026-09-11
 ### Behoben
 - **Gemessener und vorhergesagter Niederschlag waren vertauscht.** Laut

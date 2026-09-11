@@ -42,7 +42,16 @@
   "entity": {
     "sensor": {
       "temp": {
-        "name": "Outdoor temperature"
+        "name": "Outdoor temperature",
+        "state_attributes": {
+          "source": {
+            "name": "Source",
+            "state": {
+              "live": "Measured",
+              "forecast": "Forecast"
+            }
+          }
+        }
       },
       "feels_like": {
         "name": "Feels like"
@@ -93,13 +102,34 @@
         "name": "Realtime data"
       },
       "station_today_tmax": {
-        "name": "Station max temperature today"
+        "name": "Station max temperature today",
+        "state_attributes": {
+          "time": {
+            "name": "Time"
+          }
+        }
       },
       "station_today_tmin": {
-        "name": "Station min temperature today"
+        "name": "Station min temperature today",
+        "state_attributes": {
+          "time": {
+            "name": "Time"
+          }
+        }
       },
       "station_today_gust": {
-        "name": "Station max gust today"
+        "name": "Station max gust today",
+        "state_attributes": {
+          "time": {
+            "name": "Time"
+          },
+          "beaufort": {
+            "name": "Beaufort"
+          }
+        }
+      },
+      "station_today_wind_max": {
+        "name": "Station max wind today"
       },
       "station_today_press_max": {
         "name": "Station max pressure today"

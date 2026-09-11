@@ -1,13 +1,13 @@
 # Plan
 
-Stand: 11.09.2026 · veröffentlicht: 0.7.0 · API v1.5
+Stand: 11.09.2026 · veröffentlicht: 0.8.0 · API v1.5
 
 Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die API liefert, steht in [`docs/API.md`](docs/API.md) — dort nachsehen, bevor ein Punkt umgesetzt wird (siehe `AGENTS.md`). Erledigtes abhaken und die Version dazuschreiben.
 
 | # | Vorhaben | Stand | Release |
 | --- | --- | --- | --- |
 | 1 | Niederschlag und Prognose-Sensoren korrigieren | veröffentlicht | 0.7.0 |
-| 2 | Kleines Paket: `days[].gust`, `temp_source`, `station_today` | offen | – |
+| 2 | Kleines Paket: `days[].gust`, `temp_source`, `station_today` | veröffentlicht | 0.8.0 |
 | 3 | DWD-Warnungen (`alerts`) | offen | – |
 | 4 | Stündliche Vorhersage (`hours`) | offen | – |
 | 5 | Niederschlagsbilanz (`rain`) | neu bewerten | – |
@@ -42,12 +42,15 @@ Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die AP
 
 Alles aus bereits angeforderten Sektionen, kein zusätzlicher Abruf. Formate an der Antwort vom 11.09.2026 bestätigt.
 
-- [ ] `days[].gust` → `native_wind_gust_speed` in der Tagesvorhersage
-- [ ] `current.temp_source` (`live` / `forecast`) → Attribut am Sensor Außentemperatur. Macht sichtbar, wenn ein Prognosewert als Messung in die Statistik geht.
-- [ ] `station_today.wind_max` → neuer Sensor „Station heute Wind max" (km/h). State-Class wie die übrigen Station-Sensoren (`measurement`, Begründung in CHANGELOG 0.5.5).
-- [ ] `station_today.tmax_time`, `tmin_time`, `gust_time` → Attribut an den jeweiligen Station-Sensoren (`"HH:MM"`, Ortszeit)
-- [ ] `station_today.gust_bft` → Attribut am Sensor „Station heute Böe" (Ganzzahl)
-- Den englischen Namen des neuen Sensors bewusst wählen — er bestimmt die Entity-ID.
+- [x] `days[].gust` → `native_wind_gust_speed` in der Tagesvorhersage. Die aktuelle Böe bleibt bewusst leer (`gust_max` ist das Tagesmaximum).
+- [x] `current.temp_source` (`live` / `forecast`) → Attribut `source` am Sensor Außentemperatur
+- [x] `station_today.wind_max` → neuer Sensor „Station heute Wind max" / „Station max wind today" → `sensor.kraichtal_wetter_station_max_wind_today`. State-Class wie die übrigen Station-Sensoren (`measurement`, Begründung in CHANGELOG 0.5.5).
+- [x] `station_today.tmax_time`, `tmin_time`, `gust_time` → Attribut `time` an den jeweiligen Station-Sensoren (`"HH:MM"`, unverändert durchgereicht)
+- [x] `station_today.gust_bft` → Attribut `beaufort` am Sensor „Station heute Böe"
+- [x] Attribute über `attributes` in `KraichtalWetterSensorEntityDescription`, Übersetzungen unter `state_attributes`
+- [x] Getestet gegen HA 2026.9.2 mit der Antwort vom 11.09.2026 (24 Prüfungen, Randfälle `null`/fehlend) und mit Hassfest lokal
+- [x] Release 0.8.0 (11.09.2026)
+- [ ] Nach dem Update in der eigenen Instanz prüfen: Entity-ID des neuen Sensors (evtl. mit Bereichspräfix, siehe unten), Attribute in der Oberfläche übersetzt
 
 ## 3. DWD-Warnungen (`alerts`)
 
@@ -106,3 +109,10 @@ curl -s -H "X-API-Key: DEIN_KEY" "https://kraichtal-wetter.de/dashboard/api.php?
 ```
 
 Für Punkt 3 fehlt noch eine Antwort mit aktiver Warnung — bei der nächsten Warnlage sichern.
+
+## Ohne laufende Instanz prüfen
+
+So wurde Punkt 2 getestet — für 3 und 4 wiederverwendbar:
+
+- **Home Assistant als Paket:** `python3 -m venv havenv && havenv/bin/pip install homeassistant` (braucht Python ≥ 3.14.2). Damit lassen sich Sensor- und Wetter-Entität direkt instanziieren und mit einer gespeicherten API-Antwort füttern — ohne `hass`-Instanz, der Coordinator ist ein einfaches Objekt mit `data`.
+- **Hassfest lokal:** `script/` aus `home-assistant/core` (Sparse-Checkout, Tag passend zur installierten Version), dazu `pip install infrared-protocols tqdm ruff`, dann `python -m script.hassfest --integration-path custom_components/kraichtal_wetter`. Fängt vor allem Übersetzungsfehler ab, bevor die CI nach dem Taggen daran scheitert (vgl. 0.5.7).

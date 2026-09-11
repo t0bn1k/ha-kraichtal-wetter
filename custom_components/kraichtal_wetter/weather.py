@@ -158,6 +158,10 @@ class KraichtalWetterWeather(CoordinatorEntity, WeatherEntity):
     def native_wind_speed(self) -> float | None:
         return self._current().get("wind")
 
+    # Deliberately no native_wind_gust_speed for the current conditions:
+    # `gust_max` is the strongest gust of the day so far, not the current one,
+    # and the API has no field for the latter.
+
     def _base_day(self) -> datetime:
         """Return local midnight of the day the forecast was generated."""
         data = self.coordinator.data
@@ -198,6 +202,8 @@ class KraichtalWetterWeather(CoordinatorEntity, WeatherEntity):
                     "precipitation_probability": day.get("pop"),
                     "native_precipitation": day.get("rain"),
                     "native_wind_speed": day.get("wind"),
+                    # Expected peak gust; HA converts it with the wind speed unit.
+                    "native_wind_gust_speed": day.get("gust"),
                     # null when the day is forecast windstill, per the API docs.
                     "wind_bearing": day.get("wind_dir"),
                 }

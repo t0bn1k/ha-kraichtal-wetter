@@ -33,6 +33,7 @@ views:
           - entity: sensor.kraichtal_wetter_station_min_temperature_today
           - entity: sensor.kraichtal_wetter_precipitation
           - entity: sensor.kraichtal_wetter_station_max_gust_today
+          - entity: sensor.kraichtal_wetter_station_max_wind_today
           - entity: sensor.kraichtal_wetter_station_max_pressure_today
           - entity: sensor.kraichtal_wetter_station_min_pressure_today
 

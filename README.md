@@ -49,7 +49,7 @@ Den Schlüssel gibst du anschließend beim Einrichten der Integration ein. Er l�
 ## Was bietet Kraichtal Wetter?
 
 - Aktuelle Wetterdaten aus der Kraichtal Wetter API
-- Forecast über `weather.kraichtal_wetter`
+- 8-Tage-Vorhersage über `weather.kraichtal_wetter` (Temperatur, Regen, Wind und Böen)
 - Erweiterte Sensoren aus `station_today`
 - Gruppierte Entitäten unter einem Gerät in der Integrationen-Ansicht
 
@@ -80,11 +80,14 @@ Die Entity-IDs sind sprachunabhängig (englisch), die Anzeigenamen folgen der ei
 | `sensor.kraichtal_wetter_station_max_temperature_today` | Station heute Tmax | `station_today.tmax` |
 | `sensor.kraichtal_wetter_station_min_temperature_today` | Station heute Tmin | `station_today.tmin` |
 | `sensor.kraichtal_wetter_station_max_gust_today` | Station heute Böe | `station_today.gust` |
+| `sensor.kraichtal_wetter_station_max_wind_today` | Station heute Wind max | `station_today.wind_max` |
 | `sensor.kraichtal_wetter_station_max_pressure_today` | Station heute Luftdruck max | `station_today.press_max` |
 | `sensor.kraichtal_wetter_station_min_pressure_today` | Station heute Luftdruck min | `station_today.press_min` |
 | `sensor.kraichtal_wetter_api_status` | API-Status (Diagnose) | – |
 
 **Gemessen oder vorhergesagt?** Alles mit **„Station heute“** hat die Station tatsächlich gemessen — für „so viel hat es heute geregnet" ist `sensor.kraichtal_wetter_precipitation` der richtige Sensor. Die drei Sensoren **„Prognose Resttag“** sind dagegen Vorhersagen für die *verbleibenden* Stunden des Tages: Sie werden zum Abend hin kleiner und zeigen spät abends kaum mehr als die nächste Stunde. Die Vorhersage für den ganzen Tag steht in der Wetter-Entität.
+
+**Zusätzliche Attribute:** Die Außentemperatur zeigt im Attribut `source`, ob der Wert gemessen ist (`live`) oder mangels Messwert aus der Prognose stammt (`forecast`). „Station heute Tmax", „Tmin" und „Böe" tragen im Attribut `time` die Uhrzeit des Extremwerts (z. B. `15:53`), die Böe zusätzlich die Windstärke in `beaufort`. In der Oberfläche erscheinen die Attribute übersetzt („Quelle", „Uhrzeit"); in Templates gilt der englische Name, etwa `{{ state_attr('sensor.kraichtal_wetter_station_max_temperature_today', 'time') }}`.
 
 Der **API-Status** ist als Diagnose-Entität eingestuft und steht bei einem erfolgreichen Abruf auf `ok`. Schlägt ein Abruf fehl, zeigt er stattdessen den Grund — etwa den Klartext der API oder die Bedeutung des HTTP-Status. Er bleibt dabei bewusst verfügbar, während die übrigen Entitäten auf „nicht verfügbar" gehen: Genau dann ist die Ursache interessant. Zu finden unter `Einstellungen → Geräte & Dienste → Kraichtal Wetter → Gerät`.
 

@@ -31,6 +31,7 @@ Ohne `section`-Parameter liefert die API **alle elf** Sektionen. Wir fordern gez
 | Feld | Verwendung |
 | --- | --- |
 | `temp`, `feels_like`, `dewpoint`, `humidity`, `pressure` | Sensoren; zusätzlich an der Wetter-Entität |
+| `temp_source` | Attribut `source` am Sensor Außentemperatur: `live` = Messwert, `forecast` = Ersatzwert aus der Prognose |
 | `wind`, `wind_dir`, `gust_max` | Sensoren; Wind auch an der Wetter-Entität |
 | `solar` | Sensor |
 | `rain` | Sensor „Station heute Niederschlag" — die **gemessene** Tagessumme, `total_increasing` |
@@ -38,7 +39,9 @@ Ohne `section`-Parameter liefert die API **alle elf** Sektionen. Wir fordern gez
 | `obs_date`, `obs_time`, `realtime` | Sensoren |
 | `warnings` | Sensor (nur die Anzahl — siehe Backlog) |
 | `icon` | Wetterlage der `weather`-Entität, über `ICON_MAP` |
-| `station_today.tmax`, `.tmin`, `.gust`, `.press_max`, `.press_min` | Sensoren für die **gemessenen** Tagesextreme |
+| `station_today.tmax`, `.tmin`, `.gust`, `.wind_max`, `.press_max`, `.press_min` | Sensoren für die **gemessenen** Tagesextreme |
+| `station_today.tmax_time`, `.tmin_time`, `.gust_time` | Attribut `time` am jeweiligen Station-Sensor — `"HH:MM"` in Ortszeit, unverändert durchgereicht |
+| `station_today.gust_bft` | Attribut `beaufort` am Sensor „Station heute Böe" (Ganzzahl) |
 
 #### Messung oder Prognose — die Namen führen in die Irre
 
@@ -50,7 +53,9 @@ Bis 0.6.x hat die Integration `rain` und `rain_today` genau andersherum behandel
 
 ### `days` → Tagesvorhersage
 
-Array mit 8 Einträgen, Index 0 = heute. Genutzt: `icon`, `tmax`, `tmin`, `pop`, `rain`, `wind`, `wind_dir`. Nicht genutzt: `gust` (erwartete Spitzenböe — vorgemerkt, siehe [`Plan.md`](../Plan.md)), `confidence`, `label`, `spark`.
+Array mit 8 Einträgen, Index 0 = heute. Genutzt: `icon`, `tmax`, `tmin`, `pop`, `rain`, `wind`, `gust` (erwartete Spitzenböe), `wind_dir`. Nicht genutzt: `confidence`, `label`, `spark`.
+
+`current.gust_max` gehört dagegen **nicht** an die Wetter-Entität: Es ist die stärkste Böe des bisherigen Tages, keine aktuelle. Eine aktuelle Böe liefert die API nicht.
 
 Zwei dokumentierte Eigenheiten, die kein Bug sind:
 
@@ -104,8 +109,6 @@ Bewusst nicht angefordert. Wer eine davon braucht, muss sie zu `REQUESTED_SECTIO
 | `climate` | Kenntage, Jahresextreme, Stationsrekorde | Umfangreich; ein- bis zweimal täglich abzurufen, passt nicht zum Poll-Intervall der Integration. |
 | `rain` | Bilanz heute/gestern/Monat/Jahr inkl. Abweichung vom Klimamittel | Denkbar als zusätzliche Sensoren. Monats-/Jahressummen bildet Home Assistant seit 0.7.0 aber auch selbst aus `rain` (`total_increasing`); eigenständig wären nur `expected`, `annual_avg`, `delta` und Werte aus der Zeit vor der Installation. Unter `station` steht zusätzlich `h24` (letzte 24 Stunden) — beobachtet, nicht dokumentiert. Fair use: ein- bis zweimal täglich, bräuchte also einen eigenen Abruf. |
 
-## Weitere vorgemerkte Punkte
+## Weitere Punkte
 
-- **`current.temp_source`** unterscheidet `live` (echter Messwert) von `forecast` (Ersatzwert aus der Prognose). Unser Temperatursensor macht diesen Unterschied bisher nicht sichtbar — als Attribut wäre er ehrlicher.
-- **`station_today` hat mehr Felder als wir nutzen:** `wind_max` (höchster Wind), die Uhrzeiten zu den Extremwerten (`tmax_time`, `tmin_time`, `gust_time`) und die Böe in Beaufort (`gust_bft`). Beobachtet: Uhrzeiten als `"HH:MM"` in Ortszeit (`"tmax_time": "15:53"`), `gust_bft` als Ganzzahl.
 - **ETag / `If-None-Match` — geprüft und verworfen:** Jede Antwort trägt ein ETag; mit `If-None-Match` gäbe es bei unveränderten Daten ein `304` ohne Inhalt. Bei unserem Takt kommt das praktisch nie vor: Die Station liefert alle paar Minuten neue Werte, der Server cached fünf Minuten, und wir fragen frühestens alle fünf Minuten. Kein Gewinn für zusätzliche Fehlerpfade.

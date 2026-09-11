@@ -33,6 +33,7 @@ Wenn eine neue Funktion eine bisher ungenutzte Sektion braucht, gehört sie in `
 - **Entity-IDs leiten sich vom *englischen* Namen ab** (HA generiert Object-IDs bewusst sprachunabhängig aus `en.json`): `"Max gust"` → `sensor.kraichtal_wetter_max_gust`. Die Namen in `translations/en.json` sind damit **öffentliche API** — sie zu ändern verschiebt die Entity-IDs für Neuinstallationen. `de.json` beeinflusst nur die Anzeige. Vollständige Zuordnung in `README.md`.
 - **Entity-ID-Migration**: `_SENSOR_ENTITY_ID_MIGRATION` in `__init__.py` benennt die vor 0.5.0 aus deutschen Namen erzeugten IDs um. Läuft idempotent bei jedem Setup vor `async_forward_entry_setups` und lässt selbst umbenannte Entitäten in Ruhe. Beim Hinzufügen eines Sensors ist hier nichts zu tun; beim Umbenennen eines englischen Namens schon.
 - **Messung vs. Prognose**: `rain` ist die *gemessene* Tagessumme (`total_increasing`). `rain_today`, `tmax_today` und `tmin_today` sind *Prognosen* für die restlichen Stunden des Tages und tragen deshalb keine State-Class — Home Assistant schließt Vorhersagen ausdrücklich von `measurement` aus. Im Deutschen heißen gemessene Tageswerte „Station heute …", Prognosen „Prognose Resttag …". Details in `docs/API.md`.
+- **Attribute**: Weitere API-Felder hängen über `attributes` in `KraichtalWetterSensorEntityDescription` am Sensor — Paare aus Attributname und API-Feld (Dot-Notation wie bei `key`). `None` wird ausgelassen. Name und Werte werden unter `entity.sensor.<translation_key>.state_attributes` übersetzt, in allen drei JSON-Dateien.
 - **Sensoren** nutzen Dot-Notation in `sensor.py` um verschachtelte API-Felder aufzulösen (z.B. `station_today.tmax` → `data["current"]["station_today"]["tmax"]`).
 - **Forecast-Datum** wird aus `meta.generated` + Tages-Index berechnet (API liefert kein `date` pro Tag); Umrechnung über `dt_util.start_of_local_day()` pro Tag, damit DST-Wechsel korrekt bleiben.
 - **Forecast-Caching**: `async_forecast_daily()` cached, `_handle_coordinator_update()` invalidiert. Nicht `async_update()` verwenden — `CoordinatorEntity` setzt `should_poll = False`, die Methode würde nie aufgerufen.
@@ -53,6 +54,23 @@ Wenn eine neue Funktion eine bisher ungenutzte Sektion braucht, gehört sie in `
 
 Beim Release: `manifest.json` (`version`) und der CHANGELOG-Eintrag müssen zur Tag-Version passen, sonst greift die Changelog-Extraktion in `release.yml` nicht.
 
+### Changelog mit Icons
+
+Seit 0.8.0 tragen die Abschnittsüberschriften ein festes Icon, jeder Eintrag zusätzlich ein thematisches. Ältere Einträge bleiben, wie sie sind. Die Extraktion in `release.yml` sucht nur `## [Version]` und ist davon nicht betroffen.
+
+| Abschnitt | Icon |
+| --- | --- |
+| Hinzugefügt | ✨ |
+| Behoben | 🐛 |
+| Geändert | 🔧 |
+| Entfernt | 🗑️ |
+| Sicherheit | 🔒 |
+| Nach dem Update zu tun | ⚠️ |
+| Getestet / Bestätigt | ✅ |
+| Bekannt | ℹ️ |
+
+Thematisch zum Beispiel: 🌡️ Temperatur · 🌧️ Niederschlag · 💨 Wind · 🌬️ Böen · 🚨 DWD-Warnungen · 🕒 Zeit · 🌐 Übersetzung · 📝 Doku · 🧪 Tests.
+
 ### Downloads-Badge
 
 Bewusst **nicht** im README. Der übliche Badge liest `https://analytics.home-assistant.io/custom_integrations.json` unter `$.<domain>.total`; dort ist `kraichtal_wetter` nicht enthalten (die Liste erfasst nur Integrationen aus dem HACS-Standardkatalog mit Analytics-Opt-in der Nutzer), der Badge liefert also „no result". Ein GitHub-Downloadzähler hilft ebenfalls nicht, da die Releases keine Assets tragen und nur Assets gezählt werden. Nach Aufnahme in den Standardkatalog nutzbar:
@@ -69,7 +87,7 @@ custom_components/kraichtal_wetter/
 ├── config_flow.py       # Config-Flow, Reauth, Options
 ├── const.py             # DOMAIN, Konstanten
 ├── coordinator.py       # KraichtalWetterClient (HTTP)
-├── sensor.py            # 22 Messwert-Sensoren + Diagnose-Sensor API-Status
+├── sensor.py            # 23 Messwert-Sensoren + Diagnose-Sensor API-Status
 ├── weather.py           # WeatherEntity + Forecast
 ├── strings.json         # Quelle der UI-Texte (nicht zur Laufzeit geladen)
 ├── translations/        # de.json + en.json — das lädt HA tatsächlich

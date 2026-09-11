@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
@@ -22,6 +24,17 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import CONF_API_URL, DOMAIN
 
 
+@dataclass(frozen=True, kw_only=True)
+class KraichtalWetterSensorEntityDescription(SensorEntityDescription):
+    """Sensor description that can surface further API fields as attributes."""
+
+    # (attribute name, API field) pairs; the field uses the same dot notation
+    # as `key`. Attribute names are translated under
+    # entity.sensor.<translation_key>.state_attributes. A tuple rather than a
+    # dict keeps the frozen description hashable.
+    attributes: tuple[tuple[str, str], ...] = ()
+
+
 # `key` addresses the API payload (dot notation for nested fields) and forms the
 # unique_id; `translation_key` selects the display name from translations/.
 #
@@ -30,15 +43,20 @@ from .const import CONF_API_URL, DOMAIN
 # English name moves the entity_id for new installs. Treat en.json as public
 # API and see _ENTITY_ID_MIGRATION in __init__.py.
 SENSOR_TYPES = [
-    SensorEntityDescription(
+    KraichtalWetterSensorEntityDescription(
+        # When the station has no reading, the API fills `temp` from the
+        # forecast and says so in `temp_source` (live / forecast). The value
+        # enters the statistics either way; the attribute at least makes a
+        # stand-in visible instead of letting it pass for a measurement.
         key="temp",
         translation_key="temp",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         icon="mdi:thermometer",
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
+        attributes=(("source", "temp_source"),),
     ),
-    SensorEntityDescription(
+    KraichtalWetterSensorEntityDescription(
         key="feels_like",
         translation_key="feels_like",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
@@ -46,7 +64,7 @@ SENSOR_TYPES = [
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
-    SensorEntityDescription(
+    KraichtalWetterSensorEntityDescription(
         key="dewpoint",
         translation_key="dewpoint",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
@@ -54,7 +72,7 @@ SENSOR_TYPES = [
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
-    SensorEntityDescription(
+    KraichtalWetterSensorEntityDescription(
         key="humidity",
         translation_key="humidity",
         native_unit_of_measurement=PERCENTAGE,
@@ -62,7 +80,7 @@ SENSOR_TYPES = [
         device_class=SensorDeviceClass.HUMIDITY,
         state_class=SensorStateClass.MEASUREMENT,
     ),
-    SensorEntityDescription(
+    KraichtalWetterSensorEntityDescription(
         key="pressure",
         translation_key="pressure",
         native_unit_of_measurement=UnitOfPressure.HPA,
@@ -70,7 +88,7 @@ SENSOR_TYPES = [
         device_class=SensorDeviceClass.PRESSURE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
-    SensorEntityDescription(
+    KraichtalWetterSensorEntityDescription(
         key="wind",
         translation_key="wind",
         native_unit_of_measurement=UnitOfSpeed.KILOMETERS_PER_HOUR,
@@ -78,7 +96,7 @@ SENSOR_TYPES = [
         device_class=SensorDeviceClass.WIND_SPEED,
         state_class=SensorStateClass.MEASUREMENT,
     ),
-    SensorEntityDescription(
+    KraichtalWetterSensorEntityDescription(
         # The circular-averaging problem that previously kept this sensor
         # without a state class is what MEASUREMENT_ANGLE solves: the recorder
         # computes a circular mean, so a wind oscillating either side of north
@@ -91,7 +109,7 @@ SENSOR_TYPES = [
         device_class=SensorDeviceClass.WIND_DIRECTION,
         state_class=SensorStateClass.MEASUREMENT_ANGLE,
     ),
-    SensorEntityDescription(
+    KraichtalWetterSensorEntityDescription(
         key="gust_max",
         translation_key="gust_max",
         native_unit_of_measurement=UnitOfSpeed.KILOMETERS_PER_HOUR,
@@ -99,7 +117,7 @@ SENSOR_TYPES = [
         device_class=SensorDeviceClass.WIND_SPEED,
         state_class=SensorStateClass.MEASUREMENT,
     ),
-    SensorEntityDescription(
+    KraichtalWetterSensorEntityDescription(
         key="solar",
         translation_key="solar",
         native_unit_of_measurement=UnitOfIrradiance.WATTS_PER_SQUARE_METER,
@@ -107,7 +125,7 @@ SENSOR_TYPES = [
         device_class=SensorDeviceClass.IRRADIANCE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
-    SensorEntityDescription(
+    KraichtalWetterSensorEntityDescription(
         # Precipitation measured by the station's rain gauge since midnight
         # (API docs: "Niederschlag heute (Station)"). It climbs in 0.2 mm steps
         # and drops to 0 at midnight — the case the HA docs name for
@@ -137,72 +155,89 @@ SENSOR_TYPES = [
     # from MEASUREMENT by name, and TOTAL_INCREASING on rain_today turned every
     # downward revision of the forecast into a meter reset, inflating the
     # long-term sum (5 Sep 2026: 9.5 mm recorded, 3.4 mm actually fell).
-    SensorEntityDescription(
+    KraichtalWetterSensorEntityDescription(
         key="tmax_today",
         translation_key="tmax_today",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         icon="mdi:thermometer-high",
         device_class=SensorDeviceClass.TEMPERATURE,
     ),
-    SensorEntityDescription(
+    KraichtalWetterSensorEntityDescription(
         key="tmin_today",
         translation_key="tmin_today",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         icon="mdi:thermometer-low",
         device_class=SensorDeviceClass.TEMPERATURE,
     ),
-    SensorEntityDescription(
+    KraichtalWetterSensorEntityDescription(
         key="rain_today",
         translation_key="rain_today",
         native_unit_of_measurement=UnitOfPrecipitationDepth.MILLIMETERS,
         icon="mdi:weather-rainy",
         device_class=SensorDeviceClass.PRECIPITATION,
     ),
-    SensorEntityDescription(
+    KraichtalWetterSensorEntityDescription(
         key="warnings",
         translation_key="warnings",
         icon="mdi:alarm",
     ),
-    SensorEntityDescription(
+    KraichtalWetterSensorEntityDescription(
         key="obs_date",
         translation_key="obs_date",
         icon="mdi:calendar",
     ),
-    SensorEntityDescription(
+    KraichtalWetterSensorEntityDescription(
         key="obs_time",
         translation_key="obs_time",
         icon="mdi:clock",
     ),
-    SensorEntityDescription(
+    KraichtalWetterSensorEntityDescription(
         key="realtime",
         translation_key="realtime",
         icon="mdi:clock-fast",
     ),
-    SensorEntityDescription(
+    KraichtalWetterSensorEntityDescription(
+        # The `*_time` fields arrive as "HH:MM" local time and are passed
+        # through as-is: turning them into datetimes would mean pairing them
+        # with a date, and around midnight it is unclear which one.
         key="station_today.tmax",
         translation_key="station_today_tmax",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         icon="mdi:thermometer-high",
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
+        attributes=(("time", "station_today.tmax_time"),),
     ),
-    SensorEntityDescription(
+    KraichtalWetterSensorEntityDescription(
         key="station_today.tmin",
         translation_key="station_today_tmin",
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
         icon="mdi:thermometer-low",
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
+        attributes=(("time", "station_today.tmin_time"),),
     ),
-    SensorEntityDescription(
+    KraichtalWetterSensorEntityDescription(
         key="station_today.gust",
         translation_key="station_today_gust",
         native_unit_of_measurement=UnitOfSpeed.KILOMETERS_PER_HOUR,
         icon="mdi:weather-windy",
         device_class=SensorDeviceClass.WIND_SPEED,
         state_class=SensorStateClass.MEASUREMENT,
+        attributes=(
+            ("time", "station_today.gust_time"),
+            ("beaufort", "station_today.gust_bft"),
+        ),
     ),
-    SensorEntityDescription(
+    KraichtalWetterSensorEntityDescription(
+        key="station_today.wind_max",
+        translation_key="station_today_wind_max",
+        native_unit_of_measurement=UnitOfSpeed.KILOMETERS_PER_HOUR,
+        icon="mdi:weather-windy",
+        device_class=SensorDeviceClass.WIND_SPEED,
+        state_class=SensorStateClass.MEASUREMENT,
+    ),
+    KraichtalWetterSensorEntityDescription(
         key="station_today.press_max",
         translation_key="station_today_press_max",
         native_unit_of_measurement=UnitOfPressure.HPA,
@@ -210,7 +245,7 @@ SENSOR_TYPES = [
         device_class=SensorDeviceClass.PRESSURE,
         state_class=SensorStateClass.MEASUREMENT,
     ),
-    SensorEntityDescription(
+    KraichtalWetterSensorEntityDescription(
         key="station_today.press_min",
         translation_key="station_today_press_min",
         native_unit_of_measurement=UnitOfPressure.HPA,
@@ -251,10 +286,12 @@ def _resolve_current_value(data: object, key: str):
 
 
 class KraichtalWetterSensor(CoordinatorEntity, SensorEntity):
-    entity_description: SensorEntityDescription
+    entity_description: KraichtalWetterSensorEntityDescription
     _attr_has_entity_name = True
 
-    def __init__(self, coordinator, entry, description: SensorEntityDescription) -> None:
+    def __init__(
+        self, coordinator, entry, description: KraichtalWetterSensorEntityDescription
+    ) -> None:
         super().__init__(coordinator)
         self.entity_description = description
         self._attr_unique_id = f"kraichtal_wetter_{description.key}"
@@ -269,6 +306,15 @@ class KraichtalWetterSensor(CoordinatorEntity, SensorEntity):
     @property
     def native_value(self):
         return _resolve_current_value(self.coordinator.data, self.entity_description.key)
+
+    @property
+    def extra_state_attributes(self) -> dict[str, object] | None:
+        attributes = {
+            name: value
+            for name, api_field in self.entity_description.attributes
+            if (value := _resolve_current_value(self.coordinator.data, api_field)) is not None
+        }
+        return attributes or None
 
 
 class KraichtalWetterApiStatusSensor(CoordinatorEntity, SensorEntity):

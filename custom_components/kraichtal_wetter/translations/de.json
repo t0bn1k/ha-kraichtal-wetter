@@ -42,7 +42,16 @@
   "entity": {
     "sensor": {
       "temp": {
-        "name": "Außentemperatur"
+        "name": "Außentemperatur",
+        "state_attributes": {
+          "source": {
+            "name": "Quelle",
+            "state": {
+              "live": "Messung",
+              "forecast": "Prognose"
+            }
+          }
+        }
       },
       "feels_like": {
         "name": "Gefühlt"
@@ -93,13 +102,34 @@
         "name": "Echtzeitdaten"
       },
       "station_today_tmax": {
-        "name": "Station heute Tmax"
+        "name": "Station heute Tmax",
+        "state_attributes": {
+          "time": {
+            "name": "Uhrzeit"
+          }
+        }
       },
       "station_today_tmin": {
-        "name": "Station heute Tmin"
+        "name": "Station heute Tmin",
+        "state_attributes": {
+          "time": {
+            "name": "Uhrzeit"
+          }
+        }
       },
       "station_today_gust": {
-        "name": "Station heute Böe"
+        "name": "Station heute Böe",
+        "state_attributes": {
+          "time": {
+            "name": "Uhrzeit"
+          },
+          "beaufort": {
+            "name": "Beaufort"
+          }
+        }
+      },
+      "station_today_wind_max": {
+        "name": "Station heute Wind max"
       },
       "station_today_press_max": {
         "name": "Station heute Luftdruck max"
