@@ -27,14 +27,14 @@ Den Schlüssel gibst du anschließend beim Einrichten der Integration ein. Er l�
 
 ### Installation über HACS
 
-[![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=kraichtal_wetter)
-
-> **Hinweis:** Der Button merkt sich deine Home-Assistant-Instanz-URL im Browser. Läuft deine Instanz über einen anderen Port als zuvor (z. B. Standard-Port 80 statt `:8123`), öffnet der Button eine veraltete URL. Korrigiere sie dann über das Stift-Symbol auf der geöffneten my.home-assistant.io-Seite.
-
 1. Öffne in Home Assistant `HACS → Integrationen`.
 2. Füge über `⋯ → Benutzerdefinierte Repositorys` die URL `https://github.com/t0bn1k/ha-kraichtal-wetter` mit Kategorie `Integration` hinzu.
 3. Suche nach `Kraichtal Wetter`, lade die Integration herunter und starte Home Assistant neu.
 4. Füge die Integration über den Button unten oder `Einstellungen → Geräte & Dienste → Integration hinzufügen` hinzu:
+
+   [![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=kraichtal_wetter)
+
+   > **Hinweis:** Der Button merkt sich deine Home-Assistant-Instanz-URL im Browser. Läuft deine Instanz über einen anderen Port als zuvor (z. B. Standard-Port 80 statt `:8123`), öffnet der Button eine veraltete URL. Korrigiere sie dann über das Stift-Symbol auf der geöffneten my.home-assistant.io-Seite.
 
 > **Hinweis für bestehende Installationen:** Das Repository hieß bis 0.6.1 `kraichtal-wetter-hacs`. HACS verlangt für die Aufnahme in den Standardkatalog, dass „HACS" nicht im Repository-Namen vorkommt. GitHub leitet die alte Adresse automatisch weiter, installierte Integrationen laufen unverändert weiter — an Entitäten, Konfiguration und Historie ändert sich nichts. Sollte HACS für dich keine Updates mehr finden, entferne das benutzerdefinierte Repository einmal und füge es unter der neuen URL wieder hinzu; die Integration bleibt dabei installiert.
 
@@ -129,7 +129,6 @@ entities:
   - sensor.kraichtal_wetter_outdoor_temperature
   - sensor.kraichtal_wetter_humidity
 hours_to_show: 24
-refresh_interval: 300
 ```
 
 ## Hinweise

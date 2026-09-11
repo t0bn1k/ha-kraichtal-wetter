@@ -55,4 +55,3 @@ views:
           - sensor.kraichtal_wetter_humidity
           - sensor.kraichtal_wetter_pressure
         hours_to_show: 24
-        refresh_interval: 300

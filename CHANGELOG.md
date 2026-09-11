@@ -2,6 +2,19 @@
 
 Alle signifikanten Änderungen an dieser Integration werden hier festgehalten.
 
+## [0.6.2] - 2026-09-11
+### Geändert
+- **Nur Dokumentation — die Integration selbst ist unverändert.** Das Update
+  bringt kein neues Verhalten; an Entitäten, Konfiguration und Historie
+  ändert sich nichts.
+- README: Der „In Home Assistant öffnen"-Button steht jetzt unter Schritt 4
+  der HACS-Installation, auf den er verweist. Vorher stand er über der
+  Anleitung, obwohl er erst nach Download und Neustart funktioniert — bis
+  dahin kennt Home Assistant die Integration noch nicht.
+- README und Lovelace-Beispiel: `refresh_interval` aus der Verlaufskarte
+  (`history-graph`) entfernt. Die Option ist in der Home-Assistant-
+  Dokumentation der Karte nicht mehr aufgeführt.
+
 ## [0.6.1] - 2026-09-09
 ### Geändert
 - **Das Repository heißt jetzt `ha-kraichtal-wetter` (vorher

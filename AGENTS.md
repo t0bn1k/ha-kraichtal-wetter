@@ -68,7 +68,7 @@ custom_components/kraichtal_wetter/
 ├── weather.py           # WeatherEntity + Forecast
 ├── strings.json         # Quelle der UI-Texte (nicht zur Laufzeit geladen)
 ├── translations/        # de.json + en.json — das lädt HA tatsächlich
-└── brand/               # 8 Brand-Bilder (icon/logo + @2x + dark_*), lokale Auslieferung seit HA 2026.3
+└── brand/               # 4 Brand-Icons (icon + @2x + dark_*), lokale Auslieferung seit HA 2026.3
 hacs.json                # HACS-Metadaten
 docs/API.md              # Was die Integration von der API nutzt — und der Backlog
 lovelace/                # Beispiel-Dashboards
