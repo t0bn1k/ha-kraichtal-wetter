@@ -21,10 +21,10 @@ KEY_PARAM_NAMES = ("key", "api_key", "apikey")
 
 # Sections this integration actually reads. Without a `section` parameter the
 # API returns all eleven — including climate statistics, model comparisons and
-# hourly series we never touch. `meta` is always included and must not be
-# requested. Extend this tuple when a new feature needs another section; see
-# docs/API.md for what each one carries.
-REQUESTED_SECTIONS = ("current", "days")
+# series we never touch. `meta` is always included and must not be requested.
+# Extend this tuple when a new feature needs another section; see docs/API.md
+# for what each one carries.
+REQUESTED_SECTIONS = ("current", "days", "hours")
 
 # Documented meanings for the status codes the API uses, so a failure says what
 # went wrong instead of only carrying a number. 401/403 never reach this map —

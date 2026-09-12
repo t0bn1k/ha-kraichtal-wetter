@@ -21,7 +21,7 @@ Der Key gehört **ausschließlich** in den Header, nie in die URL — Begründun
 Ohne `section`-Parameter liefert die API **alle elf** Sektionen. Wir fordern gezielt an, was wir lesen (`REQUESTED_SECTIONS` in `coordinator.py`):
 
 ```
-?section=current,days
+?section=current,days,hours
 ```
 
 `meta` ist immer enthalten und darf nicht angefordert werden — wir nutzen daraus `meta.generated` als Anker für die Vorhersagedaten.
@@ -65,6 +65,16 @@ Zwei dokumentierte Eigenheiten, die kein Bug sind:
 
 Die Einträge enthalten **kein Datum**; wir leiten es aus `meta.generated` plus Index ab (siehe `_base_day()` in `weather.py`).
 
+### `hours` → stündliche Vorhersage
+
+12 Einträge für die nächsten Stunden. Genutzt: `icon`, `temp`, `pop`, `wind`. Eine Regenmenge und eine Windrichtung gibt es hier nicht.
+
+**Die Einträge tragen kein Datum, nur eine Beschriftung:** `"Jetzt"` für den ersten, danach volle Stunden (`"00:00"`, `"01:00"` …) in Ortszeit, fortlaufend über Mitternacht. `_hourly_datetimes()` in `weather.py` macht daraus Zeitstempel:
+
+- Verankert wird an der **ersten beschrifteten** Stunde — das ist die Aussage der API selbst. `meta.generated` entscheidet nur, zu welchem Tag diese Uhrzeit gehört. Sich auf `generated` zu verlassen hieße zu raten, ob die API `"Jetzt"` auf- oder abrundet.
+- Ab dort wird **in UTC** weitergezählt, damit eine Stunde bei der Zeitumstellung eine Stunde bleibt: Die doppelte 02:00 im Oktober ergibt zwei verschiedene Zeitpunkte, die beide zu ihrer Beschriftung passen.
+- Widerspricht eine Beschriftung dem Schritt — eine Lücke in der Reihe —, gilt die Beschriftung, und es geht von dort weiter.
+
 ## Wettersymbole
 
 Genau 19 Codes, vollständig in `ICON_MAP` (`weather.py`) abgebildet — gegen die Dokumentation geprüft, keine Abweichung.
@@ -100,8 +110,7 @@ Bewusst nicht angefordert. Wer eine davon braucht, muss sie zu `REQUESTED_SECTIO
 
 | Sektion | Inhalt | Einschätzung |
 | --- | --- | --- |
-| `hours` | Nächste 12 Stunden mit `temp`, `pop`, `wind`, `icon` | **Vorgemerkt:** Grundlage für `FORECAST_HOURLY`. Haken: Die Einträge tragen nur ein `label` („Jetzt", „15:00"), keinen Zeitstempel — die Zeit müsste wie bei `days` aus `meta.generated` rekonstruiert werden, inklusive Mitternachtswechsel und Sommerzeitumstellung. Beobachtet: Eintrag 0 heißt „Jetzt" (laufende Stunde), danach folgen lückenlos volle Stunden (`"00:00"`, `"01:00"` …) über Mitternacht hinweg. Keine Regenmenge, keine Windrichtung. |
-| `alerts` | DWD-Warnungen mit `title`, `event`, `sev`, `level`, `active`, `desc`, `time` | **Vorgemerkt:** Unser `warnings`-Sensor liefert bisher nur die Anzahl aus `current.warnings`. Die Einzelwarnungen als Attribute daran wären deutlich nützlicher. Fair-use-Intervall: 15–30 Minuten. |
+| `alerts` | DWD-Warnungen mit `title`, `event`, `sev`, `level`, `active`, `desc`, `time` | **Verworfen.** Dafür gibt es die Core-Integration „Deutscher Wetterdienst (DWD) Weather Warnings": Sie holt dieselben Warnungen direkt beim DWD, je Warnung mit `headline`, `description`, `instruction` sowie `start_time`/`end_time` als echten Zeitstempeln, und trennt aktuelle Warnstufe von Vorwarnstufe. Hier gibt es die Gültigkeit nur als Fließtext, keine Verhaltenshinweise und kein Vorwarn-Konzept. Der Sensor „Warnungen" aus `current.warnings` bleibt als reine Anzahl. |
 | `today` | 24 Stundenwerte des heutigen Tages (`temp`, `rain`, `snow`, `wind`, `gust`) | Für Diagramme gedacht; in HA über die Sensorhistorie bereits abgedeckt. |
 | `trend` | Wie `days`, aber mit Modellspannbreite (`lo`/`avg`/`hi`) | Kein HA-Gegenstück im Wetter-Modell. |
 | `models` | Einzelmodelle, Streuung, `confidence` | Nische. |

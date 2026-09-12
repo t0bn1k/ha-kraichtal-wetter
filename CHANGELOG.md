@@ -2,6 +2,36 @@
 
 Alle signifikanten Änderungen an dieser Integration werden hier festgehalten.
 
+## [0.9.0] - 2026-09-12
+### ✨ Hinzugefügt
+- 🕒 **Stündliche Vorhersage** für die nächsten zwölf Stunden mit Temperatur,
+  Regenwahrscheinlichkeit, Windgeschwindigkeit und Wetterlage. In einer
+  Vorhersagekarte über `forecast_type: hourly` auswählbar. Eine Regenmenge
+  und eine Windrichtung liefert die API je Stunde nicht.
+
+### 🐛 Behoben
+- 🔄 **Die Vorhersage in einem offenen Dashboard blieb stehen.** Home
+  Assistant reicht eine neue Vorhersage nur an die Karte weiter, wenn die
+  Entität ihre Abonnenten ausdrücklich benachrichtigt; der aktualisierte
+  Zustand allein genügt nicht. Bisher kam die neue Vorhersage erst beim
+  Neuladen der Seite an.
+- 🌍 **Tagesvorhersage bei abweichender Zeitzone.** Der erste Vorhersagetag
+  wird jetzt nach dem Kalendertag der API bestimmt (Europe/Berlin). Eine
+  Instanz in einer anderen Zeitzone konnte kurz nach Mitternacht die ganze
+  Vorhersage um einen Tag verschoben anzeigen.
+
+### 🔧 Geändert
+- 🚨 **Keine eigenen DWD-Warnungen.** Der Plan, die Einzelwarnungen der API
+  auszuwerten, ist verworfen: Die mitgelieferte Integration „Deutscher
+  Wetterdienst (DWD) Weather Warnings" holt dieselben Warnungen direkt beim
+  DWD, inklusive Verhaltenshinweisen sowie Beginn und Ende als Zeitstempel.
+  Der Sensor „Warnungen" bleibt als Anzahl; die README verweist auf die
+  Integration.
+
+### ✅ Getestet
+- 🧪 Zeitrekonstruktion der Stundenwerte gegen beide Zeitumstellungen, den
+  Mitternachtswechsel, Lücken in der Reihe und fehlende Beschriftungen.
+
 ## [0.8.0] - 2026-09-11
 ### ✨ Hinzugefügt
 - 💨 **Neuer Sensor „Station heute Wind max"**

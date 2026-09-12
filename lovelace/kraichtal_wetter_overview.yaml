@@ -10,6 +10,13 @@ views:
       - type: weather-forecast
         entity: weather.kraichtal_wetter
         name: Kraichtal Wetter
+        forecast_type: daily
+
+      - type: weather-forecast
+        entity: weather.kraichtal_wetter
+        name: Nächste Stunden
+        forecast_type: hourly
+        show_current: false
 
       - type: entities
         title: Aktuelle Werte

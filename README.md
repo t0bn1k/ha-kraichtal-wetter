@@ -50,6 +50,7 @@ Den Schlüssel gibst du anschließend beim Einrichten der Integration ein. Er l�
 
 - Aktuelle Wetterdaten aus der Kraichtal Wetter API
 - 8-Tage-Vorhersage über `weather.kraichtal_wetter` (Temperatur, Regen, Wind und Böen)
+- Stündliche Vorhersage für die nächsten zwölf Stunden
 - Erweiterte Sensoren aus `station_today`
 - Gruppierte Entitäten unter einem Gerät in der Integrationen-Ansicht
 
@@ -104,6 +105,12 @@ type: vertical-stack
 cards:
   - type: weather-forecast
     entity: weather.kraichtal_wetter
+    forecast_type: daily
+
+  - type: weather-forecast
+    entity: weather.kraichtal_wetter
+    forecast_type: hourly
+    show_current: false
 
   - type: entities
     title: Kraichtal Wetter – Aktuelle Werte
@@ -143,6 +150,7 @@ hours_to_show: 24
 - Alle Entitäten werden als Teil desselben Geräts in der Integrationen-Ansicht angezeigt.
 - Der API-Key kann jederzeit über Einstellungen → Geräte & Dienste → Kraichtal Wetter → Konfiguration geändert werden.
 - Das Abfrageintervall kann über die Optionen (Drei-Punkte-Menü → Optionen) angepasst werden — **mindestens 300 Sekunden**. Die API hält ihre Antwort serverseitig fünf Minuten vor; häufigere Abfragen liefern dieselben Daten und belasten nur den Betreiber. Ein niedrigerer Wert wird abgelehnt, ein früher gespeicherter beim Start auf 300 Sekunden angehoben.
+- Der Sensor **Warnungen** zeigt nur, **wie viele** DWD-Warnungen gerade gelten. Für die Warnungen im Detail — Text, Verhaltenshinweise, Beginn und Ende — ist die in Home Assistant mitgelieferte Integration [Deutscher Wetterdienst (DWD) Weather Warnings](https://www.home-assistant.io/integrations/dwd_weather_warnings/) die bessere Wahl. Sie holt die Warnungen direkt beim DWD und trennt aktuelle Warnstufe und Vorwarnstufe.
 - **Nicht jede Wetterlage, die Home Assistant kennt, kann diese Station liefern.**
   Hagel und Sturm stecken bei der Quelle in den Warn- bzw. Windfeldern und nicht
   in der Wetterlage, Schneeregen und gefrierender Regen laufen dort unter

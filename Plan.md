@@ -1,6 +1,6 @@
 # Plan
 
-Stand: 11.09.2026 · veröffentlicht: 0.8.0 · API v1.5
+Stand: 12.09.2026 · veröffentlicht: 0.9.0 · API v1.5
 
 Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die API liefert, steht in [`docs/API.md`](docs/API.md) — dort nachsehen, bevor ein Punkt umgesetzt wird (siehe `AGENTS.md`). Erledigtes abhaken und die Version dazuschreiben.
 
@@ -8,8 +8,8 @@ Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die AP
 | --- | --- | --- | --- |
 | 1 | Niederschlag und Prognose-Sensoren korrigieren | veröffentlicht | 0.7.0 |
 | 2 | Kleines Paket: `days[].gust`, `temp_source`, `station_today` | veröffentlicht | 0.8.0 |
-| 3 | DWD-Warnungen (`alerts`) | offen | – |
-| 4 | Stündliche Vorhersage (`hours`) | offen | – |
+| 3 | DWD-Warnungen (`alerts`) | verworfen — dafür gibt es die DWD-Integration | – |
+| 4 | Stündliche Vorhersage (`hours`) | veröffentlicht | 0.9.0 |
 | 5 | Niederschlagsbilanz (`rain`) | neu bewerten | – |
 | – | ETag / `If-None-Match` | verworfen | – |
 
@@ -52,29 +52,37 @@ Alles aus bereits angeforderten Sektionen, kein zusätzlicher Abruf. Formate an 
 - [x] Release 0.8.0 (11.09.2026)
 - [ ] Nach dem Update in der eigenen Instanz prüfen: Entity-ID des neuen Sensors (evtl. mit Bereichspräfix, siehe unten), Attribute in der Oberfläche übersetzt
 
-## 3. DWD-Warnungen (`alerts`)
+## 3. DWD-Warnungen (`alerts`) — verworfen (12.09.2026)
 
-Größter Nutzen der Erweiterungen. Die API liefert `count` und `items` (Titel, Art, Gültigkeit als Text, Kurztext, `sev`, `level`, `active`, `color`), sortiert nach Schwere; abgelaufene fehlen.
+Dafür gibt es die mitgelieferte Integration **„Deutscher Wetterdienst (DWD) Weather Warnings"** (`dwd_weather_warnings`), und sie ist der API in jedem Punkt überlegen, der zählt:
 
-- [ ] `alerts` zu `REQUESTED_SECTIONS`
-- [ ] Einzelwarnungen als Attribut am Sensor „Warnungen"
-- [ ] Neuer Sensor „Warnstufe" (Enum: keine / minor / moderate / severe / extreme) mit der höchsten *aktiven* Stufe — die Grundlage für Automationen
+| | `alerts` dieser API | DWD-Integration |
+| --- | --- | --- |
+| Quelle | DWD über den API-Betreiber | DWD direkt (WFS-API) |
+| Gültigkeit | Fließtext | `start_time` / `end_time` als Zeitstempel |
+| Verhaltenshinweise | – | `instruction` |
+| Vorwarnung | nur Flag `active` | eigener Sensor „Vorwarnstufe" |
+| Weitere Felder | `sev`, `level`, `color` | `event_code`, `level`, `parameters`, `color`, `headline`, `description` |
+| Ort | fest die Station | wählbare Warnzelle, auch per Gerätestandort |
+| Takt | unser Abrufintervall | 15 Minuten |
 
-**Offen:**
-- Noch keine Antwort *mit* Warnung gesehen (11.09.: `count: 0`). Beim ersten Auftreten eine Antwort sichern und die Felder prüfen.
-- `current.warnings` zählt nur aktive Warnungen, `alerts` enthält auch angekündigte (`active: false`). Vorschlag: Sensorzustand bleibt `current.warnings`, angekündigte Warnungen erscheinen im Attribut — damit ist eine Vorwarnung möglich.
-- Gültigkeit nur als Text — kein Kalender, keine Zeitstempel.
-- Abgrenzung zur Core-Integration „DWD Weather Warnings": hier ohne zusätzliche Einrichtung. Die API selbst verweist für sicherheitskritische Entscheidungen auf die amtlichen DWD-Warnungen.
+Übrig blieben als Vorteile nur der fertige deutsche Text „Warnstufe 3 – Schwer" und die Farbe. Das wiegt eine zweite, schwächere Warnquelle nicht auf.
+
+Der Sensor „Warnungen" aus `current.warnings` bleibt als schnelle Anzahl erhalten; die README verweist für Details auf die DWD-Integration.
 
 ## 4. Stündliche Vorhersage (`hours`)
 
 12 Einträge mit `label`, `temp`, `pop`, `wind`, `icon` — keine Regenmenge, keine Windrichtung.
 
-- [ ] `hours` zu `REQUESTED_SECTIONS`, `WeatherEntityFeature.FORECAST_HOURLY`, `async_forecast_hourly()` mit Cache wie bei der Tagesvorhersage
-- [ ] Zeitstempel: `meta.generated` auf die volle Stunde abrunden, je Eintrag eine Stunde in **UTC** addieren (sonst geht die Sommerzeitumstellung schief), `label` nur zur Plausibilitätsprüfung — bei Abweichung den Eintrag verwerfen statt eine falsche Zeit zu liefern
-- [ ] Zeitzone explizit `Europe/Berlin` (laut API-Doku), nicht die Zeitzone der HA-Instanz
+- [x] `hours` in `REQUESTED_SECTIONS`, `WeatherEntityFeature.FORECAST_HOURLY`, `async_forecast_hourly()` mit eigenem Cache
+- [x] Zeitstempel: verankert an der ersten beschrifteten Stunde (statt an `meta.generated`, sonst müsste man raten, ob die API „Jetzt" auf- oder abrundet), von dort in **UTC** weitergezählt; widerspricht eine Beschriftung dem Schritt, gilt die Beschriftung
+- [x] Zeitzone fest `Europe/Berlin` (`API_TIME_ZONE`), auch für den Kalendertag der Tagesvorhersage
+- [x] Nebenbefund behoben: Die Entität benachrichtigt jetzt ihre Forecast-Abonnenten (`async_update_listeners`) — vorher blieb die Vorhersage in einem offenen Dashboard stehen
+- [x] Getestet gegen beide Zeitumstellungen, Mitternacht, Lücken und fehlende Beschriftungen
+- [x] Release 0.9.0 (12.09.2026)
+- [ ] Nach dem Update prüfen: Vorhersagekarte mit `forecast_type: hourly`
 
-**Beobachtet:** Eintrag 0 heißt „Jetzt" (laufende Stunde), danach lückenlos volle Stunden über Mitternacht. Zu prüfen: das Verhalten um die Zeitumstellung am 25.10.2026.
+**Offen:** Was die API um 02:00 am 25.10.2026 tatsächlich in die Beschriftungen schreibt, ist Annahme — der Code kommt mit beiden plausiblen Varianten zurecht. Bei Gelegenheit eine Antwort aus dieser Nacht sichern.
 
 ## 5. Niederschlagsbilanz (`rain`) — neu bewerten
 
@@ -85,13 +93,14 @@ Monats- und Jahressummen bildet Home Assistant nach 0.7.0 selbst aus `rain`. Eig
 ## Verworfen
 
 - **ETag / `If-None-Match`:** Bei unserem Takt kommt ein 304 praktisch nie vor (Station alle paar Minuten, Server-Cache 5 Minuten, Abruf frühestens alle 5 Minuten). Kein Gewinn für zusätzliche Fehlerpfade.
+- **`alerts`:** siehe Punkt 3 — die DWD-Integration kann es besser.
 - **`today`, `trend`, `models`, `astro`, `climate`:** Begründung in `docs/API.md`.
 
 ## Übergreifend
 
 - **Englische Namen.** „Precipitation today", „Max temperature today" usw. sind für die englische Oberfläche weiterhin irreführend. Eine Änderung verschiebt aber die Entity-IDs *neuer* Installationen. Optionen: lassen · ändern und in der README beide IDs nennen · ändern mit Migration (bricht Automationen). Empfehlung: lassen, solange niemand danach fragt.
-- **Fair use.** Die Doku empfiehlt für `days`, `hours` und `alerts` 15–30 Minuten, wir fragen alle 5 Minuten ab. Wegen des 5-Minuten-Server-Caches vertretbar. Kommt `rain` (Punkt 5), braucht es ohnehin einen zweiten Abruf — dann prüfen, ob `days`/`hours`/`alerts` mit umziehen.
-- **Zeitzone.** `_base_day()` in `weather.py` rechnet in der HA-Zeitzone, die API in `Europe/Berlin`. Bei Instanzen in anderen Zeitzonen verschieben sich die Tagesgrenzen. Zusammen mit Punkt 4 angehen.
+- **Fair use.** Die Doku empfiehlt für `days` und `hours` 15–30 Minuten, wir fragen alle 5 Minuten ab. Wegen des 5-Minuten-Server-Caches vertretbar. Kommt `rain` (Punkt 5), braucht es ohnehin einen zweiten Abruf — dann prüfen, ob `days`/`hours`/`alerts` mit umziehen.
+- ~~**Zeitzone.**~~ Erledigt in 0.9.0: Der Kalendertag kommt aus `Europe/Berlin`, die Anzeige bleibt auf lokaler Mitternacht, damit die Karte den erwarteten Wochentag beschriftet.
 - **Bereich in der Entity-ID.** In einer Instanz, deren Gerät einem Bereich zugeordnet ist, heißt der API-Status `sensor.garten_kraichtal_wetter_api_status` statt `sensor.kraichtal_wetter_api_status`. Vermutlich übernimmt Home Assistant den Bereich in die ID neu angelegter Entitäten. Die README kann nur den Normalfall zeigen; betrifft jeden neuen Sensor aus 2 und 3.
 
 ## Außerhalb des Codes
@@ -108,7 +117,7 @@ Eine echte Antwort, der Key steht nur im Header und landet nicht in der Datei:
 curl -s -H "X-API-Key: DEIN_KEY" "https://kraichtal-wetter.de/dashboard/api.php?section=current,days,hours,alerts,rain&pretty=1" > /tmp/kw.json
 ```
 
-Für Punkt 3 fehlt noch eine Antwort mit aktiver Warnung — bei der nächsten Warnlage sichern.
+Eine Antwort aus der Nacht der Zeitumstellung (25.10.2026, 02:00–03:00) wäre nützlich, um die Beschriftungen der Stundenwerte gegenzuprüfen.
 
 ## Ohne laufende Instanz prüfen
 
