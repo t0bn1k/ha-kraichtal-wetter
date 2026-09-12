@@ -30,7 +30,7 @@ Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die AP
 - [x] Deutsche Namen: „Station heute Niederschlag", „Prognose Resttag Niederschlag/Tmax/Tmin"
 - [x] README (Tabelle, Erklärung, Upgrade-Hinweis, Beispiel), Beispiel-Dashboard, `docs/API.md`, `AGENTS.md`, CHANGELOG
 - [x] Release 0.7.0 (11.09.2026)
-- [ ] Nach dem Update in der eigenen Instanz: *Entwicklerwerkzeuge → Statistik* — die Hinweise zu den drei Prognose-Sensoren bestätigen und die alten Daten löschen
+- [x] Alte Statistik der drei Prognose-Sensoren gelöscht (12.09.2026, `recorder/clear_statistics`); die Meldungen „state class removed" verschwinden erst nach `recorder/update_statistics_issues` oder dem nächsten Prüflauf
 - [ ] Optional beim API-Autor bestätigen lassen, dass die `*_today`-Werte nur die restlichen Stunden abdecken (beobachtet, nicht dokumentiert)
 
 **Entscheidungen:**
@@ -51,7 +51,7 @@ Alles aus bereits angeforderten Sektionen, kein zusätzlicher Abruf. Formate an 
 - [x] Attribute über `attributes` in `KraichtalWetterSensorEntityDescription`, Übersetzungen unter `state_attributes`
 - [x] Getestet gegen HA 2026.9.2 mit der Antwort vom 11.09.2026 (24 Prüfungen, Randfälle `null`/fehlend) und mit Hassfest lokal
 - [x] Release 0.8.0 (11.09.2026)
-- [ ] Nach dem Update in der eigenen Instanz prüfen: Entity-ID des neuen Sensors (evtl. mit Bereichspräfix, siehe unten), Attribute in der Oberfläche übersetzt
+- [x] In einer echten Instanz bestätigt (12.09.2026): Sensor liegt als `sensor.garten_kraichtal_wetter_station_heute_wind_max` an, die Attribute kommen an (`time: "15:22"`, `beaufort: 4`)
 
 ## 3. DWD-Warnungen (`alerts`) — verworfen (12.09.2026)
 
@@ -81,7 +81,7 @@ Der Sensor „Warnungen" aus `current.warnings` bleibt als schnelle Anzahl erhal
 - [x] Nebenbefund behoben: Die Entität benachrichtigt jetzt ihre Forecast-Abonnenten (`async_update_listeners`) — vorher blieb die Vorhersage in einem offenen Dashboard stehen
 - [x] Getestet gegen beide Zeitumstellungen, Mitternacht, Lücken und fehlende Beschriftungen
 - [x] Release 0.9.0 (12.09.2026)
-- [ ] Nach dem Update prüfen: Vorhersagekarte mit `forecast_type: hourly`
+- [x] In einer echten Instanz bestätigt (12.09.2026, 15:2x Uhr): zwölf Einträge ab 15:00, lückenlos stündlich über Mitternacht bis 02:00
 
 **Offen:** Was die API um 02:00 am 25.10.2026 tatsächlich in die Beschriftungen schreibt, ist Annahme — der Code kommt mit beiden plausiblen Varianten zurecht. Bei Gelegenheit eine Antwort aus dieser Nacht sichern.
 
@@ -107,7 +107,7 @@ Sichtbar geworden am neuen Sensor aus 0.8.0: Er heißt in einer deutschen Instan
 - [x] README (Tabelle, Beispiele, Upgrade-Hinweis), Beispiel-Dashboard, `AGENTS.md`
 - [x] Getestet: Umbenennung aus beiden Alt-Zuständen, Format mit Bereich, selbst vergebene IDs, bereits korrekte IDs, englischsprachige Instanz, Einmaligkeit und die Reihenfolge im Setup
 - [x] Release 0.10.0 (12.09.2026)
-- [ ] Danach in der eigenen Instanz: Automation „Nibe Lüftung Stufe 4 bei sommerlicher Nachtauskühlung" sowie die Dashboards `_Home` und `_ShellyDisplays` auf die neuen IDs umstellen
+- [x] Verweise in der Testinstanz nachgezogen (12.09.2026): eine Automation und sieben Stellen in zwei Dashboards; Helfer und Gruppen waren nicht betroffen
 
 **Folge für Bestandsinstallationen mit Bereich:** Die Entitäten bekommen das Bereichspräfix, das eine Neuinstallation auch hätte — aus `sensor.kraichtal_wetter_outdoor_temperature` wird dort `sensor.garten_kraichtal_wetter_aussentemperatur`. Genau das macht sie zu den bereits nativ angelegten Sensoren konsistent.
 
@@ -117,6 +117,11 @@ Sichtbar geworden am neuen Sensor aus 0.8.0: Er heißt in einer deutschen Instan
 - **`alerts`:** siehe Punkt 3 — die DWD-Integration kann es besser.
 - **`rain`:** siehe Punkt 5 — Home Assistant rechnet die Summen selbst.
 - **`today`, `trend`, `models`, `astro`, `climate`:** Begründung in `docs/API.md`.
+
+## Entschieden, nicht noch einmal aufrollen
+
+- **Die drei „Prognose Resttag"-Sensoren bleiben standardmäßig aktiv** (12.09.2026). Sie standardmäßig zu deaktivieren wurde erwogen und verworfen: Sie beantworten „wie warm wird es heute noch" und „wie viel Regen kommt heute noch" als *einzelnen Zustand*, und das kann sonst nichts. Die Tagesvorhersage gilt für den ganzen Kalendertag, die Stundenvorhersage liefert nur eine Liste, aus der man das Maximum erst per Template ziehen müsste. Für eine Bedingung — Bewässerung ist der typische Fall — ist der Sensor der einfache Weg.
+- Dass sie **keine Langzeitstatistik** führen, ist kein Mangel, sondern die Vorgabe von Home Assistant für Vorhersagen. Home Assistant meldet nach dem Update einmalig „state class removed"; die alten Daten gehören gelöscht (`recorder/clear_statistics`, danach `recorder/update_statistics_issues`).
 
 ## Übergreifend
 
