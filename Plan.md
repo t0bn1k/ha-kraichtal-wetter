@@ -1,6 +1,6 @@
 # Plan
 
-Stand: 12.09.2026 · veröffentlicht: 0.9.0 · API v1.5
+Stand: 12.09.2026 · veröffentlicht: 0.10.0 · API v1.5
 
 Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die API liefert, steht in [`docs/API.md`](docs/API.md) — dort nachsehen, bevor ein Punkt umgesetzt wird (siehe `AGENTS.md`). Erledigtes abhaken und die Version dazuschreiben.
 
@@ -10,7 +10,8 @@ Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die AP
 | 2 | Kleines Paket: `days[].gust`, `temp_source`, `station_today` | veröffentlicht | 0.8.0 |
 | 3 | DWD-Warnungen (`alerts`) | verworfen — dafür gibt es die DWD-Integration | – |
 | 4 | Stündliche Vorhersage (`hours`) | veröffentlicht | 0.9.0 |
-| 5 | Niederschlagsbilanz (`rain`) | neu bewerten | – |
+| 5 | Niederschlagsbilanz (`rain`) | verworfen — HA rechnet das selbst | – |
+| 6 | Entity-IDs nach den Einstellungen des Nutzers | veröffentlicht | 0.10.0 |
 | – | ETag / `If-None-Match` | verworfen | – |
 
 ## 1. Niederschlag und Prognose-Sensoren korrigieren
@@ -84,24 +85,45 @@ Der Sensor „Warnungen" aus `current.warnings` bleibt als schnelle Anzahl erhal
 
 **Offen:** Was die API um 02:00 am 25.10.2026 tatsächlich in die Beschriftungen schreibt, ist Annahme — der Code kommt mit beiden plausiblen Varianten zurecht. Bei Gelegenheit eine Antwort aus dieser Nacht sichern.
 
-## 5. Niederschlagsbilanz (`rain`) — neu bewerten
+## 5. Niederschlagsbilanz (`rain`) — verworfen (12.09.2026)
 
-Monats- und Jahressummen bildet Home Assistant nach 0.7.0 selbst aus `rain`. Eigenständig wären nur `expected`, `annual_avg`, `delta` („zu trocken um X mm"), die Jahressumme aus der Zeit vor der Installation und `station.h24` (nicht dokumentiert). Laut Fair use nur ein- bis zweimal täglich abzurufen — bräuchte einen zweiten, langsamen Abruf.
+Seit 0.7.0 trägt der gemessene Niederschlag `total_increasing`, also bildet Home Assistant Monats- und Jahressummen selbst — aus den eigenen Daten und für jeden beliebigen Zeitraum. Eigenständig blieben nur der Vergleich mit dem Klimamittel (`expected`, `annual_avg`, `delta`), die Jahressumme aus der Zeit vor der Installation und `station.h24`.
 
-- [ ] Entscheiden, ob sich das lohnt. Wenn ja, eher nur `delta` und `year`.
+Das wiegt den Preis nicht auf: Die Sektion darf laut Fair use nur ein- bis zweimal täglich abgerufen werden, bräuchte also einen zweiten Coordinator mit eigenem Intervall — deutlich mehr bewegliche Teile als der Nutzen rechtfertigt. Wer die Klimazahlen sehen will, findet sie im Dashboard der Quelle.
+
+## 6. Entity-IDs: alte Migration gegen HA-Schema — zu entscheiden
+
+**Befund (12.09.2026, am HA-Quellcode 2026.9 geprüft):** Home Assistant bildet Entity-IDs aus dem Namen in der Sprache der Instanz, sofern sie in `NATIVE_ENTITY_IDS` steht — `de` steht dort — und stellt Bereich und Gerät voran (`EntityNamePart.AREA, DEVICE, ENTITY`). Die bisherige Annahme in `AGENTS.md`, IDs entstünden sprachunabhängig aus `en.json`, war falsch.
+
+Sichtbar geworden am neuen Sensor aus 0.8.0: Er heißt in einer deutschen Instanz mit Bereich `sensor.garten_kraichtal_wetter_station_heute_wind_max` — deutscher Name, Bereich davor. Die älteren Sensoren tragen nur deshalb englische IDs, weil `_SENSOR_ENTITY_ID_MIGRATION` sie 0.5.0 dorthin umbenannt hat.
+
+**Das Problem:** Die Migration läuft bei *jedem* Setup und benennt alles um, was noch die alten deutschen Object-IDs trägt. Auf einer Neuinstallation ohne Bereich legt HA heute genau solche deutschen IDs an — beim nächsten Start zieht die Migration sie nach Englisch. Mit Bereich greift sie nicht, weil das Präfix nicht passt. Ergebnis: Neuinstallationen bekommen je nach Bereich unterschiedliche, teils gemischte IDs.
+
+**Entscheidung (12.09.2026): deutsche IDs, und zwar in dem Format, das der Nutzer eingestellt hat.** Seit HA 2026.8 lässt sich festlegen, aus welchen Teilen eine Entity-ID besteht (Bereich, Etage, Gerät, Entität). Statt Ziel-IDs fest zu verdrahten, fragen wir HA über `registry.async_regenerate_entity_id()`, wie es die Entität heute benennen würde — das trifft Sprache und Format automatisch.
+
+- [x] Feste Ziel-IDs raus; `_LEGACY_SENSOR_OBJECT_IDS` listet nur noch die Alt-IDs (englisch aus 0.5.0, deutsch von davor), die überhaupt angefasst werden dürfen
+- [x] Einmalig über `async_migrate_entry` und die Config-Entry-Version (`VERSION = 2`); die Umbenennung selbst am Ende von `async_setup_entry`, weil die Registry erst dann die aktuellen Namen kennt
+- [x] `async_regenerate_entity_id()` gibt es seit HA 2026.3, das einstellbare Format seit 2026.8 — passt zum Minimum 2026.3, ältere Versionen bekommen eben das damalige Standardformat
+- [x] README (Tabelle, Beispiele, Upgrade-Hinweis), Beispiel-Dashboard, `AGENTS.md`
+- [x] Getestet: Umbenennung aus beiden Alt-Zuständen, Format mit Bereich, selbst vergebene IDs, bereits korrekte IDs, englischsprachige Instanz, Einmaligkeit und die Reihenfolge im Setup
+- [x] Release 0.10.0 (12.09.2026)
+- [ ] Danach in der eigenen Instanz: Automation „Nibe Lüftung Stufe 4 bei sommerlicher Nachtauskühlung" sowie die Dashboards `_Home` und `_ShellyDisplays` auf die neuen IDs umstellen
+
+**Folge für Bestandsinstallationen mit Bereich:** Die Entitäten bekommen das Bereichspräfix, das eine Neuinstallation auch hätte — aus `sensor.kraichtal_wetter_outdoor_temperature` wird dort `sensor.garten_kraichtal_wetter_aussentemperatur`. Genau das macht sie zu den bereits nativ angelegten Sensoren konsistent.
 
 ## Verworfen
 
 - **ETag / `If-None-Match`:** Bei unserem Takt kommt ein 304 praktisch nie vor (Station alle paar Minuten, Server-Cache 5 Minuten, Abruf frühestens alle 5 Minuten). Kein Gewinn für zusätzliche Fehlerpfade.
 - **`alerts`:** siehe Punkt 3 — die DWD-Integration kann es besser.
+- **`rain`:** siehe Punkt 5 — Home Assistant rechnet die Summen selbst.
 - **`today`, `trend`, `models`, `astro`, `climate`:** Begründung in `docs/API.md`.
 
 ## Übergreifend
 
-- **Englische Namen.** „Precipitation today", „Max temperature today" usw. sind für die englische Oberfläche weiterhin irreführend. Eine Änderung verschiebt aber die Entity-IDs *neuer* Installationen. Optionen: lassen · ändern und in der README beide IDs nennen · ändern mit Migration (bricht Automationen). Empfehlung: lassen, solange niemand danach fragt.
+- **Englische Namen.** „Precipitation today", „Max temperature today" usw. sind für eine englischsprachige Oberfläche weiterhin irreführend — es sind Prognosen. Sie zu korrigieren betrifft nach Punkt 6 nur noch englischsprachige Neuinstallationen, ist also billig geworden. Offen, weil niemand danach gefragt hat.
 - **Fair use.** Die Doku empfiehlt für `days` und `hours` 15–30 Minuten, wir fragen alle 5 Minuten ab. Wegen des 5-Minuten-Server-Caches vertretbar. Kommt `rain` (Punkt 5), braucht es ohnehin einen zweiten Abruf — dann prüfen, ob `days`/`hours`/`alerts` mit umziehen.
 - ~~**Zeitzone.**~~ Erledigt in 0.9.0: Der Kalendertag kommt aus `Europe/Berlin`, die Anzeige bleibt auf lokaler Mitternacht, damit die Karte den erwarteten Wochentag beschriftet.
-- **Bereich in der Entity-ID.** In einer Instanz, deren Gerät einem Bereich zugeordnet ist, heißt der API-Status `sensor.garten_kraichtal_wetter_api_status` statt `sensor.kraichtal_wetter_api_status`. Vermutlich übernimmt Home Assistant den Bereich in die ID neu angelegter Entitäten. Die README kann nur den Normalfall zeigen; betrifft jeden neuen Sensor aus 2 und 3.
+- **Bereich in der Entity-ID.** Home Assistant stellt Bereich und Gerät voran, siehe Punkt 6.
 
 ## Außerhalb des Codes
 

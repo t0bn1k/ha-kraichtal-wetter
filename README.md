@@ -56,45 +56,49 @@ Den Schlüssel gibst du anschließend beim Einrichten der Integration ein. Er l�
 
 ## Unterstützte Entitäten
 
-Die Entity-IDs sind sprachunabhängig (englisch), die Anzeigenamen folgen der eingestellten Home-Assistant-Sprache:
+Anzeigenamen und Entity-IDs folgen der eingestellten Home-Assistant-Sprache; die Tabelle zeigt eine deutsche Instanz. **Wie die IDs genau aufgebaut sind, bestimmt Home Assistant, nicht die Integration** — je nach dem dort eingestellten Format kann der Bereich vorangestellt sein, etwa `sensor.garten_kraichtal_wetter_station_heute_wind_max`. Die tatsächlichen IDs stehen unter `Einstellungen → Geräte & Dienste → Kraichtal Wetter → Gerät`.
 
 | Entität | Anzeige (Deutsch) | API-Feld |
 | --- | --- | --- |
 | `weather.kraichtal_wetter` | Kraichtal Wetter | – |
-| `sensor.kraichtal_wetter_outdoor_temperature` | Außentemperatur | `temp` |
-| `sensor.kraichtal_wetter_feels_like` | Gefühlt | `feels_like` |
-| `sensor.kraichtal_wetter_dew_point` | Taupunkt | `dewpoint` |
-| `sensor.kraichtal_wetter_humidity` | Luftfeuchtigkeit | `humidity` |
-| `sensor.kraichtal_wetter_pressure` | Luftdruck | `pressure` |
-| `sensor.kraichtal_wetter_wind_speed` | Windgeschwindigkeit | `wind` |
-| `sensor.kraichtal_wetter_wind_direction` | Windrichtung | `wind_dir` |
-| `sensor.kraichtal_wetter_max_gust` | Böen max | `gust_max` |
-| `sensor.kraichtal_wetter_solar_irradiance` | Solarstrahlung | `solar` |
-| `sensor.kraichtal_wetter_precipitation` | Station heute Niederschlag | `rain` |
-| `sensor.kraichtal_wetter_max_temperature_today` | Prognose Resttag Tmax | `tmax_today` |
-| `sensor.kraichtal_wetter_min_temperature_today` | Prognose Resttag Tmin | `tmin_today` |
-| `sensor.kraichtal_wetter_precipitation_today` | Prognose Resttag Niederschlag | `rain_today` |
-| `sensor.kraichtal_wetter_warnings` | Warnungen | `warnings` |
-| `sensor.kraichtal_wetter_observation_date` | Beobachtungsdatum | `obs_date` |
-| `sensor.kraichtal_wetter_observation_time` | Beobachtungszeit | `obs_time` |
-| `sensor.kraichtal_wetter_realtime_data` | Echtzeitdaten | `realtime` |
-| `sensor.kraichtal_wetter_station_max_temperature_today` | Station heute Tmax | `station_today.tmax` |
-| `sensor.kraichtal_wetter_station_min_temperature_today` | Station heute Tmin | `station_today.tmin` |
-| `sensor.kraichtal_wetter_station_max_gust_today` | Station heute Böe | `station_today.gust` |
-| `sensor.kraichtal_wetter_station_max_wind_today` | Station heute Wind max | `station_today.wind_max` |
-| `sensor.kraichtal_wetter_station_max_pressure_today` | Station heute Luftdruck max | `station_today.press_max` |
-| `sensor.kraichtal_wetter_station_min_pressure_today` | Station heute Luftdruck min | `station_today.press_min` |
+| `sensor.kraichtal_wetter_aussentemperatur` | Außentemperatur | `temp` |
+| `sensor.kraichtal_wetter_gefuhlt` | Gefühlt | `feels_like` |
+| `sensor.kraichtal_wetter_taupunkt` | Taupunkt | `dewpoint` |
+| `sensor.kraichtal_wetter_luftfeuchtigkeit` | Luftfeuchtigkeit | `humidity` |
+| `sensor.kraichtal_wetter_luftdruck` | Luftdruck | `pressure` |
+| `sensor.kraichtal_wetter_windgeschwindigkeit` | Windgeschwindigkeit | `wind` |
+| `sensor.kraichtal_wetter_windrichtung` | Windrichtung | `wind_dir` |
+| `sensor.kraichtal_wetter_boen_max` | Böen max | `gust_max` |
+| `sensor.kraichtal_wetter_solarstrahlung` | Solarstrahlung | `solar` |
+| `sensor.kraichtal_wetter_station_heute_niederschlag` | Station heute Niederschlag | `rain` |
+| `sensor.kraichtal_wetter_prognose_resttag_tmax` | Prognose Resttag Tmax | `tmax_today` |
+| `sensor.kraichtal_wetter_prognose_resttag_tmin` | Prognose Resttag Tmin | `tmin_today` |
+| `sensor.kraichtal_wetter_prognose_resttag_niederschlag` | Prognose Resttag Niederschlag | `rain_today` |
+| `sensor.kraichtal_wetter_warnungen` | Warnungen | `warnings` |
+| `sensor.kraichtal_wetter_beobachtungsdatum` | Beobachtungsdatum | `obs_date` |
+| `sensor.kraichtal_wetter_beobachtungszeit` | Beobachtungszeit | `obs_time` |
+| `sensor.kraichtal_wetter_echtzeitdaten` | Echtzeitdaten | `realtime` |
+| `sensor.kraichtal_wetter_station_heute_tmax` | Station heute Tmax | `station_today.tmax` |
+| `sensor.kraichtal_wetter_station_heute_tmin` | Station heute Tmin | `station_today.tmin` |
+| `sensor.kraichtal_wetter_station_heute_boe` | Station heute Böe | `station_today.gust` |
+| `sensor.kraichtal_wetter_station_heute_wind_max` | Station heute Wind max | `station_today.wind_max` |
+| `sensor.kraichtal_wetter_station_heute_luftdruck_max` | Station heute Luftdruck max | `station_today.press_max` |
+| `sensor.kraichtal_wetter_station_heute_luftdruck_min` | Station heute Luftdruck min | `station_today.press_min` |
 | `sensor.kraichtal_wetter_api_status` | API-Status (Diagnose) | – |
 
-**Gemessen oder vorhergesagt?** Alles mit **„Station heute“** hat die Station tatsächlich gemessen — für „so viel hat es heute geregnet" ist `sensor.kraichtal_wetter_precipitation` der richtige Sensor. Die drei Sensoren **„Prognose Resttag“** sind dagegen Vorhersagen für die *verbleibenden* Stunden des Tages: Sie werden zum Abend hin kleiner und zeigen spät abends kaum mehr als die nächste Stunde. Die Vorhersage für den ganzen Tag steht in der Wetter-Entität.
+**Gemessen oder vorhergesagt?** Alles mit **„Station heute“** hat die Station tatsächlich gemessen — für „so viel hat es heute geregnet" ist `sensor.kraichtal_wetter_station_heute_niederschlag` der richtige Sensor. Die drei Sensoren **„Prognose Resttag“** sind dagegen Vorhersagen für die *verbleibenden* Stunden des Tages: Sie werden zum Abend hin kleiner und zeigen spät abends kaum mehr als die nächste Stunde. Die Vorhersage für den ganzen Tag steht in der Wetter-Entität.
 
-**Zusätzliche Attribute:** Die Außentemperatur zeigt im Attribut `source`, ob der Wert gemessen ist (`live`) oder mangels Messwert aus der Prognose stammt (`forecast`). „Station heute Tmax", „Tmin" und „Böe" tragen im Attribut `time` die Uhrzeit des Extremwerts (z. B. `15:53`), die Böe zusätzlich die Windstärke in `beaufort`. In der Oberfläche erscheinen die Attribute übersetzt („Quelle", „Uhrzeit"); in Templates gilt der englische Name, etwa `{{ state_attr('sensor.kraichtal_wetter_station_max_temperature_today', 'time') }}`.
+**Zusätzliche Attribute:** Die Außentemperatur zeigt im Attribut `source`, ob der Wert gemessen ist (`live`) oder mangels Messwert aus der Prognose stammt (`forecast`). „Station heute Tmax", „Tmin" und „Böe" tragen im Attribut `time` die Uhrzeit des Extremwerts (z. B. `15:53`), die Böe zusätzlich die Windstärke in `beaufort`. In der Oberfläche erscheinen die Attribute übersetzt („Quelle", „Uhrzeit"); in Templates gilt der englische Name, etwa `{{ state_attr('sensor.kraichtal_wetter_station_heute_tmax', 'time') }}`.
 
 Der **API-Status** ist als Diagnose-Entität eingestuft und steht bei einem erfolgreichen Abruf auf `ok`. Schlägt ein Abruf fehl, zeigt er stattdessen den Grund — etwa den Klartext der API oder die Bedeutung des HTTP-Status. Er bleibt dabei bewusst verfügbar, während die übrigen Entitäten auf „nicht verfügbar" gehen: Genau dann ist die Ursache interessant. Zu finden unter `Einstellungen → Geräte & Dienste → Kraichtal Wetter → Gerät`.
 
-> **Upgrade auf 0.7.0:** Die Entity-IDs bleiben gleich, aber gemessener und vorhergesagter Niederschlag wurden bis dahin verwechselt. Wer `sensor.kraichtal_wetter_precipitation_today` als „Regen heute" in Automationen nutzt (etwa für die Bewässerung), hat mit einer Prognose gearbeitet und sollte auf `sensor.kraichtal_wetter_precipitation` wechseln. Unter `Entwicklerwerkzeuge → Statistik` meldet Home Assistant für die drei Prognose-Sensoren einmalig, dass sie keine Statistikklasse mehr haben — die alten Daten dort bitte löschen, sie sind nicht aussagekräftig. Details im [Changelog](CHANGELOG.md).
+> **Upgrade auf 0.10.0 — die Entity-IDs folgen jetzt deinen Home-Assistant-Einstellungen.** Die Integration fragt Home Assistant beim ersten Start nach dem Update, wie es die Entitäten heute benennen würde, und übernimmt das: in der Sprache deiner Instanz und in dem Format, das du für Entity-IDs eingestellt hast. Auf einer deutschen Instanz wird aus `sensor.kraichtal_wetter_outdoor_temperature` also wieder `sensor.kraichtal_wetter_aussentemperatur` — mit Bereich im Format entsprechend `sensor.garten_kraichtal_wetter_aussentemperatur`. Hintergrund: Die Umstellung auf englische IDs in 0.5.0 beruhte auf der falschen Annahme, IDs seien sprachunabhängig; seitdem waren neu hinzugekommene Sensoren anders benannt als die alten.
+>
+> Die Umbenennung läuft einmalig, die Recorder-Historie bleibt erhalten, und Entitäten mit selbst vergebener ID bleiben unberührt. **Eigene Dashboards, Automationen, Skripte und Templates musst du anpassen** — Home Assistant schreibt Verweise dort nicht mit um.
+>
+> **Upgrade auf 0.7.0:** Die Entity-IDs bleiben gleich, aber gemessener und vorhergesagter Niederschlag wurden bis dahin verwechselt. Wer `sensor.kraichtal_wetter_prognose_resttag_niederschlag` als „Regen heute" in Automationen nutzt (etwa für die Bewässerung), hat mit einer Prognose gearbeitet und sollte auf `sensor.kraichtal_wetter_station_heute_niederschlag` wechseln. Unter `Entwicklerwerkzeuge → Statistik` meldet Home Assistant für die drei Prognose-Sensoren einmalig, dass sie keine Statistikklasse mehr haben — die alten Daten dort bitte löschen, sie sind nicht aussagekräftig. Details im [Changelog](CHANGELOG.md).
 
-> **Upgrade von 0.4.x:** In 0.5.0 wurden die Entity-IDs von den deutschen Namen (`sensor.kraichtal_wetter_boen_max`) auf sprachunabhängige englische umgestellt. Die Integration benennt bestehende Entitäten beim ersten Start automatisch um, sodass die Recorder-Historie erhalten bleibt. Eigene Dashboards und Automationen müssen dagegen von Hand angepasst werden — Home Assistant schreibt Verweise dort nicht mit um.
+> **Upgrade von 0.4.x:** In 0.5.0 waren die IDs vorübergehend englisch. Wer direkt von 0.4.x auf 0.10.0 geht, landet ohne Umweg bei den deutschen IDs der Tabelle; die Umbenennung erfolgt beim ersten Start.
 
 ## Lovelace Beispiele
 
@@ -116,20 +120,20 @@ cards:
     title: Kraichtal Wetter – Aktuelle Werte
     show_header_toggle: false
     entities:
-      - sensor.kraichtal_wetter_outdoor_temperature
-      - sensor.kraichtal_wetter_feels_like
-      - sensor.kraichtal_wetter_humidity
-      - sensor.kraichtal_wetter_pressure
-      - sensor.kraichtal_wetter_wind_speed
-      - sensor.kraichtal_wetter_warnings
+      - sensor.kraichtal_wetter_aussentemperatur
+      - sensor.kraichtal_wetter_gefuhlt
+      - sensor.kraichtal_wetter_luftfeuchtigkeit
+      - sensor.kraichtal_wetter_luftdruck
+      - sensor.kraichtal_wetter_windgeschwindigkeit
+      - sensor.kraichtal_wetter_warnungen
 
   - type: entities
     title: Kraichtal Wetter – Heute gemessen
     show_header_toggle: false
     entities:
-      - sensor.kraichtal_wetter_station_max_temperature_today
-      - sensor.kraichtal_wetter_station_min_temperature_today
-      - sensor.kraichtal_wetter_precipitation
+      - sensor.kraichtal_wetter_station_heute_tmax
+      - sensor.kraichtal_wetter_station_heute_tmin
+      - sensor.kraichtal_wetter_station_heute_niederschlag
 ```
 
 ### Verlauf
@@ -138,8 +142,8 @@ cards:
 type: history-graph
 title: Verlauf Temperatur & Luftfeuchte
 entities:
-  - sensor.kraichtal_wetter_outdoor_temperature
-  - sensor.kraichtal_wetter_humidity
+  - sensor.kraichtal_wetter_aussentemperatur
+  - sensor.kraichtal_wetter_luftfeuchtigkeit
 hours_to_show: 24
 ```
 

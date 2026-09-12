@@ -4,8 +4,8 @@ views:
     path: kraichtal-wetter
     badges:
       - entity: weather.kraichtal_wetter
-      - entity: sensor.kraichtal_wetter_outdoor_temperature
-      - entity: sensor.kraichtal_wetter_humidity
+      - entity: sensor.kraichtal_wetter_aussentemperatur
+      - entity: sensor.kraichtal_wetter_luftfeuchtigkeit
     cards:
       - type: weather-forecast
         entity: weather.kraichtal_wetter
@@ -22,49 +22,49 @@ views:
         title: Aktuelle Werte
         show_header_toggle: false
         entities:
-          - entity: sensor.kraichtal_wetter_outdoor_temperature
-          - entity: sensor.kraichtal_wetter_feels_like
-          - entity: sensor.kraichtal_wetter_dew_point
-          - entity: sensor.kraichtal_wetter_humidity
-          - entity: sensor.kraichtal_wetter_pressure
-          - entity: sensor.kraichtal_wetter_wind_speed
-          - entity: sensor.kraichtal_wetter_wind_direction
-          - entity: sensor.kraichtal_wetter_max_gust
-          - entity: sensor.kraichtal_wetter_solar_irradiance
+          - entity: sensor.kraichtal_wetter_aussentemperatur
+          - entity: sensor.kraichtal_wetter_gefuhlt
+          - entity: sensor.kraichtal_wetter_taupunkt
+          - entity: sensor.kraichtal_wetter_luftfeuchtigkeit
+          - entity: sensor.kraichtal_wetter_luftdruck
+          - entity: sensor.kraichtal_wetter_windgeschwindigkeit
+          - entity: sensor.kraichtal_wetter_windrichtung
+          - entity: sensor.kraichtal_wetter_boen_max
+          - entity: sensor.kraichtal_wetter_solarstrahlung
 
       - type: entities
         title: Station heute (gemessen)
         show_header_toggle: false
         entities:
-          - entity: sensor.kraichtal_wetter_station_max_temperature_today
-          - entity: sensor.kraichtal_wetter_station_min_temperature_today
-          - entity: sensor.kraichtal_wetter_precipitation
-          - entity: sensor.kraichtal_wetter_station_max_gust_today
-          - entity: sensor.kraichtal_wetter_station_max_wind_today
-          - entity: sensor.kraichtal_wetter_station_max_pressure_today
-          - entity: sensor.kraichtal_wetter_station_min_pressure_today
+          - entity: sensor.kraichtal_wetter_station_heute_tmax
+          - entity: sensor.kraichtal_wetter_station_heute_tmin
+          - entity: sensor.kraichtal_wetter_station_heute_niederschlag
+          - entity: sensor.kraichtal_wetter_station_heute_boe
+          - entity: sensor.kraichtal_wetter_station_heute_wind_max
+          - entity: sensor.kraichtal_wetter_station_heute_luftdruck_max
+          - entity: sensor.kraichtal_wetter_station_heute_luftdruck_min
 
       - type: entities
         title: Prognose für den Rest des Tages
         show_header_toggle: false
         entities:
-          - entity: sensor.kraichtal_wetter_max_temperature_today
-          - entity: sensor.kraichtal_wetter_min_temperature_today
-          - entity: sensor.kraichtal_wetter_precipitation_today
+          - entity: sensor.kraichtal_wetter_prognose_resttag_tmax
+          - entity: sensor.kraichtal_wetter_prognose_resttag_tmin
+          - entity: sensor.kraichtal_wetter_prognose_resttag_niederschlag
 
       - type: entities
         title: Status
         show_header_toggle: false
         entities:
-          - entity: sensor.kraichtal_wetter_warnings
-          - entity: sensor.kraichtal_wetter_observation_date
-          - entity: sensor.kraichtal_wetter_observation_time
-          - entity: sensor.kraichtal_wetter_realtime_data
+          - entity: sensor.kraichtal_wetter_warnungen
+          - entity: sensor.kraichtal_wetter_beobachtungsdatum
+          - entity: sensor.kraichtal_wetter_beobachtungszeit
+          - entity: sensor.kraichtal_wetter_echtzeitdaten
 
       - type: history-graph
         title: Verlauf der wichtigsten Werte
         entities:
-          - sensor.kraichtal_wetter_outdoor_temperature
-          - sensor.kraichtal_wetter_humidity
-          - sensor.kraichtal_wetter_pressure
+          - sensor.kraichtal_wetter_aussentemperatur
+          - sensor.kraichtal_wetter_luftfeuchtigkeit
+          - sensor.kraichtal_wetter_luftdruck
         hours_to_show: 24

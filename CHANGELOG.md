@@ -2,6 +2,32 @@
 
 Alle signifikanten Änderungen an dieser Integration werden hier festgehalten.
 
+## [0.10.0] - 2026-09-12
+### ⚠️ Geändert (Breaking)
+- 🏷️ **Die Entity-IDs folgen jetzt den Einstellungen von Home Assistant.** Die
+  Integration fragt beim ersten Start nach dem Update ab, wie Home Assistant
+  die Entitäten heute benennen würde, und übernimmt das — in der Sprache der
+  Instanz und in dem Format, das seit Home Assistant 2026.8 für Entity-IDs
+  einstellbar ist (Bereich, Etage, Gerät, Entität).
+  - Auf einer deutschen Instanz wird aus
+    `sensor.kraichtal_wetter_outdoor_temperature` wieder
+    `sensor.kraichtal_wetter_aussentemperatur`, mit Bereich im Format
+    entsprechend `sensor.garten_kraichtal_wetter_aussentemperatur`.
+  - **Warum:** Die Umstellung auf englische IDs in 0.5.0 beruhte auf der
+    Annahme, IDs seien sprachunabhängig. Das trifft auf aktuelle
+    Home-Assistant-Versionen nicht zu — seitdem bekamen neu hinzugekommene
+    Sensoren Namen nach dem Schema von Home Assistant, während die alten
+    englisch blieben.
+  - Die Umbenennung läuft **einmalig**. Die Recorder-Historie bleibt erhalten,
+    Entitäten mit selbst vergebener ID bleiben unberührt.
+  - **Eigene Dashboards, Automationen, Skripte und Templates müssen angepasst
+    werden** — Home Assistant schreibt Verweise dort nicht mit um.
+
+### ✅ Getestet
+- 🧪 Umbenennung aus beiden Alt-Zuständen (englisch und vor 0.5.0), Format mit
+  Bereich, selbst vergebene IDs, bereits korrekte IDs, englischsprachige
+  Instanz sowie die Einmaligkeit über die Config-Entry-Version.
+
 ## [0.9.0] - 2026-09-12
 ### ✨ Hinzugefügt
 - 🕒 **Stündliche Vorhersage** für die nächsten zwölf Stunden mit Temperatur,

@@ -21,102 +21,133 @@ from .coordinator import KraichtalWetterClient
 
 _LOGGER = logging.getLogger(__name__)
 
-# Before 0.5.0 the sensors carried hardcoded German names, from which Home
-# Assistant derived entity ids like sensor.kraichtal_wetter_boen_max. 0.5.0
-# moved the names into translations/, so the ids are now derived from the
-# English names instead. Rename the existing registry entries rather than
-# leaving them behind, which would orphan their recorder history.
+# Entity ids earlier versions left behind, per sensor `key`. 0.5.0 renamed
+# every entity to its *English* name, assuming ids were language-independent;
+# they are not — Home Assistant derives them from the name in the language of
+# the instance. Before 0.5.0 the ids came from the hardcoded German names, so
+# both sets are listed: an install may have skipped 0.5.0 entirely.
 #
-# Maps the sensor `key` to (old object id, new object id).
-_SENSOR_ENTITY_ID_MIGRATION: dict[str, tuple[str, str]] = {
-    "temp": ("kraichtal_wetter_aussentemperatur", "kraichtal_wetter_outdoor_temperature"),
-    "feels_like": ("kraichtal_wetter_gefuhlt", "kraichtal_wetter_feels_like"),
-    "dewpoint": ("kraichtal_wetter_taupunkt", "kraichtal_wetter_dew_point"),
-    "humidity": ("kraichtal_wetter_luftfeuchtigkeit", "kraichtal_wetter_humidity"),
-    "pressure": ("kraichtal_wetter_luftdruck", "kraichtal_wetter_pressure"),
-    "wind": ("kraichtal_wetter_windgeschwindigkeit", "kraichtal_wetter_wind_speed"),
-    "wind_dir": ("kraichtal_wetter_windrichtung", "kraichtal_wetter_wind_direction"),
-    "gust_max": ("kraichtal_wetter_boen_max", "kraichtal_wetter_max_gust"),
-    "solar": ("kraichtal_wetter_solarstrahlung", "kraichtal_wetter_solar_irradiance"),
-    "rain": ("kraichtal_wetter_niederschlag_aktuell", "kraichtal_wetter_precipitation"),
+# Only an entity still carrying one of these is renamed, so an id the user
+# picked themselves is never touched. There is no target id here on purpose —
+# it is asked of Home Assistant, see _async_migrate_entity_ids().
+_LEGACY_SENSOR_OBJECT_IDS: dict[str, tuple[str, ...]] = {
+    "temp": ("kraichtal_wetter_outdoor_temperature", "kraichtal_wetter_aussentemperatur"),
+    "feels_like": ("kraichtal_wetter_feels_like", "kraichtal_wetter_gefuhlt"),
+    "dewpoint": ("kraichtal_wetter_dew_point", "kraichtal_wetter_taupunkt"),
+    "humidity": ("kraichtal_wetter_humidity", "kraichtal_wetter_luftfeuchtigkeit"),
+    "pressure": ("kraichtal_wetter_pressure", "kraichtal_wetter_luftdruck"),
+    "wind": ("kraichtal_wetter_wind_speed", "kraichtal_wetter_windgeschwindigkeit"),
+    "wind_dir": ("kraichtal_wetter_wind_direction", "kraichtal_wetter_windrichtung"),
+    "gust_max": ("kraichtal_wetter_max_gust", "kraichtal_wetter_boen_max"),
+    "solar": ("kraichtal_wetter_solar_irradiance", "kraichtal_wetter_solarstrahlung"),
+    "rain": ("kraichtal_wetter_precipitation", "kraichtal_wetter_niederschlag_aktuell"),
     "tmax_today": (
-        "kraichtal_wetter_maximale_temperatur_heute",
         "kraichtal_wetter_max_temperature_today",
+        "kraichtal_wetter_maximale_temperatur_heute",
     ),
     "tmin_today": (
-        "kraichtal_wetter_minimale_temperatur_heute",
         "kraichtal_wetter_min_temperature_today",
+        "kraichtal_wetter_minimale_temperatur_heute",
     ),
     "rain_today": (
-        "kraichtal_wetter_niederschlag_heute",
         "kraichtal_wetter_precipitation_today",
+        "kraichtal_wetter_niederschlag_heute",
     ),
-    "warnings": ("kraichtal_wetter_warnungen", "kraichtal_wetter_warnings"),
-    "obs_date": ("kraichtal_wetter_beobachtungsdatum", "kraichtal_wetter_observation_date"),
-    "obs_time": ("kraichtal_wetter_beobachtungszeit", "kraichtal_wetter_observation_time"),
-    "realtime": ("kraichtal_wetter_echtzeitdaten", "kraichtal_wetter_realtime_data"),
+    "warnings": ("kraichtal_wetter_warnings", "kraichtal_wetter_warnungen"),
+    "obs_date": (
+        "kraichtal_wetter_observation_date",
+        "kraichtal_wetter_beobachtungsdatum",
+    ),
+    "obs_time": (
+        "kraichtal_wetter_observation_time",
+        "kraichtal_wetter_beobachtungszeit",
+    ),
+    "realtime": ("kraichtal_wetter_realtime_data", "kraichtal_wetter_echtzeitdaten"),
     "station_today.tmax": (
-        "kraichtal_wetter_station_heute_tmax",
         "kraichtal_wetter_station_max_temperature_today",
+        "kraichtal_wetter_station_heute_tmax",
     ),
     "station_today.tmin": (
-        "kraichtal_wetter_station_heute_tmin",
         "kraichtal_wetter_station_min_temperature_today",
+        "kraichtal_wetter_station_heute_tmin",
     ),
     "station_today.gust": (
-        "kraichtal_wetter_station_heute_boe",
         "kraichtal_wetter_station_max_gust_today",
+        "kraichtal_wetter_station_heute_boe",
     ),
     "station_today.press_max": (
-        "kraichtal_wetter_station_heute_luftdruck_max",
         "kraichtal_wetter_station_max_pressure_today",
+        "kraichtal_wetter_station_heute_luftdruck_max",
     ),
     "station_today.press_min": (
-        "kraichtal_wetter_station_heute_luftdruck_min",
         "kraichtal_wetter_station_min_pressure_today",
+        "kraichtal_wetter_station_heute_luftdruck_min",
     ),
 }
 
-# The weather entity became the device's primary entity in 0.5.0, so it now
-# takes the plain device name instead of a "Forecast" suffix.
-# (unique_id, old object id, new object id)
-_WEATHER_ENTITY_ID_MIGRATION = (
-    "kraichtal_wetter_forecast",
-    "kraichtal_wetter_forecast",
-    "kraichtal_wetter",
-)
+# The weather entity became the device's primary entity in 0.5.0 and dropped
+# the "Forecast" suffix; its name is the device name in every language.
+_LEGACY_WEATHER_OBJECT_IDS = ("kraichtal_wetter_forecast", "kraichtal_wetter")
+
+# Entry ids whose entities still need the rename below, remembered between
+# async_migrate_entry (which runs before the platforms) and async_setup_entry.
+_PENDING_ID_MIGRATION = f"{DOMAIN}_pending_entity_id_migration"
 
 
 @callback
 def _async_migrate_entity_ids(hass: HomeAssistant) -> None:
-    """Rename the pre-0.5.0 German-derived entity ids."""
+    """Regenerate entity ids that earlier versions left in the wrong shape.
+
+    The new id is not spelled out here — `async_regenerate_entity_id()` builds
+    the one Home Assistant would give the entity today: in the language of the
+    instance and in the format configured for entity ids, which since 2026.8
+    the user chooses (area, floor, device, entity). Whatever they picked, the
+    migrated entities end up looking like freshly created ones.
+    """
     registry = er.async_get(hass)
 
-    migrations = [
-        ("sensor", f"kraichtal_wetter_{key}", old_object_id, new_object_id)
-        for key, (old_object_id, new_object_id) in _SENSOR_ENTITY_ID_MIGRATION.items()
+    candidates = [
+        ("sensor", f"kraichtal_wetter_{key}", object_ids)
+        for key, object_ids in _LEGACY_SENSOR_OBJECT_IDS.items()
     ]
-    migrations.append(("weather", *_WEATHER_ENTITY_ID_MIGRATION))
+    candidates.append(
+        ("weather", "kraichtal_wetter_forecast", _LEGACY_WEATHER_OBJECT_IDS)
+    )
 
-    for platform, unique_id, old_object_id, new_object_id in migrations:
+    for platform, unique_id, legacy_object_ids in candidates:
         entity_id = registry.async_get_entity_id(platform, DOMAIN, unique_id)
         if entity_id is None:
             continue
 
-        # Only touch entities still carrying the old generated id, so an id the
-        # user picked themselves is never overwritten.
-        if entity_id != f"{platform}.{old_object_id}":
+        if entity_id not in {f"{platform}.{object_id}" for object_id in legacy_object_ids}:
             continue
 
-        new_entity_id = f"{platform}.{new_object_id}"
-        if registry.async_get(new_entity_id) is not None:
-            _LOGGER.warning(
-                "Not renaming %s: %s already exists", entity_id, new_entity_id
-            )
+        entry = registry.async_get(entity_id)
+        if entry is None:
+            continue
+
+        new_entity_id = registry.async_regenerate_entity_id(entry)
+        if new_entity_id == entity_id:
             continue
 
         _LOGGER.info("Migrating entity id %s to %s", entity_id, new_entity_id)
         registry.async_update_entity(entity_id, new_entity_id=new_entity_id)
+
+
+async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Migrate an older config entry.
+
+    Home Assistant calls this before the entry is set up and only while the
+    stored version differs, which is what makes the rename a one-off: a fresh
+    install starts at the current version and is never touched. The rename
+    itself waits for async_setup_entry, because the registry only carries the
+    current entity names once the platforms have registered their entities.
+    """
+    if entry.version < 2:
+        hass.data.setdefault(_PENDING_ID_MIGRATION, set()).add(entry.entry_id)
+        hass.config_entries.async_update_entry(entry, version=2)
+
+    return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -161,11 +192,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         "entry": entry,
     }
 
-    # Must run before the platforms are set up so the entities attach to the
-    # renamed registry entries instead of claiming the old ids again.
-    _async_migrate_entity_ids(hass)
-
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+
+    # Only now does the registry know the entities' current names, which is
+    # what the regenerated ids are built from (see async_migrate_entry).
+    if entry.entry_id in hass.data.get(_PENDING_ID_MIGRATION, ()):
+        hass.data[_PENDING_ID_MIGRATION].discard(entry.entry_id)
+        _async_migrate_entity_ids(hass)
 
     return True
 

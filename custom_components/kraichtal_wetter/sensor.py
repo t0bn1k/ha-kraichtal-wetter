@@ -38,10 +38,11 @@ class KraichtalWetterSensorEntityDescription(SensorEntityDescription):
 # `key` addresses the API payload (dot notation for nested fields) and forms the
 # unique_id; `translation_key` selects the display name from translations/.
 #
-# NOTE: Home Assistant derives the entity_id from the *English* name in
-# translations/en.json (deliberately language-independent), so changing an
-# English name moves the entity_id for new installs. Treat en.json as public
-# API and see _ENTITY_ID_MIGRATION in __init__.py.
+# NOTE: Home Assistant builds the entity_id from the name in the instance's
+# own language (German is one of the languages it does that for), prefixed with
+# the area and device. So both translation files move entity_ids for new
+# installs, not just en.json — see AGENTS.md and _SENSOR_ENTITY_ID_MIGRATION in
+# __init__.py.
 SENSOR_TYPES = [
     KraichtalWetterSensorEntityDescription(
         # When the station has no reading, the API fills `temp` from the

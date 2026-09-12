@@ -116,7 +116,7 @@ Bewusst nicht angefordert. Wer eine davon braucht, muss sie zu `REQUESTED_SECTIO
 | `models` | Einzelmodelle, Streuung, `confidence` | Nische. |
 | `astro` | Sonnenauf-/-untergang, Mondphase | Deckt HA über `sun.sun` und die Mond-Integration bereits ab. |
 | `climate` | Kenntage, Jahresextreme, Stationsrekorde | Umfangreich; ein- bis zweimal täglich abzurufen, passt nicht zum Poll-Intervall der Integration. |
-| `rain` | Bilanz heute/gestern/Monat/Jahr inkl. Abweichung vom Klimamittel | Denkbar als zusätzliche Sensoren. Monats-/Jahressummen bildet Home Assistant seit 0.7.0 aber auch selbst aus `rain` (`total_increasing`); eigenständig wären nur `expected`, `annual_avg`, `delta` und Werte aus der Zeit vor der Installation. Unter `station` steht zusätzlich `h24` (letzte 24 Stunden) — beobachtet, nicht dokumentiert. Fair use: ein- bis zweimal täglich, bräuchte also einen eigenen Abruf. |
+| `rain` | Bilanz heute/gestern/Monat/Jahr inkl. Abweichung vom Klimamittel | **Verworfen.** Monats- und Jahressummen bildet Home Assistant seit 0.7.0 selbst aus `current.rain` (`total_increasing`). Eigenständig blieben nur `expected`, `annual_avg`, `delta`, Werte aus der Zeit vor der Installation und `station.h24` (letzte 24 Stunden, nicht dokumentiert) — zu wenig für den zweiten, langsamen Abruf, den die Sektion laut Fair use bräuchte. |
 
 ## Weitere Punkte
 

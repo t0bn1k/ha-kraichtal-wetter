@@ -26,7 +26,8 @@ SCAN_INTERVAL_SELECTOR = vol.All(cv.positive_int, vol.Range(min=MIN_SCAN_INTERVA
 
 
 class KraichtalWetterConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    VERSION = 1
+    # 2: entity ids follow the German names again (see async_migrate_entry).
+    VERSION = 2
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         if user_input is not None:
