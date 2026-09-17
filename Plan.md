@@ -1,6 +1,6 @@
 # Plan
 
-Stand: 17.09.2026 · veröffentlicht: 0.11.0 · API v1.5
+Stand: 17.09.2026 · veröffentlicht: 0.12.0 · API v1.5
 
 Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die API liefert, steht in [`docs/API.md`](docs/API.md) — dort nachsehen, bevor ein Punkt umgesetzt wird (siehe `AGENTS.md`). Erledigtes abhaken und die Version dazuschreiben.
 
@@ -13,6 +13,7 @@ Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die AP
 | 5 | Niederschlagsbilanz (`rain`) | verworfen — HA rechnet das selbst | – |
 | 6 | Entity-IDs nach den Einstellungen des Nutzers | veröffentlicht | 0.10.0 |
 | 7 | Diagnose-Download | veröffentlicht | 0.11.0 |
+| 8 | Irreführende englische Namen | veröffentlicht | 0.12.0 |
 | – | ETag / `If-None-Match` | verworfen | – |
 
 ## 1. Niederschlag und Prognose-Sensoren korrigieren
@@ -128,6 +129,26 @@ Sichtbar geworden am neuen Sensor aus 0.8.0: Er heißt in einer deutschen Instan
 
 **Entscheidung:** `system_health.py` wurde miterwogen und zurückgestellt — es überschneidet sich mit dem vorhandenen Diagnose-Sensor „API-Status" und beantwortet nur, *ob* etwas klemmt, nicht *was*.
 
+## 8. Irreführende englische Namen
+
+**Befund:** Was 0.7.0 auf der deutschen Seite geradegezogen hat, blieb auf der englischen stehen. Dort hieß eine Prognose weiter „Precipitation today", als wäre sie ein Messwert, und der gemessene Niederschlag schlicht „Precipitation" — ohne den Hinweis, dass er von der Station kommt.
+
+| Schlüssel | bisher | jetzt | deutsches Vorbild |
+| --- | --- | --- | --- |
+| `rain` | Precipitation | Station precipitation today | Station heute Niederschlag |
+| `tmax_today` | Max temperature today | Forecast rest of day max temperature | Prognose Resttag Tmax |
+| `tmin_today` | Min temperature today | Forecast rest of day min temperature | Prognose Resttag Tmin |
+| `rain_today` | Precipitation today | Forecast rest of day precipitation | Prognose Resttag Niederschlag |
+
+**Umsetzung:**
+- [x] `strings.json` und `translations/en.json` identisch geändert — die beiden sind byte-gleich, sonst scheitert Hassfest (vgl. 0.5.7)
+- [x] Die sechs `station_today_*`-Schlüssel blieben unangetastet, sie hießen bereits „Station … today"
+- [x] README-Upgrade-Hinweis, CHANGELOG, Release 0.12.0
+
+**Entscheidung: keine zweite Entity-ID-Migration.** Bestehende englische Installationen behalten ihre IDs, nur der Anzeigename ändert sich. Eine erzwungene Umbenennung kostet mehr, als ein klarerer Name einbringt — Home Assistant schreibt Verweise in eigenen Dashboards und Automationen nicht mit um, das war die Lehre aus Punkt 6. Die Folge ist bewusst in Kauf genommen: Eine englische Neuinstallation bekommt IDs nach dem neuen Namen, eine bestehende behält die alten.
+
+**Nebenbefund:** `.ruff.toml` im Wurzelverzeichnis hält fest, dass `homeassistant` als First-Party sortiert wird. Ohne die Datei meldet ruff I001 für `config_flow.py` und `coordinator.py` und will die Leerzeile vor dem `homeassistant`-Block entfernen — das wäre falsch, die übrigen vier Module trennen ihn ebenso ab wie der HA-Core selbst. Der Code blieb unverändert.
+
 ## Verworfen
 
 - **ETag / `If-None-Match`:** Bei unserem Takt kommt ein 304 praktisch nie vor (Station alle paar Minuten, Server-Cache 5 Minuten, Abruf frühestens alle 5 Minuten). Kein Gewinn für zusätzliche Fehlerpfade.
@@ -142,7 +163,7 @@ Sichtbar geworden am neuen Sensor aus 0.8.0: Er heißt in einer deutschen Instan
 
 ## Übergreifend
 
-- **Englische Namen.** „Precipitation today", „Max temperature today" usw. sind für eine englischsprachige Oberfläche weiterhin irreführend — es sind Prognosen. Sie zu korrigieren betrifft nach Punkt 6 nur noch englischsprachige Neuinstallationen, ist also billig geworden. Offen, weil niemand danach gefragt hat.
+- ~~**Englische Namen.**~~ Erledigt in 0.12.0, siehe Punkt 8.
 - **Fair use.** Die Doku empfiehlt für `days` und `hours` 15–30 Minuten, wir fragen alle 5 Minuten ab. Wegen des 5-Minuten-Server-Caches vertretbar. Kommt `rain` (Punkt 5), braucht es ohnehin einen zweiten Abruf — dann prüfen, ob `days`/`hours`/`alerts` mit umziehen.
 - ~~**Zeitzone.**~~ Erledigt in 0.9.0: Der Kalendertag kommt aus `Europe/Berlin`, die Anzeige bleibt auf lokaler Mitternacht, damit die Karte den erwarteten Wochentag beschriftet.
 - **Bereich in der Entity-ID.** Home Assistant stellt Bereich und Gerät voran, siehe Punkt 6.

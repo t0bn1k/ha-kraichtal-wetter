@@ -116,6 +116,7 @@ lovelace/                # Beispiel-Dashboards
 ## Stil (im Code)
 
 - `from __future__ import annotations`
+- **`homeassistant`-Importe als eigener Block**, durch eine Leerzeile von `voluptuous`/`aiohttp` getrennt — so macht es der HA-Core selbst. `.ruff.toml` im Wurzelverzeichnis hält das fest (`known-first-party = ["homeassistant"]`). Ohne diese Datei meldet ruff I001 für `config_flow.py` und `coordinator.py` und will die Leerzeile entfernen; **diesem Vorschlag nicht folgen**, er macht die beiden Dateien inkonsistent zu den übrigen vier.
 - `voluptuous` + `cv` für Schemata
 - `urllib.parse` für URL-Bau (kein String-Concatenation)
 - `CoordinatorEntity` + `SensorEntityDescription`-Pattern

@@ -2,6 +2,44 @@
 
 Alle signifikanten Änderungen an dieser Integration werden hier festgehalten.
 
+## [0.12.0] - 2026-09-17
+### 🔧 Geändert
+- 🌐 **Die englischen Anzeigenamen sagen jetzt, was sie sind.** Vier Sensoren
+  hießen auf einer englischsprachigen Instanz so, als wären sie Messwerte,
+  obwohl drei davon Prognosen sind — dieselbe Verwechslung, die 0.7.0 auf der
+  deutschen Seite behoben hat. Die deutsche Seite ist **nicht** betroffen.
+
+  | Sensor | bisher | jetzt |
+  | --- | --- | --- |
+  | `rain` | Precipitation | Station precipitation today |
+  | `tmax_today` | Max temperature today | Forecast rest of day max temperature |
+  | `tmin_today` | Min temperature today | Forecast rest of day min temperature |
+  | `rain_today` | Precipitation today | Forecast rest of day precipitation |
+
+  Die sechs `station_today_*`-Sensoren hießen bereits „Station … today" und
+  bleiben unverändert.
+
+### ⚠️ Nach dem Update zu tun
+- 🏷️ **Nur auf englischsprachigen Instanzen, und nur zur Kenntnis:** Die
+  Entity-IDs bleiben, wie sie sind — `sensor.kraichtal_wetter_precipitation_today`
+  heißt weiter so, nur der angezeigte Name ändert sich. Dashboards,
+  Automationen und Templates laufen unverändert weiter.
+  - **Warum nicht umbenannt:** Eine erzwungene Umbenennung kostet mehr, als ein
+    klarerer Anzeigename einbringt — Home Assistant schreibt Verweise in
+    eigenen Dashboards und Automationen nicht mit um. Das war die Lehre aus
+    0.10.0 und gilt hier genauso.
+  - **Folge:** Eine englische Neuinstallation bekommt IDs nach dem neuen Namen
+    (`sensor.kraichtal_wetter_forecast_rest_of_day_precipitation`), eine
+    bestehende behält die alten. Wer das angleichen will, benennt die Entität
+    in Home Assistant selbst um.
+
+### ✅ Getestet
+- 🧪 `strings.json` und `translations/en.json` auf Gleichheit geprüft — daran
+  scheitert sonst Hassfest (vgl. 0.5.7) — sowie auf denselben Schlüsselsatz wie
+  `translations/de.json`.
+- 🧪 Die 29 Prüfungen der Diagnose aus 0.11.0 erneut gegen HA 2026.9.2
+  durchlaufen lassen.
+
 ## [0.11.0] - 2026-09-17
 ### ✨ Hinzugefügt
 - 🩺 **Diagnose-Download.** Unter `Einstellungen → Geräte & Dienste → Kraichtal

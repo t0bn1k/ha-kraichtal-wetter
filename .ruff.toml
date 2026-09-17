@@ -1,0 +1,13 @@
+# Home Assistant sortiert `homeassistant`-Importe als eigenen Block, getrennt
+# von den uebrigen Third-Party-Paketen — so wie es der Core selbst tut
+# (`known-first-party = ["homeassistant"]` in dessen ruff-Konfiguration).
+#
+# Ohne diese Datei haelt ruff `homeassistant` fuer ein gewoehnliches
+# Third-Party-Paket und meldet I001 fuer `config_flow.py` und
+# `coordinator.py`, wo `voluptuous` bzw. `aiohttp` davor stehen. Der
+# vorgeschlagene Fix zieht die Leerzeile heraus und macht die beiden Dateien
+# damit inkonsistent zu den uebrigen vier. Der Code ist richtig, die
+# Standardkonfiguration passt nur nicht zu diesem Projekt.
+
+[lint.isort]
+known-first-party = ["homeassistant"]

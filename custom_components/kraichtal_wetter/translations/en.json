@@ -78,16 +78,16 @@
         "name": "Solar irradiance"
       },
       "rain": {
-        "name": "Precipitation"
+        "name": "Station precipitation today"
       },
       "tmax_today": {
-        "name": "Max temperature today"
+        "name": "Forecast rest of day max temperature"
       },
       "tmin_today": {
-        "name": "Min temperature today"
+        "name": "Forecast rest of day min temperature"
       },
       "rain_today": {
-        "name": "Precipitation today"
+        "name": "Forecast rest of day precipitation"
       },
       "warnings": {
         "name": "Warnings"
