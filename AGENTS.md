@@ -76,13 +76,15 @@ Seit 0.8.0 tragen die Abschnittsüberschriften ein festes Icon, jeder Eintrag zu
 
 Thematisch zum Beispiel: 🌡️ Temperatur · 🌧️ Niederschlag · 💨 Wind · 🌬️ Böen · 🚨 DWD-Warnungen · 🕒 Zeit · 🌐 Übersetzung · 📝 Doku · 🧪 Tests.
 
-### Downloads-Badge
+### Sterne- und Installations-Badge
 
-Bewusst **nicht** im README. Der übliche Badge liest `https://analytics.home-assistant.io/custom_integrations.json` unter `$.<domain>.total`; dort ist `kraichtal_wetter` nicht enthalten (die Liste erfasst nur Integrationen aus dem HACS-Standardkatalog mit Analytics-Opt-in der Nutzer), der Badge liefert also „no result". Ein GitHub-Downloadzähler hilft ebenfalls nicht, da die Releases keine Assets tragen und nur Assets gezählt werden. Nach Aufnahme in den Standardkatalog nutzbar:
+Beide stehen im README-Kopf. Der Sterne-Badge liest GitHub direkt und ist sofort korrekt.
 
-```
-[![Downloads](https://img.shields.io/badge/dynamic/json?url=https://analytics.home-assistant.io/custom_integrations.json&query=$.kraichtal_wetter.total&label=Downloads&color=41BDF5&style=for-the-badge)](https://analytics.home-assistant.io/)
-```
+Der Installations-Badge liest `https://analytics.home-assistant.io/custom_integrations.json` unter `$.kraichtal_wetter.total`. Dort ist die Domain noch **nicht** enthalten — die Liste erfasst Integrationen, die auf Instanzen mit Analytics-Opt-in laufen, praktisch also erst nach Aufnahme in den HACS-Standardkatalog. Bis dahin zeigt der Badge grau „no result"; er springt ohne weiteres Zutun auf eine Zahl um, sobald die Domain in der Datei auftaucht. Bewusst so eingebaut statt später nachgerüstet (Stand 17.09.2026).
+
+Die Zahl sind gemeldete **aktive Installationen**, keine Downloads — daher das Label „Installationen".
+
+Ein GitHub-Downloadzähler (`img.shields.io/github/downloads/.../total`) hilft nicht: Er zählt nur hochgeladene Release-Assets, und unsere Releases tragen keine. Das ließe sich nur mit `zip_release` in `hacs.json` plus einem Zip-Asset in `release.yml` ändern — was den Installationsweg umstellt und deshalb nicht gemacht wurde.
 
 ## Verzeichnisstruktur
 

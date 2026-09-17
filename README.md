@@ -2,6 +2,8 @@
 
 [![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![Release](https://img.shields.io/github/v/release/t0bn1k/ha-kraichtal-wetter?style=for-the-badge)](https://github.com/t0bn1k/ha-kraichtal-wetter/releases)
+[![Sterne](https://img.shields.io/github/stars/t0bn1k/ha-kraichtal-wetter?style=for-the-badge&label=Sterne&color=41BDF5)](https://github.com/t0bn1k/ha-kraichtal-wetter/stargazers)
+[![Installationen](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fanalytics.home-assistant.io%2Fcustom_integrations.json&query=%24.kraichtal_wetter.total&label=Installationen&color=41BDF5&style=for-the-badge)](https://analytics.home-assistant.io/)
 [![Lizenz](https://img.shields.io/github/license/t0bn1k/ha-kraichtal-wetter?style=for-the-badge)](LICENSE)
 [![Validate](https://img.shields.io/github/actions/workflow/status/t0bn1k/ha-kraichtal-wetter/validate.yml?style=for-the-badge&label=validate)](https://github.com/t0bn1k/ha-kraichtal-wetter/actions/workflows/validate.yml)
 

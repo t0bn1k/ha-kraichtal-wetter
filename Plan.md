@@ -132,8 +132,8 @@ Sichtbar geworden am neuen Sensor aus 0.8.0: Er heißt in einer deutschen Instan
 
 ## Außerhalb des Codes
 
-- [ ] **HACS-Standardkatalog:** [hacs/default#10787](https://github.com/hacs/default/pull/10787) ist offen, alle Checks grün, rund 900 PRs davor (11.09.2026). Nicht kommentieren — der Bot bittet ausdrücklich darum.
-- [ ] **Nach dem Merge:** Downloads-Badge einbauen (Vorlage in `AGENTS.md`) und die Installationsanleitung vom benutzerdefinierten Repository auf die Katalogsuche umstellen.
+- [ ] **HACS-Standardkatalog:** [hacs/default#10787](https://github.com/hacs/default/pull/10787) ist offen, alle Checks grün, `mergeable`, keine Reviewer-Rückfrage. Davor stehen 904 ältere offene Nicht-Draft-PRs (17.09.2026) — genau die Sortierung, auf die der hacs-bot verlinkt. Die Position bewegt sich kaum, weil etwa so viele PRs nachkommen wie gemergt werden (203 Merges in 30 Tagen). Streng der Reihe nach wird aber nicht gearbeitet: zuletzt gemergte Katalog-PRs lagen 5–11 Wochen zwischen Erstellung und Merge, die 904 sind also Obergrenze, nicht Wartezeit. Nicht kommentieren — der Bot bittet ausdrücklich darum.
+- [ ] **Nach dem Merge:** Installationsanleitung vom benutzerdefinierten Repository auf die Katalogsuche umstellen und den HACS-Badge von „Custom" auf „Default" ziehen. Sterne- und Installations-Badge stehen seit 17.09.2026 im README (`AGENTS.md`); der Installations-Badge füllt sich von selbst, sobald `kraichtal_wetter` in den HA-Analytics auftaucht.
 - **Icon in HACS:** fehlt, ist bekannt und nicht am Repo zu lösen (`AGENTS.md`).
 
 ## Testdaten beschaffen
