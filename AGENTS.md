@@ -69,6 +69,7 @@ Seit 0.8.0 tragen die Abschnittsüberschriften ein festes Icon, jeder Eintrag zu
 | Behoben | 🐛 |
 | Geändert | 🔧 |
 | Entfernt | 🗑️ |
+| Dokumentation | 📝 |
 | Sicherheit | 🔒 |
 | Nach dem Update zu tun | ⚠️ |
 | Getestet / Bestätigt | ✅ |
@@ -86,6 +87,12 @@ Die Zahl sind gemeldete **aktive Installationen**, keine Downloads — daher das
 
 Ein GitHub-Downloadzähler (`img.shields.io/github/downloads/.../total`) hilft nicht: Er zählt nur hochgeladene Release-Assets, und unsere Releases tragen keine. Das ließe sich nur mit `zip_release` in `hacs.json` plus einem Zip-Asset in `release.yml` ändern — was den Installationsweg umstellt und deshalb nicht gemacht wurde.
 
+### README in der HACS-Ansicht
+
+Die HACS-Oberfläche zeigt **nicht** die README von `main`. `HacsRepository.get_documentation()` (`custom_components/hacs/repositories/base.py`) setzt bei einer installierten Integration `target_version = installed_version` und lädt `https://raw.githubusercontent.com/<repo>/<tag>/README.md`. README-Änderungen werden dort also erst mit dem **nächsten Release** sichtbar — „Update information" in HACS hilft nicht, weil der Tag derselbe bleibt.
+
+Alle Links im README deshalb **absolut** halten. Relative Ziele wie `](LICENSE)` lösen sich in HACS gegen die Home-Assistant-URL auf und gehen ins Leere; beim Lizenz-Badge blieb außerdem das Bild leer, solange sein Linkziel relativ war.
+
 ## Verzeichnisstruktur
 
 ```
@@ -94,6 +101,7 @@ custom_components/kraichtal_wetter/
 ├── config_flow.py       # Config-Flow, Reauth, Options
 ├── const.py             # DOMAIN, Konstanten
 ├── coordinator.py       # KraichtalWetterClient (HTTP)
+├── diagnostics.py       # Diagnose-Download am Config-Entry, Key redigiert
 ├── sensor.py            # 23 Messwert-Sensoren + Diagnose-Sensor API-Status
 ├── weather.py           # WeatherEntity + Forecast
 ├── strings.json         # Quelle der UI-Texte (nicht zur Laufzeit geladen)

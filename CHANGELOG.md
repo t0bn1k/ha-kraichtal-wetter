@@ -2,6 +2,36 @@
 
 Alle signifikanten Änderungen an dieser Integration werden hier festgehalten.
 
+## [0.11.0] - 2026-09-17
+### ✨ Hinzugefügt
+- 🩺 **Diagnose-Download.** Unter `Einstellungen → Geräte & Dienste → Kraichtal
+  Wetter → ⋯ → Diagnose herunterladen` gibt es jetzt eine JSON-Datei mit dem
+  Config-Entry, dem Zustand des Coordinators und der letzten Antwort der API.
+  Das ist gedacht für Fehlerberichte: Bisher ließ sich eine Rohantwort nur
+  beschaffen, indem man die API von Hand mit dem eigenen Schlüssel abfragte.
+  - **Der API-Key steht nicht darin.** Redigiert werden alle drei Feldnamen,
+    unter denen ihn frühere Versionen abgelegt haben (`key`, `api_key`,
+    `apikey`), zusätzlich der Schlüssel *innerhalb* von Werten — eine
+    Installation von vor 0.4.4 trägt ihn in der gespeicherten URL — und
+    schließlich der Text einer gescheiterten Aktualisierung.
+  - Die Datei nennt `key_in_url`, wenn der Eintrag den Schlüssel noch in der
+    URL führt. Ein Leck ist das nicht, der Client trennt ihn vor jeder Anfrage
+    ab; es erklärt nur einen Eintrag, der sonst merkwürdig aussieht.
+
+### 📝 Dokumentation
+- 📝 Alle Links im README sind jetzt absolut. Relative Ziele wie `](LICENSE)`
+  lösen sich in der HACS-Ansicht gegen die Home-Assistant-URL auf und gehen ins
+  Leere; beim Lizenz-Badge blieb außerdem das Bild leer.
+- ⭐ Sterne- und Installations-Badge im README ergänzt. Der zweite liest die
+  Home-Assistant-Analytics und zeigt bis zur Aufnahme in den HACS-Standard-
+  katalog „no result".
+
+### ✅ Getestet
+- 🧪 29 Prüfungen der Diagnose gegen Home Assistant 2026.9.2: alle drei
+  Schlüsselnamen, Schlüssel nur in der URL, Schlüssel im Fehlertext, Schlüssel
+  verschachtelt in der API-Antwort, fehlender Schlüssel, fehlendes Intervall
+  und die JSON-Serialisierbarkeit der Ausgabe.
+
 ## [0.10.0] - 2026-09-12
 ### ⚠️ Geändert (Breaking)
 - 🏷️ **Die Entity-IDs folgen jetzt den Einstellungen von Home Assistant.** Die

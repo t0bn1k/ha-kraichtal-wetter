@@ -4,7 +4,7 @@
 [![Release](https://img.shields.io/github/v/release/t0bn1k/ha-kraichtal-wetter?style=for-the-badge)](https://github.com/t0bn1k/ha-kraichtal-wetter/releases)
 [![Sterne](https://img.shields.io/github/stars/t0bn1k/ha-kraichtal-wetter?style=for-the-badge&label=Sterne&color=41BDF5)](https://github.com/t0bn1k/ha-kraichtal-wetter/stargazers)
 [![Installationen](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fanalytics.home-assistant.io%2Fcustom_integrations.json&query=%24.kraichtal_wetter.total&label=Installationen&color=41BDF5&style=for-the-badge)](https://analytics.home-assistant.io/)
-[![Lizenz](https://img.shields.io/github/license/t0bn1k/ha-kraichtal-wetter?style=for-the-badge)](LICENSE)
+[![Lizenz](https://img.shields.io/github/license/t0bn1k/ha-kraichtal-wetter?style=for-the-badge)](https://github.com/t0bn1k/ha-kraichtal-wetter/blob/main/LICENSE)
 [![Validate](https://img.shields.io/github/actions/workflow/status/t0bn1k/ha-kraichtal-wetter/validate.yml?style=for-the-badge&label=validate)](https://github.com/t0bn1k/ha-kraichtal-wetter/actions/workflows/validate.yml)
 
 Kraichtal Wetter ist eine Home Assistant Custom Integration, die aktuelle Wetterdaten aus der Kraichtal Wetter API als Sensoren und als `weather`-Entität bereitstellt.
@@ -55,6 +55,7 @@ Den Schlüssel gibst du anschließend beim Einrichten der Integration ein. Er l�
 - Stündliche Vorhersage für die nächsten zwölf Stunden
 - Erweiterte Sensoren aus `station_today`
 - Gruppierte Entitäten unter einem Gerät in der Integrationen-Ansicht
+- Diagnose-Download für Fehlerberichte — ohne den eigenen API-Key
 
 ## Unterstützte Entitäten
 
@@ -98,9 +99,17 @@ Der **API-Status** ist als Diagnose-Entität eingestuft und steht bei einem erfo
 >
 > Die Umbenennung läuft einmalig, die Recorder-Historie bleibt erhalten, und Entitäten mit selbst vergebener ID bleiben unberührt. **Eigene Dashboards, Automationen, Skripte und Templates musst du anpassen** — Home Assistant schreibt Verweise dort nicht mit um.
 >
-> **Upgrade auf 0.7.0:** Die Entity-IDs bleiben gleich, aber gemessener und vorhergesagter Niederschlag wurden bis dahin verwechselt. Wer `sensor.kraichtal_wetter_prognose_resttag_niederschlag` als „Regen heute" in Automationen nutzt (etwa für die Bewässerung), hat mit einer Prognose gearbeitet und sollte auf `sensor.kraichtal_wetter_station_heute_niederschlag` wechseln. Unter `Entwicklerwerkzeuge → Statistik` meldet Home Assistant für die drei Prognose-Sensoren einmalig, dass sie keine Statistikklasse mehr haben — die alten Daten dort bitte löschen, sie sind nicht aussagekräftig. Details im [Changelog](CHANGELOG.md).
+> **Upgrade auf 0.7.0:** Die Entity-IDs bleiben gleich, aber gemessener und vorhergesagter Niederschlag wurden bis dahin verwechselt. Wer `sensor.kraichtal_wetter_prognose_resttag_niederschlag` als „Regen heute" in Automationen nutzt (etwa für die Bewässerung), hat mit einer Prognose gearbeitet und sollte auf `sensor.kraichtal_wetter_station_heute_niederschlag` wechseln. Unter `Entwicklerwerkzeuge → Statistik` meldet Home Assistant für die drei Prognose-Sensoren einmalig, dass sie keine Statistikklasse mehr haben — die alten Daten dort bitte löschen, sie sind nicht aussagekräftig. Details im [Changelog](https://github.com/t0bn1k/ha-kraichtal-wetter/blob/main/CHANGELOG.md).
 
 > **Upgrade von 0.4.x:** In 0.5.0 waren die IDs vorübergehend englisch. Wer direkt von 0.4.x auf 0.10.0 geht, landet ohne Umweg bei den deutschen IDs der Tabelle; die Umbenennung erfolgt beim ersten Start.
+
+## Ein Problem melden
+
+Zu einem Fehlerbericht gehört möglichst die Antwort der API, die ihn ausgelöst hat. Die lässt sich herunterladen, ohne sie von Hand abzufragen:
+
+`Einstellungen → Geräte & Dienste → Kraichtal Wetter → ⋯ → Diagnose herunterladen`
+
+Die JSON-Datei enthält deine Einstellungen, den Zustand des letzten Abrufs und die vollständige API-Antwort. **Dein API-Key steht nicht darin** — er wird herausgefiltert, auch wenn er in einer gespeicherten URL oder in einer Fehlermeldung steckt. Die Datei kannst du unverändert an ein [Issue](https://github.com/t0bn1k/ha-kraichtal-wetter/issues) hängen.
 
 ## Lovelace Beispiele
 
@@ -171,4 +180,4 @@ Dieses Repository enthält die Custom Integration unter `custom_components/kraic
 
 ## Lizenz
 
-[MIT](LICENSE)
+[MIT](https://github.com/t0bn1k/ha-kraichtal-wetter/blob/main/LICENSE)

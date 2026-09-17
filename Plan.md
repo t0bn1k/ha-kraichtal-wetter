@@ -1,6 +1,6 @@
 # Plan
 
-Stand: 12.09.2026 · veröffentlicht: 0.10.0 · API v1.5
+Stand: 17.09.2026 · veröffentlicht: 0.11.0 · API v1.5
 
 Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die API liefert, steht in [`docs/API.md`](docs/API.md) — dort nachsehen, bevor ein Punkt umgesetzt wird (siehe `AGENTS.md`). Erledigtes abhaken und die Version dazuschreiben.
 
@@ -12,6 +12,7 @@ Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die AP
 | 4 | Stündliche Vorhersage (`hours`) | veröffentlicht | 0.9.0 |
 | 5 | Niederschlagsbilanz (`rain`) | verworfen — HA rechnet das selbst | – |
 | 6 | Entity-IDs nach den Einstellungen des Nutzers | veröffentlicht | 0.10.0 |
+| 7 | Diagnose-Download | veröffentlicht | 0.11.0 |
 | – | ETag / `If-None-Match` | verworfen | – |
 
 ## 1. Niederschlag und Prognose-Sensoren korrigieren
@@ -110,6 +111,20 @@ Sichtbar geworden am neuen Sensor aus 0.8.0: Er heißt in einer deutschen Instan
 - [x] Verweise in der Testinstanz nachgezogen (12.09.2026): eine Automation und sieben Stellen in zwei Dashboards; Helfer und Gruppen waren nicht betroffen
 
 **Folge für Bestandsinstallationen mit Bereich:** Die Entitäten bekommen das Bereichspräfix, das eine Neuinstallation auch hätte — aus `sensor.kraichtal_wetter_outdoor_temperature` wird dort `sensor.garten_kraichtal_wetter_aussentemperatur`. Genau das macht sie zu den bereits nativ angelegten Sensoren konsistent.
+
+## 7. Diagnose-Download
+
+**Warum:** Das README bittet um Fehlerberichte, aber die Antwort der API — das, was einen Fehler überhaupt erklärt — bekam man nur, indem man sie von Hand mit dem eigenen Schlüssel abfragte. Die HA-Standardplattform `diagnostics` schließt die Lücke, ohne eine Entität oder einen Abruf hinzuzufügen.
+
+**Umsetzung:**
+- [x] `diagnostics.py` mit `async_get_config_entry_diagnostics`: Config-Entry, angefragte Sektionen, Coordinator-Zustand und die letzte API-Antwort
+- [x] Redaktion auf drei Ebenen: `async_redact_data` über die Feldnamen `key`/`api_key`/`apikey`, danach ein Durchlauf über die *Werte* (dort steckt er bei einem Eintrag von vor 0.4.4, in der gespeicherten URL), und derselbe Filter über den Text von `coordinator.last_exception`
+- [x] Die URL läuft durch `_split_api_key()` aus `coordinator.py` — dieselbe Funktion, die auch den Client schützt, statt einer zweiten Kopie der Logik
+- [x] 29 Prüfungen gegen HA 2026.9.2 (siehe „Ohne laufende Instanz prüfen"), darunter der Fall, in dem der Schlüssel **nur** in der URL steht und `async_redact_data` ihn nicht sehen kann
+- [x] README-Abschnitt „Ein Problem melden", CHANGELOG, `AGENTS.md`
+- [ ] In einer echten Instanz bestätigen: Datei herunterladen und gegen den eigenen Schlüssel prüfen
+
+**Entscheidung:** `system_health.py` wurde miterwogen und zurückgestellt — es überschneidet sich mit dem vorhandenen Diagnose-Sensor „API-Status" und beantwortet nur, *ob* etwas klemmt, nicht *was*.
 
 ## Verworfen
 
