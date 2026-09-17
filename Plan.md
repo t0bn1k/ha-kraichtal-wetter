@@ -122,7 +122,9 @@ Sichtbar geworden am neuen Sensor aus 0.8.0: Er heißt in einer deutschen Instan
 - [x] Die URL läuft durch `_split_api_key()` aus `coordinator.py` — dieselbe Funktion, die auch den Client schützt, statt einer zweiten Kopie der Logik
 - [x] 29 Prüfungen gegen HA 2026.9.2 (siehe „Ohne laufende Instanz prüfen"), darunter der Fall, in dem der Schlüssel **nur** in der URL steht und `async_redact_data` ihn nicht sehen kann
 - [x] README-Abschnitt „Ein Problem melden", CHANGELOG, `AGENTS.md`
-- [ ] In einer echten Instanz bestätigen: Datei herunterladen und gegen den eigenen Schlüssel prüfen
+- [x] In einer echten Instanz bestätigt (17.09.2026, 0.11.0): `key` steht auf `**REDACTED**`, `api_url` und `request.url` sind sauber, `key_in_url` false, `coordinator.last_update_success` true, die vollständige Antwort (`meta`, `current`, `days`, `hours`) liegt bei. Kein Schlüssel im Dump.
+- **Merke:** Home Assistant verpackt die Ausgabe der Integration noch einmal — im Download liegt sie unter `data`, neben den von HA ergänzten Blöcken `home_assistant`, `custom_components`, `integration_manifest`, `setup_times` und `issues`. Wer im Dump nach `entry` oder `coordinator` sucht, muss also eine Ebene tiefer.
+- **Mit im Dump:** `meta.lat`/`meta.lon` der Station (49.13/8.73). Das ist der öffentliche Standort der Wetterstation, nicht der des Nutzers — unbedenklich für ein Issue.
 
 **Entscheidung:** `system_health.py` wurde miterwogen und zurückgestellt — es überschneidet sich mit dem vorhandenen Diagnose-Sensor „API-Status" und beantwortet nur, *ob* etwas klemmt, nicht *was*.
 
