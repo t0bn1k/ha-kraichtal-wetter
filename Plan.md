@@ -33,7 +33,7 @@ Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die AP
 - [x] README (Tabelle, Erklärung, Upgrade-Hinweis, Beispiel), Beispiel-Dashboard, `docs/API.md`, `AGENTS.md`, CHANGELOG
 - [x] Release 0.7.0 (11.09.2026)
 - [x] Alte Statistik der drei Prognose-Sensoren gelöscht (12.09.2026, `recorder/clear_statistics`); die Meldungen „state class removed" verschwinden erst nach `recorder/update_statistics_issues` oder dem nächsten Prüflauf
-- [ ] Optional beim API-Autor bestätigen lassen, dass die `*_today`-Werte nur die restlichen Stunden abdecken (beobachtet, nicht dokumentiert)
+- [ ] Beim API-Betreiber bestätigen lassen, dass die `*_today`-Werte nur die restlichen Stunden abdecken (beobachtet, nicht dokumentiert). **Anfrage gestellt am 17.09.2026**, siehe „Anfrage an den API-Betreiber" — Antwort steht aus.
 
 **Entscheidungen:**
 - *Keine* State-Class statt `measurement` — die HA-Entwicklerdoku schließt „a prediction of the future" ausdrücklich aus.
@@ -85,7 +85,18 @@ Der Sensor „Warnungen" aus `current.warnings` bleibt als schnelle Anzahl erhal
 - [x] Release 0.9.0 (12.09.2026)
 - [x] In einer echten Instanz bestätigt (12.09.2026, 15:2x Uhr): zwölf Einträge ab 15:00, lückenlos stündlich über Mitternacht bis 02:00
 
-**Offen:** Was die API um 02:00 am 25.10.2026 tatsächlich in die Beschriftungen schreibt, ist Annahme — der Code kommt mit beiden plausiblen Varianten zurecht. Bei Gelegenheit eine Antwort aus dieser Nacht sichern.
+**Offen:** Was die API um 02:00 am 25.10.2026 tatsächlich in die Beschriftungen schreibt, ist Annahme — der Code kommt mit beiden plausiblen Varianten zurecht. **Anfrage beim Betreiber gestellt am 17.09.2026** (siehe „Anfrage an den API-Betreiber"); zuerst die Antwort abwarten, gemessen wird nur, wenn keine kommt.
+
+**Falls doch gemessen werden muss:** Umgestellt wird um 03:00 MESZ auf 02:00 MEZ. Doppelt durchlaufen wird damit die Stunde **02:00–02:59**, *nicht* 02:xx und 03:xx — lokal 03:20 gibt es nur einmal. Die drei sinnvollen Abrufe in UTC:
+
+| Lauf | Lokal | UTC | Was er zeigt |
+| --- | --- | --- | --- |
+| 1 | 02:20 MESZ | `2026-10-25T00:20:00Z` | erster Durchlauf der doppelten Stunde |
+| 2 | 02:20 MEZ | `2026-10-25T01:20:00Z` | zweiter Durchlauf — der entscheidende |
+| 3 | 03:20 MEZ | `2026-10-25T02:20:00Z` | Kontrolle, Reihe wieder normal |
+
+Seit 0.11.0 genügt dafür ein Diagnose-Abruf, der die rohe Antwort mitliefert — kein `curl` mit Schlüssel nötig:
+`ha_get_integration(entry_id="01M20W183QPDMPPKYSNFT8N23N", include_diagnostics=True)`, die `hours` liegen unter `data.data.api.hours`. Alternativ das `curl`-Rezept unter „Testdaten beschaffen".
 
 ## 5. Niederschlagsbilanz (`rain`) — verworfen (12.09.2026)
 
@@ -173,6 +184,10 @@ Sichtbar geworden am neuen Sensor aus 0.8.0: Er heißt in einer deutschen Instan
 - [ ] **HACS-Standardkatalog:** [hacs/default#10787](https://github.com/hacs/default/pull/10787) ist offen, alle Checks grün, `mergeable`, keine Reviewer-Rückfrage. Davor stehen 904 ältere offene Nicht-Draft-PRs (17.09.2026) — genau die Sortierung, auf die der hacs-bot verlinkt. Die Position bewegt sich kaum, weil etwa so viele PRs nachkommen wie gemergt werden (203 Merges in 30 Tagen). Streng der Reihe nach wird aber nicht gearbeitet: zuletzt gemergte Katalog-PRs lagen 5–11 Wochen zwischen Erstellung und Merge, die 904 sind also Obergrenze, nicht Wartezeit. Nicht kommentieren — der Bot bittet ausdrücklich darum.
 - [ ] **Nach dem Merge:** Installationsanleitung vom benutzerdefinierten Repository auf die Katalogsuche umstellen und den HACS-Badge von „Custom" auf „Default" ziehen. Sterne- und Installations-Badge stehen seit 17.09.2026 im README (`AGENTS.md`); der Installations-Badge füllt sich von selbst, sobald `kraichtal_wetter` in den HA-Analytics auftaucht.
 - **Icon in HACS:** fehlt, ist bekannt und nicht am Repo zu lösen (`AGENTS.md`).
+- [ ] **Anfrage an den API-Betreiber** (gestellt 17.09.2026, Antwort steht aus). Zwei Fragen in einem Schreiben, das bewusst **nicht** im Repo liegt — es ist ein Brief, kein Projektdokument:
+  1. Wie beschriftet `hours` die wiederholte Stunde in der Nacht zum 25.10.2026? Dazu die Anregung, je Eintrag einen eindeutigen Zeitpunkt mitzuliefern (Unix-Zeitstempel oder ISO 8601 mit Offset) — das würde das Rückrechnen in `weather.py` dauerhaft überflüssig machen, nicht nur in dieser Nacht.
+  2. Gelten `tmax_today`, `tmin_today` und `rain_today` nur für die restlichen Stunden des Tages? Belegt mit der Antwort vom 11.09.2026, 23:00 (Max/Min der zwei verbliebenen Stundenwerte ergeben exakt 13,5 und 12,4) und dem fallenden `rain_today`-Verlauf vom 05.09.
+  - Kommt eine Antwort, gehört sie nach `docs/API.md` — und die beiden offenen Punkte oben sind damit erledigt.
 
 ## Testdaten beschaffen
 
