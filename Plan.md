@@ -14,6 +14,7 @@ Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die AP
 | 6 | Entity-IDs nach den Einstellungen des Nutzers | veröffentlicht | 0.10.0 |
 | 7 | Diagnose-Download | veröffentlicht | 0.11.0 |
 | 8 | Irreführende englische Namen | veröffentlicht | 0.12.0 |
+| 9 | Zeitstempel `time` in `hours` nutzen | wartet auf die API | – |
 | – | ETag / `If-None-Match` | verworfen | – |
 
 ## 1. Niederschlag und Prognose-Sensoren korrigieren
@@ -33,7 +34,7 @@ Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die AP
 - [x] README (Tabelle, Erklärung, Upgrade-Hinweis, Beispiel), Beispiel-Dashboard, `docs/API.md`, `AGENTS.md`, CHANGELOG
 - [x] Release 0.7.0 (11.09.2026)
 - [x] Alte Statistik der drei Prognose-Sensoren gelöscht (12.09.2026, `recorder/clear_statistics`); die Meldungen „state class removed" verschwinden erst nach `recorder/update_statistics_issues` oder dem nächsten Prüflauf
-- [ ] Beim API-Betreiber bestätigen lassen, dass die `*_today`-Werte nur die restlichen Stunden abdecken (beobachtet, nicht dokumentiert). **Anfrage gestellt am 17.09.2026**, siehe „Anfrage an den API-Betreiber" — Antwort steht aus.
+- [x] Beim API-Betreiber bestätigen lassen, dass die `*_today`-Werte nur die restlichen Stunden abdecken. **Bestätigt am 17.09.2026**: Die Werte sind Min/Max bzw. Summe über das Stundenarray des Tages, in dem vergangene Stunden auf `null` stehen und vor der Rechnung herausfallen — übrig bleiben die verbleibenden Prognosestunden. Der Betreiber bestätigt ausdrücklich, dass sie auf die Vorhersage-Seite gehören und nicht in die Langzeitstatistik, und schärft seine Doku nach. Details in [`docs/API.md`](docs/API.md).
 
 **Entscheidungen:**
 - *Keine* State-Class statt `measurement` — die HA-Entwicklerdoku schließt „a prediction of the future" ausdrücklich aus.
@@ -85,9 +86,11 @@ Der Sensor „Warnungen" aus `current.warnings` bleibt als schnelle Anzahl erhal
 - [x] Release 0.9.0 (12.09.2026)
 - [x] In einer echten Instanz bestätigt (12.09.2026, 15:2x Uhr): zwölf Einträge ab 15:00, lückenlos stündlich über Mitternacht bis 02:00
 
-**Offen:** Was die API um 02:00 am 25.10.2026 tatsächlich in die Beschriftungen schreibt, ist Annahme — der Code kommt mit beiden plausiblen Varianten zurecht. **Anfrage beim Betreiber gestellt am 17.09.2026** (siehe „Anfrage an den API-Betreiber"); zuerst die Antwort abwarten, gemessen wird nur, wenn keine kommt.
+**Erledigt — beantwortet am 17.09.2026.** Die API führt die Stundenwerte in 24 festen Slots pro Kalendertag; es gibt in der Nacht zum 25.10.2026 **genau ein** `"02:00"`, gefolgt von `"03:00"`. Zwei Instanzen der Quelle werden in denselben Slot gemittelt. Im März fehlt 02:00 ganz, auf `"01:00"` folgt `"03:00"`. Die Reihe ist in diesen beiden Nächten also nicht garantiert lückenlos — an allen anderen Tagen schon.
 
-**Falls doch gemessen werden muss:** Umgestellt wird um 03:00 MESZ auf 02:00 MEZ. Doppelt durchlaufen wird damit die Stunde **02:00–02:59**, *nicht* 02:xx und 03:xx — lokal 03:20 gibt es nur einmal. Die drei sinnvollen Abrufe in UTC:
+`_hourly_datetimes()` deckt das ab, ohne Änderung: Weil bei einem Widerspruch die Beschriftung gilt, entsteht im Oktober 02:00 MESZ gefolgt von 03:00 MEZ (real zwei Stunden Abstand, genau der Sprung in den Daten), im März 01:00 MEZ gefolgt von 03:00 MESZ. Die Zeitstempel bleiben eindeutig und streng steigend. Nachgerechnet am 17.09.2026 mit beiden Label-Reihen — die Tabellen mit den konkreten Zeitstempeln stehen in [`docs/API.md`](docs/API.md) unter „Zeitumstellung: was die API tatsächlich tut". Die verbleibende Unschärfe — der eine 02:00-Eintrag wird auf den ersten Durchlauf gelegt, obwohl er gemittelt sein kann — steht in [`docs/API.md`](docs/API.md) und ist bewusst in Kauf genommen.
+
+**Eine Messung in der Umstellungsnacht ist damit nicht mehr nötig.** Wer sie trotzdem fahren will: Umgestellt wird um 03:00 MESZ auf 02:00 MEZ. Doppelt durchlaufen wird die Stunde **02:00–02:59**, *nicht* 02:xx und 03:xx — lokal 03:20 gibt es nur einmal. Die drei sinnvollen Abrufe in UTC:
 
 | Lauf | Lokal | UTC | Was er zeigt |
 | --- | --- | --- | --- |
@@ -160,6 +163,21 @@ Sichtbar geworden am neuen Sensor aus 0.8.0: Er heißt in einer deutschen Instan
 
 **Nebenbefund:** `.ruff.toml` im Wurzelverzeichnis hält fest, dass `homeassistant` als First-Party sortiert wird. Ohne die Datei meldet ruff I001 für `config_flow.py` und `coordinator.py` und will die Leerzeile vor dem `homeassistant`-Block entfernen — das wäre falsch, die übrigen vier Module trennen ihn ebenso ab wie der HA-Core selbst. Der Code blieb unverändert.
 
+## 9. Zeitstempel `time` in `hours` nutzen — wartet auf die API
+
+**Stand:** Der Betreiber hat das Feld am 17.09.2026 auf unsere Anregung hin zugesagt, **live ist es noch nicht**. Neben `label` soll in jedem `hours`-Eintrag `time` stehen: ISO 8601 mit Offset, z. B. `"2026-10-25T02:00:00+02:00"`. `label` bleibt unverändert.
+
+**Was es bringt:** Das Rückrechnen in `_hourly_datetimes()` entfällt — an 363 Tagen im Jahr ohnehin unauffällig, aber in den zwei Umstellungsnächten die einzige Quelle, die den Zeitpunkt ohne Annahme kennt. Der Offset kommt dann von der API statt aus unserer Ableitung über `Europe/Berlin`.
+
+**Was es nicht bringt:** Die Slot-Struktur bleibt (siehe Punkt 4). Der eine 02:00-Eintrag im Oktober trägt einen Zeitstempel, nicht zwei; im März fehlt 02:00 auch im Zeitstempel.
+
+**Umsetzung, wenn das Feld da ist:**
+- [ ] Gegen eine echte Antwort prüfen, wie das Feld tatsächlich aussieht — Name, Format, Offset, und ob es an jedem Eintrag steht (auch am ersten, „Jetzt"). **Erst dann Code schreiben**, nicht gegen die Ankündigung (siehe `AGENTS.md`, „Die API ist die Referenz").
+- [ ] `time` bevorzugen, `_hourly_datetimes()` als **Rückfallebene** behalten: Ein fehlendes oder unlesbares Feld darf die Stundenvorhersage nicht kosten, und alte Antworten im Server-Cache haben es noch nicht.
+- [ ] `docs/API.md` und diesen Punkt nachziehen, CHANGELOG-Eintrag, Release
+
+**Entscheidung: nicht auf Verdacht implementieren.** Das Format ist angekündigt, nicht gemessen — genau die Art Annahme, die in diesem Repo schon zweimal falsch war. Bis dahin bleibt die Rückrechnung, die beide Umstellungsnächte nachweislich verkraftet.
+
 ## Verworfen
 
 - **ETag / `If-None-Match`:** Bei unserem Takt kommt ein 304 praktisch nie vor (Station alle paar Minuten, Server-Cache 5 Minuten, Abruf frühestens alle 5 Minuten). Kein Gewinn für zusätzliche Fehlerpfade.
@@ -184,10 +202,10 @@ Sichtbar geworden am neuen Sensor aus 0.8.0: Er heißt in einer deutschen Instan
 - [ ] **HACS-Standardkatalog:** [hacs/default#10787](https://github.com/hacs/default/pull/10787) ist offen, alle Checks grün, `mergeable`, keine Reviewer-Rückfrage. Davor stehen 904 ältere offene Nicht-Draft-PRs (17.09.2026) — genau die Sortierung, auf die der hacs-bot verlinkt. Die Position bewegt sich kaum, weil etwa so viele PRs nachkommen wie gemergt werden (203 Merges in 30 Tagen). Streng der Reihe nach wird aber nicht gearbeitet: zuletzt gemergte Katalog-PRs lagen 5–11 Wochen zwischen Erstellung und Merge, die 904 sind also Obergrenze, nicht Wartezeit. Nicht kommentieren — der Bot bittet ausdrücklich darum.
 - [ ] **Nach dem Merge:** Installationsanleitung vom benutzerdefinierten Repository auf die Katalogsuche umstellen und den HACS-Badge von „Custom" auf „Default" ziehen. Sterne- und Installations-Badge stehen seit 17.09.2026 im README (`AGENTS.md`); der Installations-Badge füllt sich von selbst, sobald `kraichtal_wetter` in den HA-Analytics auftaucht.
 - **Icon in HACS:** fehlt, ist bekannt und nicht am Repo zu lösen (`AGENTS.md`).
-- [ ] **Anfrage an den API-Betreiber** (gestellt 17.09.2026, Antwort steht aus). Zwei Fragen in einem Schreiben, das bewusst **nicht** im Repo liegt — es ist ein Brief, kein Projektdokument:
-  1. Wie beschriftet `hours` die wiederholte Stunde in der Nacht zum 25.10.2026? Dazu die Anregung, je Eintrag einen eindeutigen Zeitpunkt mitzuliefern (Unix-Zeitstempel oder ISO 8601 mit Offset) — das würde das Rückrechnen in `weather.py` dauerhaft überflüssig machen, nicht nur in dieser Nacht.
-  2. Gelten `tmax_today`, `tmin_today` und `rain_today` nur für die restlichen Stunden des Tages? Belegt mit der Antwort vom 11.09.2026, 23:00 (Max/Min der zwei verbliebenen Stundenwerte ergeben exakt 13,5 und 12,4) und dem fallenden `rain_today`-Verlauf vom 05.09.
-  - Kommt eine Antwort, gehört sie nach `docs/API.md` — und die beiden offenen Punkte oben sind damit erledigt.
+- [x] **Anfrage an den API-Betreiber** (gestellt und beantwortet am 17.09.2026). Zwei Fragen in einem Schreiben, das bewusst **nicht** im Repo liegt — es ist ein Brief, kein Projektdokument. Beide Antworten stehen in [`docs/API.md`](docs/API.md), beide offenen Punkte sind damit erledigt:
+  1. **Beschriftung der wiederholten Stunde:** ein einziges `"02:00"`, kein doppeltes — 24 feste Slots pro Kalendertag, zwei Instanzen werden gemittelt (Punkt 4). Die Anregung, je Eintrag einen eindeutigen Zeitpunkt mitzuliefern, ist angenommen und wird als Feld `time` umgesetzt (Punkt 9).
+  2. **`*_today` gilt nur für die restlichen Stunden:** bestätigt, samt Mechanismus (Punkt 1). Der Betreiber schärft die Beschreibung in seiner Doku nach.
+  - Offen bleibt nur die Ankündigung: Sobald `time` live ist, greift Punkt 9.
 
 ## Testdaten beschaffen
 
@@ -197,7 +215,7 @@ Eine echte Antwort, der Key steht nur im Header und landet nicht in der Datei:
 curl -s -H "X-API-Key: DEIN_KEY" "https://kraichtal-wetter.de/dashboard/api.php?section=current,days,hours,alerts,rain&pretty=1" > /tmp/kw.json
 ```
 
-Eine Antwort aus der Nacht der Zeitumstellung (25.10.2026, 02:00–03:00) wäre nützlich, um die Beschriftungen der Stundenwerte gegenzuprüfen.
+Eine Antwort aus der Nacht der Zeitumstellung (25.10.2026, 02:00–03:00) wird **nicht mehr gebraucht** — die Beschriftungen sind seit dem 17.09.2026 vom Betreiber beschrieben (Punkt 4). Nützlich wäre sie höchstens noch als Gegenprobe, sobald das Feld `time` live ist.
 
 ## Ohne laufende Instanz prüfen
 

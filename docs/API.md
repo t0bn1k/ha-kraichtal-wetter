@@ -46,8 +46,12 @@ Ohne `section`-Parameter liefert die API **alle elf** Sektionen. Wir fordern gez
 #### Messung oder Prognose — die Namen führen in die Irre
 
 - **`rain` ist gemessen**, und zwar die Tagessumme seit Mitternacht („Niederschlag heute (Station)" laut Doku) — kein Momentanwert. Sie steigt in den 0,2-mm-Schritten des Regenmessers und fällt um Mitternacht auf 0.
-- **`rain_today`, `tmax_today` und `tmin_today` sind Prognosen** („Prognose für heute" laut Doku) — und zwar, wie eine echte Antwort zeigt, nur für die **verbleibenden** Stunden des Tages. Am 11.09.2026 um 23:00 enthielt `today.temp` nur noch Werte für 22 und 23 Uhr (13,5 und 12,4 °C); genau das waren `tmax_today` und `tmin_today`, während die Station 24,4 °C gemessen hatte und `days[0]` 24 °C vorhersagte. Die Doku sagt das nicht ausdrücklich — beobachtet, nicht dokumentiert.
+- **`rain_today`, `tmax_today` und `tmin_today` sind Prognosen** („Prognose für heute" laut Doku) — und zwar nur für die **verbleibenden** Stunden des Tages. Am 11.09.2026 um 23:00 enthielt `today.temp` nur noch Werte für 22 und 23 Uhr (13,5 und 12,4 °C); genau das waren `tmax_today` und `tmin_today`, während die Station 24,4 °C gemessen hatte und `days[0]` 24 °C vorhersagte.
 - Die Prognose für den **ganzen** Tag steht in `days[0]`, die Messwerte in `station_today.*` und `rain`.
+
+**Vom Betreiber bestätigt (17.09.2026)**, samt Mechanismus: `tmax_today`/`tmin_today` sind Maximum und Minimum über das Stundenarray des heutigen Tages, in dem bereits vergangene Stunden auf `null` stehen; die `null`-Werte fallen vor der Min/Max-Bildung heraus, übrig bleiben die noch nicht abgelaufenen Prognosestunden. `rain_today` ist entsprechend die Summe der Restmengen und fällt deshalb im Tagesverlauf, während `current.rain` als gemessene Tagessumme steigt. Der Betreiber bestätigt ausdrücklich, dass die drei Werte auf die Vorhersage-Seite gehören und nicht in die Langzeitstatistik — also genau die Korrektur aus 0.7.0 — und schärft die Beschreibung in seiner Doku nach.
+
+**Gemessene Tageswerte für die Statistik** sind laut Betreiber: `current.temp` (mit `temp_source: "live"` als Beleg, dass es kein Prognose-Ersatzwert ist), `current.station_today.tmax`/`.tmin` für die gemessenen Tagesextreme mit Uhrzeit, und `current.rain` bzw. `rain.station.today` für den gemessenen Tagesregen. Alles davon nutzt die Integration bereits, bis auf die Sektion `rain` — die ist bewusst verworfen (siehe Backlog).
 
 Bis 0.6.x hat die Integration `rain` und `rain_today` genau andersherum behandelt. Home Assistant schließt Prognosen ausdrücklich von `measurement` aus („not … a prediction of the future"), deshalb tragen die drei Prognose-Sensoren keine State-Class.
 
@@ -72,8 +76,49 @@ Die Einträge enthalten **kein Datum**; wir leiten es aus `meta.generated` plus 
 **Die Einträge tragen kein Datum, nur eine Beschriftung:** `"Jetzt"` für den ersten, danach volle Stunden (`"00:00"`, `"01:00"` …) in Ortszeit, fortlaufend über Mitternacht. `_hourly_datetimes()` in `weather.py` macht daraus Zeitstempel:
 
 - Verankert wird an der **ersten beschrifteten** Stunde — das ist die Aussage der API selbst. `meta.generated` entscheidet nur, zu welchem Tag diese Uhrzeit gehört. Sich auf `generated` zu verlassen hieße zu raten, ob die API `"Jetzt"` auf- oder abrundet.
-- Ab dort wird **in UTC** weitergezählt, damit eine Stunde bei der Zeitumstellung eine Stunde bleibt: Die doppelte 02:00 im Oktober ergibt zwei verschiedene Zeitpunkte, die beide zu ihrer Beschriftung passen.
+- Ab dort wird **in UTC** weitergezählt, damit eine Stunde bei der Zeitumstellung eine Stunde bleibt.
 - Widerspricht eine Beschriftung dem Schritt — eine Lücke in der Reihe —, gilt die Beschriftung, und es geht von dort weiter.
+
+#### Zeitumstellung: was die API tatsächlich tut
+
+**Vom Betreiber bestätigt (17.09.2026)** — vorher Annahme, jetzt aus der Datenebene beschrieben:
+
+Die Stundenwerte liegen intern in **24 festen Slots pro Kalendertag**, indiziert nach der lokalen Stunde 0–23; `label` ist dieser Index als `%02d:00`. Eine 25. Stunde kann die Struktur gar nicht abbilden.
+
+- **Oktober (doppelte Stunde):** Es gibt **genau ein** `"02:00"`, nie zwei. Liefert die Quelle (WXSIM) beide Instanzen, werden sie in **demselben Slot gemittelt**. Auf `"02:00"` folgt direkt `"03:00"`.
+- **März (fehlende Stunde):** Der 02:00-Slot bleibt leer und fällt aus der Ausgabe heraus — auf `"01:00"` folgt `"03:00"`.
+- **Die Reihe ist in diesen beiden Nächten nicht garantiert lückenlos.** Der interne Stundenzähler läuft durch die Wanduhr-Wiederholung hindurch weiter, während die Slots nur einmal 02:00 haben. An allen anderen Tagen des Jahres ist sie lückenlos.
+
+`_hourly_datetimes()` kommt damit richtig zurecht, **ohne Änderung** — weil bei einem Widerspruch zwischen Schritt und Beschriftung die Beschriftung gilt. Mit den bestätigten Label-Reihen nachgerechnet (17.09.2026):
+
+**Oktober, Nacht zum 25.10.2026** — ein `"02:00"`, danach `"03:00"`:
+
+| Label | Zeitstempel | UTC | Anmerkung |
+| --- | --- | --- | --- |
+| `01:00` | `2026-10-25T01:00:00+02:00` | 23:00 | — |
+| `02:00` | `2026-10-25T02:00:00+02:00` | 00:00 | erster Durchlauf der doppelten Stunde |
+| `03:00` | `2026-10-25T03:00:00+01:00` | 02:00 | **zwei Stunden später** — der Sprung in den Daten |
+| `04:00` | `2026-10-25T04:00:00+01:00` | 03:00 | Reihe wieder normal |
+
+**März, Nacht zum 29.03.2026** — `"02:00"` fehlt:
+
+| Label | Zeitstempel | UTC | Anmerkung |
+| --- | --- | --- | --- |
+| `01:00` | `2026-03-29T01:00:00+01:00` | 00:00 | — |
+| `03:00` | `2026-03-29T03:00:00+02:00` | 01:00 | eine Stunde später, die 02:00 gibt es nicht |
+| `04:00` | `2026-03-29T04:00:00+02:00` | 02:00 | Reihe wieder normal |
+
+In beiden Fällen sind die Zeitstempel eindeutig und steigen streng — keine Dubletten, kein Rückwärtssprung. Home Assistant sortiert sie also sauber ein. Der reale Abstand zwischen zwei Einträgen entspricht dem Sprung in den Daten, nicht stur einer Stunde; das ist die richtige Wiedergabe dessen, was die API liefert.
+
+**Die verbleibende Unschärfe, bewusst in Kauf genommen:** Der eine 02:00-Eintrag im Oktober bekommt den Zeitpunkt des *ersten* Durchlaufs (`+02:00`). Enthält der Slot gemittelte Werte oder den zweiten Durchlauf, ist dieser eine Eintrag um eine Stunde zu früh angesetzt. Das betrifft höchstens einen von zwölf Einträgen, in einer Nacht im Jahr, und lässt sich aus den Daten heraus nicht auflösen.
+
+#### Angekündigt: ein Feld `time` je Stundeneintrag
+
+Der Betreiber hat auf unsere Anregung hin zugesagt (17.09.2026, noch nicht live): neben `label` steht künftig `time` mit ISO 8601 samt Offset, z. B. `"2026-10-25T02:00:00+02:00"`. `label` bleibt unverändert.
+
+Damit entfällt das Rückrechnen. Die Einschränkung aus der Slot-Struktur bleibt aber bestehen: In der Oktobernacht trägt der eine 02:00-Eintrag **einen** Zeitstempel, nicht zwei; im März fehlt 02:00 im Zeitstempel wie im Label. Das Feld macht die Zeit eindeutig — es erfindet keine zweite Stunde, die die Daten nicht hergeben.
+
+Sobald es live ist: `time` bevorzugen, Rückrechnung als Rückfallebene behalten (`Plan.md`, Punkt 9).
 
 ## Wettersymbole
 

@@ -123,9 +123,19 @@ def _hourly_datetimes(generated: datetime, labels: list[object]) -> list[datetim
       label belongs to. Anchoring on `generated` instead would be a guess about
       whether the API rounds "Jetzt" up or down.
     - From there we step in UTC, so an hour stays an hour when the clocks
-      change: the repeated 02:00 in October becomes two distinct instants that
-      both match their label. Where a label disagrees with the step — a gap in
-      the series — we follow the label and carry on from there.
+      change. Where a label disagrees with the step — a gap in the series — we
+      follow the label and carry on from there.
+
+    That second rule is what carries the clock changes, confirmed by the API's
+    operator on 17.09.2026: the hours live in 24 fixed slots per calendar day,
+    so October has exactly one "02:00" (both instants averaged into that slot)
+    followed by "03:00", and March skips "02:00" entirely. Following the label
+    turns those into 02:00+02:00 → 03:00+01:00 and 01:00+01:00 → 03:00+02:00 —
+    strictly increasing instants that match the real jump in the data. The one
+    entry labelled 02:00 in October lands on the first pass through that hour;
+    if the slot holds an average, it is an hour early, which the data cannot
+    resolve. An announced `time` field will replace this reconstruction — see
+    Plan.md, point 9.
     """
     base = generated.astimezone(API_TIME_ZONE).replace(minute=0, second=0, microsecond=0)
 
