@@ -112,13 +112,13 @@ In beiden Fällen sind die Zeitstempel eindeutig und steigen streng — keine Du
 
 **Die verbleibende Unschärfe, bewusst in Kauf genommen:** Der eine 02:00-Eintrag im Oktober bekommt den Zeitpunkt des *ersten* Durchlaufs (`+02:00`). Enthält der Slot gemittelte Werte oder den zweiten Durchlauf, ist dieser eine Eintrag um eine Stunde zu früh angesetzt. Das betrifft höchstens einen von zwölf Einträgen, in einer Nacht im Jahr, und lässt sich aus den Daten heraus nicht auflösen.
 
-#### Angekündigt: ein Feld `time` je Stundeneintrag
+#### Angekündigt, von uns nicht genutzt: ein Feld `time` je Stundeneintrag
 
-Der Betreiber hat auf unsere Anregung hin zugesagt (17.09.2026, noch nicht live): neben `label` steht künftig `time` mit ISO 8601 samt Offset, z. B. `"2026-10-25T02:00:00+02:00"`. `label` bleibt unverändert.
+Der Betreiber hat auf unsere Anregung hin zugesagt (17.09.2026, am 24.09.2026 noch nicht live): neben `label` steht künftig `time` mit ISO 8601 samt Offset, z. B. `"2026-10-25T02:00:00+02:00"`. `label` bleibt unverändert.
 
-Damit entfällt das Rückrechnen. Die Einschränkung aus der Slot-Struktur bleibt aber bestehen: In der Oktobernacht trägt der eine 02:00-Eintrag **einen** Zeitstempel, nicht zwei; im März fehlt 02:00 im Zeitstempel wie im Label. Das Feld macht die Zeit eindeutig — es erfindet keine zweite Stunde, die die Daten nicht hergeben.
+**Die Integration nutzt es bewusst nicht** (entschieden 24.09.2026). Die Rückrechnung oben ist gegen die Antwort des Betreibers geprüft und verkraftet beide Umstellungsnächte; `time` würde das Ergebnis nur an diesen zwei Nächten im Jahr berühren. Die Einschränkung aus der Slot-Struktur bliebe ohnehin: Der eine 02:00-Eintrag im Oktober trüge **einen** Zeitstempel, nicht zwei, und im März fehlt 02:00 im Zeitstempel wie im Label. Taucht das Feld auf, wird es wie jedes andere ungenutzte Feld ignoriert.
 
-Sobald es live ist: `time` bevorzugen, Rückrechnung als Rückfallebene behalten (`Plan.md`, Punkt 9).
+Nicht zu verwechseln mit `current.obs_date`/`obs_time`: Das ist die Uhrzeit der letzten Stationsmessung (`"07:50"`, ohne Offset, als Sensor „Beobachtungszeit" angelegt), keine Zeitangabe für die Vorhersagestunden. Den Tagesanker für `hours` liefert `meta.generated`, das Datum und Offset trägt.
 
 ## Wettersymbole
 
