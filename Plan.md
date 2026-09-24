@@ -1,6 +1,6 @@
 # Plan
 
-Stand: 24.09.2026 · veröffentlicht: 0.12.1 · in Arbeit: 0.12.2 · API v1.5
+Stand: 24.09.2026 · veröffentlicht: 0.12.2 · API v1.5
 
 Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die API liefert, steht in [`docs/API.md`](docs/API.md) — dort nachsehen, bevor ein Punkt umgesetzt wird (siehe `AGENTS.md`). Erledigtes abhaken und die Version dazuschreiben.
 
@@ -16,7 +16,7 @@ Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die AP
 | 8 | Irreführende englische Namen | veröffentlicht | 0.12.0 |
 | 9 | Zeitstempel `time` in `hours` nutzen | verworfen — Rückrechnung bestätigt und ausreichend | – |
 | 10 | Fehler aus der Code-Durchsicht | veröffentlicht | 0.12.1 |
-| 11 | Tests im Repo | umgesetzt | 0.12.2 |
+| 11 | Tests im Repo | veröffentlicht | 0.12.2 |
 | – | ETag / `If-None-Match` | verworfen | – |
 
 ## 1. Niederschlag und Prognose-Sensoren korrigieren
@@ -197,7 +197,7 @@ Der Betreiber hat am 17.09.2026 auf unsere Anregung hin zugesagt, neben `label` 
 - [x] CI: `.github/workflows/tests.yml` mit ruff und pytest
 - [x] Gegen eingebaute Fehler geprüft: die vier Fehler aus 0.12.0 und 15 Mutationen werden erkannt (Details in `AGENTS.md`, „Tests“)
 - [x] Nebenbei: veralteten Docstring in `_hourly_datetimes()` korrigiert (verwies noch auf das Feld `time` als Ersatz)
-- [ ] Release 0.12.2
+- [x] Release 0.12.2 (24.09.2026)
 
 **Zwei Erkenntnisse aus der Mutationsprüfung:**
 - Das Vorwärtszählen in UTC in `_hourly_datetimes()` ist bei den bestätigten Label-Reihen wirkungsgleich mit lokalem Zählen — die Beschriftung korrigiert jeden Schritt. Entscheidend ist UTC beim **Rückwärtszählen** für „Jetzt“, das keine Beschriftung hat: Wer während des zweiten Durchlaufs von 02:00 im Oktober abruft, bekäme lokal gezählt einen Zeitstempel zwei Stunden zu früh. Dafür gibt es jetzt einen eigenen Test.
