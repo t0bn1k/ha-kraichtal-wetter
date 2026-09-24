@@ -20,9 +20,13 @@
         }
       }
     },
+    "error": {
+      "invalid_auth": "Der API-Key wurde abgelehnt. Prüfe ihn auf Tippfehler oder beantrage über das Antragsformular einen neuen.",
+      "cannot_connect": "Die Kraichtal-Wetter-API ist nicht erreichbar. Versuche es später erneut.",
+      "unknown": "Unerwarteter Fehler bei der Prüfung des API-Keys. Details stehen im Log."
+    },
     "abort": {
       "already_configured": "Kraichtal Wetter ist bereits konfiguriert.",
-      "entry_not_found": "Konfigurationseintrag nicht gefunden.",
       "reauth_successful": "API-Key erfolgreich aktualisiert."
     }
   },

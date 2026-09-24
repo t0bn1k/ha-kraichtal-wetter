@@ -2,6 +2,40 @@
 
 Alle signifikanten Änderungen an dieser Integration werden hier festgehalten.
 
+## [0.12.1] - 2026-09-24
+### 🐛 Behoben
+- 🕒 **Ein geändertes Abfrageintervall gilt jetzt sofort.** Bisher speicherte
+  der Optionsdialog den Wert, aber erst ein Neustart von Home Assistant hat ihn
+  übernommen.
+- 🕒 **Das bei der Einrichtung gewählte Intervall wird jetzt genutzt.** Es landete
+  an einer Stelle, die beim Start nicht gelesen wurde — jede Installation lief
+  mit 300 Sekunden, bis jemand den Optionsdialog öffnete.
+- 🔑 **Ein falscher API-Key wird direkt am Formular gemeldet.** Einrichtung und
+  erneute Anmeldung prüfen den Key jetzt gegen die API. Bisher legte ein
+  Tippfehler die Integration trotzdem an, und der Dialog zur erneuten Anmeldung
+  nahm den nächsten falschen Key genauso ungeprüft an. Ist die API nicht
+  erreichbar, sagt das Formular das, statt einen ungeprüften Key zu speichern.
+- 📝 **Ein API-Ausfall füllt nicht mehr das Log.** Jeder fehlgeschlagene Abruf
+  stand bisher als Fehler im Log, bei einem nächtlichen Ausfall also rund
+  hundertmal. Jetzt meldet Home Assistant den Ausfall einmal und die Erholung
+  einmal; Einzelheiten gibt es auf Debug-Ebene.
+- 🌐 **Klare Meldung, wenn die API kein JSON liefert** (etwa eine Wartungsseite):
+  „API returned no JSON" statt des rätselhaften „HTTP error 200".
+
+### 📝 Dokumentation
+- 📝 Das README versprach, den API-Key jederzeit unter „Konfiguration" ändern zu
+  können. Diesen Dialog gibt es nicht; ein neuer Key wird abgefragt, wenn die
+  API den alten ablehnt. Die Beschreibung stimmt jetzt.
+
+### ✅ Getestet
+- 🧪 26 Prüfungen gegen HA 2026.9.3 mit `pytest-homeassistant-custom-component`:
+  alle Fehlerfälle der Key-Prüfung (401, 403, 500, Verbindungsfehler, Timeout,
+  `ok: false`, Unerwartetes), Intervall aus der Einrichtung und aus den
+  Optionen samt Neuladen, erneute Anmeldung mit falschem und richtigem Key,
+  Log-Ebenen und die JSON-Meldung. Gegenprobe mit 0.12.0: Dort bleibt das
+  Intervall bei 600 wie bei 900 Sekunden auf 300, und ein falscher Key legt den
+  Eintrag an.
+
 ## [0.12.0] - 2026-09-17
 ### 🔧 Geändert
 - 🌐 **Die englischen Anzeigenamen sagen jetzt, was sie sind.** Vier Sensoren
