@@ -1,6 +1,6 @@
 # Plan
 
-Stand: 24.09.2026 · veröffentlicht: 0.12.0, in Arbeit: 0.12.1 · API v1.5
+Stand: 24.09.2026 · veröffentlicht: 0.12.1 · API v1.5
 
 Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die API liefert, steht in [`docs/API.md`](docs/API.md) — dort nachsehen, bevor ein Punkt umgesetzt wird (siehe `AGENTS.md`). Erledigtes abhaken und die Version dazuschreiben.
 
@@ -15,7 +15,7 @@ Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die AP
 | 7 | Diagnose-Download | veröffentlicht | 0.11.0 |
 | 8 | Irreführende englische Namen | veröffentlicht | 0.12.0 |
 | 9 | Zeitstempel `time` in `hours` nutzen | verworfen — Rückrechnung bestätigt und ausreichend | – |
-| 10 | Fehler aus der Code-Durchsicht | umgesetzt | 0.12.1 |
+| 10 | Fehler aus der Code-Durchsicht | veröffentlicht | 0.12.1 |
 | 11 | Tests im Repo | geplant | – |
 | – | ETag / `If-None-Match` | verworfen | – |
 
@@ -184,7 +184,7 @@ Der Betreiber hat am 17.09.2026 auf unsere Anregung hin zugesagt, neben `label` 
 - [x] `ContentTypeError` als „API returned no JSON" statt „HTTP error 200"
 - [x] README: falsches Versprechen „Key jederzeit unter Konfiguration ändern" korrigiert
 - [x] 26 Prüfungen gegen HA 2026.9.3, Gegenprobe mit 0.12.0
-- [ ] Release 0.12.1
+- [x] Release 0.12.1 (24.09.2026)
 
 **Idee, nicht umgesetzt:** Ein Reconfigure-Schritt, mit dem man den Key auch ohne Ablehnung durch die API tauschen kann. Das README hat ihn versprochen, gebraucht hat ihn bisher niemand. `_async_validate_key()` wäre wiederverwendbar.
 

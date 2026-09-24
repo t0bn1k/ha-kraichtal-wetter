@@ -65,6 +65,20 @@ Wenn eine neue Funktion eine bisher ungenutzte Sektion braucht, gehört sie in `
 
 Beim Release: `manifest.json` (`version`) und der CHANGELOG-Eintrag müssen zur Tag-Version passen, sonst greift die Changelog-Extraktion in `release.yml` nicht.
 
+### Wo die Version überall steht
+
+Vor dem Tag, im Release-PR:
+
+1. `custom_components/kraichtal_wetter/manifest.json` → `"version"`
+2. `CHANGELOG.md` → neuer Eintrag `## [x.y.z] - JJJJ-MM-TT` ganz oben (Format genau so, `release.yml` sucht danach)
+3. `Plan.md` → Kopfzeile `Stand: … · veröffentlicht: … · in Arbeit: x.y.z`, Tabellenzeile des Vorhabens mit `x.y.z` in der Spalte Release, im Abschnitt die Checkbox `- [ ] Release x.y.z`
+4. `README.md` → Upgrade-Hinweis „Upgrade auf x.y.z …" **nur**, wenn Nutzer nach dem Update etwas tun oder wissen müssen — nicht bei jedem Release
+
+Nach dem Merge:
+
+5. Annotierter Tag auf den Merge-Commit: `git tag -a vx.y.z -m "vx.y.z: <Titel>"`, dann pushen — `release.yml` baut das Release
+6. `Plan.md` nachziehen: Kopfzeile auf `veröffentlicht: x.y.z` (ohne „in Arbeit"), Tabellenstand auf „veröffentlicht", Checkbox `- [x] Release x.y.z (TT.MM.JJJJ)`
+
 ### Changelog mit Icons
 
 Seit 0.8.0 tragen die Abschnittsüberschriften ein festes Icon, jeder Eintrag zusätzlich ein thematisches. Ältere Einträge bleiben, wie sie sind. Die Extraktion in `release.yml` sucht nur `## [Version]` und ist davon nicht betroffen.
