@@ -16,7 +16,7 @@ Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die AP
 | 8 | Irreführende englische Namen | veröffentlicht | 0.12.0 |
 | 9 | Zeitstempel `time` in `hours` nutzen | verworfen — Rückrechnung bestätigt und ausreichend | – |
 | 10 | Fehler aus der Code-Durchsicht | veröffentlicht | 0.12.1 |
-| 11 | Tests im Repo | geplant | – |
+| 11 | Tests im Repo | umgesetzt | – (nicht nutzerrelevant) |
 | – | ETag / `If-None-Match` | verworfen | – |
 
 ## 1. Niederschlag und Prognose-Sensoren korrigieren
@@ -137,7 +137,7 @@ Sichtbar geworden am neuen Sensor aus 0.8.0: Er heißt in einer deutschen Instan
 - [x] `diagnostics.py` mit `async_get_config_entry_diagnostics`: Config-Entry, angefragte Sektionen, Coordinator-Zustand und die letzte API-Antwort
 - [x] Redaktion auf drei Ebenen: `async_redact_data` über die Feldnamen `key`/`api_key`/`apikey`, danach ein Durchlauf über die *Werte* (dort steckt er bei einem Eintrag von vor 0.4.4, in der gespeicherten URL), und derselbe Filter über den Text von `coordinator.last_exception`
 - [x] Die URL läuft durch `_split_api_key()` aus `coordinator.py` — dieselbe Funktion, die auch den Client schützt, statt einer zweiten Kopie der Logik
-- [x] 29 Prüfungen gegen HA 2026.9.2 (siehe „Ohne laufende Instanz prüfen"), darunter der Fall, in dem der Schlüssel **nur** in der URL steht und `async_redact_data` ihn nicht sehen kann
+- [x] 29 Prüfungen gegen HA 2026.9.2 (ad hoc, seit Punkt 11 als `tests/test_diagnostics.py` im Repo), darunter der Fall, in dem der Schlüssel **nur** in der URL steht und `async_redact_data` ihn nicht sehen kann
 - [x] README-Abschnitt „Ein Problem melden", CHANGELOG, `AGENTS.md`
 - [x] In einer echten Instanz bestätigt (17.09.2026, 0.11.0): `key` steht auf `**REDACTED**`, `api_url` und `request.url` sind sauber, `key_in_url` false, `coordinator.last_update_success` true, die vollständige Antwort (`meta`, `current`, `days`, `hours`) liegt bei. Kein Schlüssel im Dump.
 - **Merke:** Home Assistant verpackt die Ausgabe der Integration noch einmal — im Download liegt sie unter `data`, neben den von HA ergänzten Blöcken `home_assistant`, `custom_components`, `integration_manifest`, `setup_times` und `issues`. Wer im Dump nach `entry` oder `coordinator` sucht, muss also eine Ebene tiefer.
@@ -190,11 +190,19 @@ Der Betreiber hat am 17.09.2026 auf unsere Anregung hin zugesagt, neben `label` 
 
 **Zurückgestellt:** `hass.data` → `entry.runtime_data`. Moderner, aber berührt alle Plattformen und die Diagnose, ohne dass Nutzer etwas davon merken — passt besser zu Punkt 11, wenn Tests es absichern.
 
-## 11. Tests im Repo — geplant
+## 11. Tests im Repo (24.09.2026)
 
-Die Prüfungen bisher liefen ad hoc in einer lokalen venv und sind nicht eingecheckt. Ziel: `tests/` mit `pytest-homeassistant-custom-component` und ein CI-Job. Zuerst die heiklen Stellen: Zeitumstellung in `_hourly_datetimes()`, Redaktion in `diagnostics.py`, Migration der Entity-IDs, Key-Prüfung und Intervall aus 0.12.1.
+- [x] `tests/` mit `pytest-homeassistant-custom-component` 0.13.366 (= HA 2026.9.3), 101 Tests, rund 2 Sekunden
+- [x] Abgedeckt: Rückrechnung der Stundenzeitstempel samt beider Umstellungsnächte, Tages- und Stundenvorhersage, Push an Forecast-Abonnenten, Icon-Tabelle, alle Sensoren mit Attributen und State-Classes, API-Status, Client (Header, Key in der URL, Fehlerzuordnung, Log-Ebenen, Key nie im Log), Config-Flow (Key-Prüfung, Reauth, Optionen), Setup (Intervall, Alt-Felder des Keys, Reauth, Retry), Entity-ID-Migration, Diagnose-Redaktion
+- [x] CI: `.github/workflows/tests.yml` mit ruff und pytest
+- [x] Gegen eingebaute Fehler geprüft: die vier Fehler aus 0.12.0 und 15 Mutationen werden erkannt (Details in `AGENTS.md`, „Tests“)
+- [x] Nebenbei: veralteten Docstring in `_hourly_datetimes()` korrigiert (verwies noch auf das Feld `time` als Ersatz)
 
-**Merke für die Einrichtung:** Das Paket bringt ein eigenes `custom_components` mit (`testing_config`), das unseres verdeckt. In der `conftest.py` den Repo-Pfad an `custom_components.__path__` anhängen, dazu die Fixture `enable_custom_integrations` autouse. `MockConfigEntry.start_reauth_flow()` gibt es, am echten `ConfigEntry` heißt es `async_start_reauth()`.
+**Zwei Erkenntnisse aus der Mutationsprüfung:**
+- Das Vorwärtszählen in UTC in `_hourly_datetimes()` ist bei den bestätigten Label-Reihen wirkungsgleich mit lokalem Zählen — die Beschriftung korrigiert jeden Schritt. Entscheidend ist UTC beim **Rückwärtszählen** für „Jetzt“, das keine Beschriftung hat: Wer während des zweiten Durchlaufs von 02:00 im Oktober abruft, bekäme lokal gezählt einen Zeitstempel zwei Stunden zu früh. Dafür gibt es jetzt einen eigenen Test.
+- Die Diagnose muss einen Key, der nur in der alten URL steht, auch in Fehlermeldungen finden. Das war ungetestet, jetzt nicht mehr.
+
+**Nächster Schritt, wenn gewünscht:** `hass.data` → `entry.runtime_data` (Punkt 10, zurückgestellt) — jetzt durch Tests abgesichert.
 
 ## Verworfen
 
@@ -237,7 +245,5 @@ Eine Antwort aus der Nacht der Zeitumstellung (25.10.2026, 02:00–03:00) wird *
 
 ## Ohne laufende Instanz prüfen
 
-So wurde Punkt 2 getestet — für 3 und 4 wiederverwendbar:
-
-- **Home Assistant als Paket:** `python3 -m venv havenv && havenv/bin/pip install homeassistant` (braucht Python ≥ 3.14.2). Damit lassen sich Sensor- und Wetter-Entität direkt instanziieren und mit einer gespeicherten API-Antwort füttern — ohne `hass`-Instanz, der Coordinator ist ein einfaches Objekt mit `data`.
+- **Tests:** seit Punkt 11 im Repo, Aufruf in `AGENTS.md` unter „Tests“. Das ersetzt die frühere Ad-hoc-venv.
 - **Hassfest lokal:** `script/` aus `home-assistant/core` (Sparse-Checkout, Tag passend zur installierten Version), dazu `pip install infrared-protocols tqdm ruff`, dann `python -m script.hassfest --integration-path custom_components/kraichtal_wetter`. Fängt vor allem Übersetzungsfehler ab, bevor die CI nach dem Taggen daran scheitert (vgl. 0.5.7).
