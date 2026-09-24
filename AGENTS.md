@@ -2,7 +2,7 @@
 
 ## Repo-Übersicht
 
-Home-Assistant-Custom-Integration für die Kraichtal-Wetter-API. Kein Build-System, keine Tests, keine Linter.
+Home-Assistant-Custom-Integration für die Kraichtal-Wetter-API. Kein Build-System. Tests unter `tests/` (pytest), Linter ist ruff — beides läuft in der CI, siehe „Tests“.
 
 ## Domain & Manifest
 
@@ -62,6 +62,7 @@ Wenn eine neue Funktion eine bisher ungenutzte Sektion braucht, gehört sie in `
 
 - `.github/workflows/release.yml` — Tag `v*.*.*` erzeugt GitHub Release mit automatisch extrahiertem Changelog-Eintrag.
 - `.github/workflows/validate.yml` — HACS-Action und Hassfest (Push, PR, nächtlich). Voraussetzung für die Aufnahme in den HACS-Standardkatalog.
+- `.github/workflows/tests.yml` — ruff und pytest (Push, PR).
 
 Beim Release: `manifest.json` (`version`) und der CHANGELOG-Eintrag müssen zur Tag-Version passen, sonst greift die Changelog-Extraktion in `release.yml` nicht.
 
@@ -131,7 +132,24 @@ hacs.json                # HACS-Metadaten
 docs/API.md              # Was die Integration von der API nutzt — und was die API sonst hergibt
 Plan.md                  # Umsetzungsplan: Reihenfolge, Stand, Entscheidungen
 lovelace/                # Beispiel-Dashboards
+tests/                   # pytest-Suite, fixtures/response.json ist eine echte API-Antwort
+requirements_test.txt    # Test-Abhängigkeiten, pinnt damit auch die HA-Version
+pytest.ini               # asyncio-Modus, Testpfad
 ```
+
+## Tests
+
+```sh
+python3.14 -m venv .venv && .venv/bin/pip install -r requirements_test.txt
+.venv/bin/ruff check . && .venv/bin/pytest
+```
+
+- **Harness:** `pytest-homeassistant-custom-component` startet einen echten HA-Core je Test. Netzwerk ist gesperrt (`pytest-socket`); die API wird über `aioclient_mock` beantwortet, nicht über gepatchte Methoden — so laufen Header, URL und Fehlerpfade wie in echt.
+- **Versionen:** Jede Plugin-Version passt zu genau einer HA-Version (0.13.366 = 2026.9.3). In `requirements_test.txt` beide zusammen anheben.
+- **`custom_components` wird verdeckt:** Das Plugin bringt ein eigenes, reguläres `custom_components`-Paket mit, das unser Namespace-Paket überdeckt. `tests/conftest.py` hängt deshalb den Repo-Pfad an `custom_components.__path__`. Nicht entfernen, sonst findet kein Test die Integration.
+- **Erwartungswerte zur Zeitumstellung** in `tests/test_hourly.py` sind die Tabellen aus `docs/API.md`, vom Betreiber bestätigt. Schlägt dort etwas fehl, zuerst die Doku prüfen, nicht den Test anpassen.
+- **Die Tests sind gegen eingebaute Fehler geprüft (24.09.2026):** alle vier Fehler aus 0.12.0 und 15 gezielte Mutationen, von der Rückrechnung über die State-Classes bis zur Redaktion. Einzige überlebende Mutation: `async_migrate_entry` bei jeder Version — verhaltensgleich, weil HA die Funktion nur bei abweichender Version aufruft.
+- **Neue Funktion → neuer Test.** Besonders bei allem, was API-Felder deutet: Der Test hält die Semantik aus der Doku fest, damit sie nicht wieder aus einem Feldnamen oder Symbol erraten wird.
 
 ## Stil (im Code)
 

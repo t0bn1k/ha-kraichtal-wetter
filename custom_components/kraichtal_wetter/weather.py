@@ -134,8 +134,8 @@ def _hourly_datetimes(generated: datetime, labels: list[object]) -> list[datetim
     strictly increasing instants that match the real jump in the data. The one
     entry labelled 02:00 in October lands on the first pass through that hour;
     if the slot holds an average, it is an hour early, which the data cannot
-    resolve. An announced `time` field will replace this reconstruction — see
-    Plan.md, point 9.
+    resolve. The API has announced a `time` field per entry; it is deliberately
+    not used, this reconstruction is confirmed and sufficient — Plan.md, point 9.
     """
     base = generated.astimezone(API_TIME_ZONE).replace(minute=0, second=0, microsecond=0)
 

@@ -1,0 +1,4 @@
+# Pins Home Assistant itself: each release of the plugin matches exactly one
+# HA version (0.13.366 = 2026.9.3). Bump both together.
+pytest-homeassistant-custom-component==0.13.366
+ruff==0.16.8

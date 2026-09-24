@@ -180,6 +180,8 @@ hours_to_show: 24
 
 Dieses Repository enthält die Custom Integration unter `custom_components/kraichtal_wetter` sowie die Dokumentation und das Changelog für die Integration.
 
+Unter `tests/` liegt eine Testsuite, die bei jedem Push gegen einen echten Home-Assistant-Core läuft. Wer beitragen möchte, findet den Aufruf in [AGENTS.md](https://github.com/t0bn1k/ha-kraichtal-wetter/blob/main/AGENTS.md#tests).
+
 ## Lizenz
 
 [MIT](https://github.com/t0bn1k/ha-kraichtal-wetter/blob/main/LICENSE)

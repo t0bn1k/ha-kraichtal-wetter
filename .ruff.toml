@@ -11,3 +11,8 @@
 
 [lint.isort]
 known-first-party = ["homeassistant"]
+
+# Die Tests importieren die Integration als `custom_components.kraichtal_wetter`.
+# Als lokaler Ordner einsortiert steht sie hinter dem `homeassistant`-Block,
+# dort wo in der Integration selbst die Relativimporte stehen.
+known-local-folder = ["custom_components"]

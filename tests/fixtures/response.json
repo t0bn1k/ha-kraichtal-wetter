@@ -1,0 +1,35 @@
+{
+  "ok": true,
+  "meta": {"station": "Wetterstation", "lat": 49.13, "lon": 8.73, "generated": "2026-09-24T07:51:05+02:00", "timestamp": 1790229065, "version": "1.5", "cached": false, "sections": ["current", "days", "hours"]},
+  "current": {
+    "temp": 13.1, "temp_source": "live", "feels_like": 14.2, "humidity": 68, "dewpoint": 7.3, "pressure": 1021.8,
+    "wind": 0, "wind_dir": 68, "gust_max": 12, "solar": 19, "rain": 0,
+    "obs_date": "24.09.26", "obs_time": "07:50", "realtime": true,
+    "station_today": {"tmax": 16.1, "tmax_time": "04:27", "tmin": 10.1, "tmin_time": "02:13", "gust": 11.9, "gust_time": "03:44", "gust_bft": 2, "wind_max": 3.2, "press_max": 1021.9, "press_min": 1021},
+    "icon": "ovc", "tmin_today": 10.4, "tmax_today": 18.3, "rain_today": 0, "warnings": 0
+  },
+  "days": [
+    {"label": "Heute", "tmax": 19, "tmin": 10, "icon": "ovc", "pop": 0, "wind": 10, "rain": 0, "gust": 29, "wind_dir": 325, "confidence": 76, "spark": [13.8, 14.6, 15.1, 17.6, 18.2, 17.4, 14.9, 12.3, 10.4, 10.4]},
+    {"label": "Fr 25.09.", "tmax": 22, "tmin": 6, "icon": "suncloud", "pop": 0, "wind": 5, "rain": 0, "gust": 14, "wind_dir": 91, "confidence": 83, "spark": [9.9, 8.5, 9.1, 10.7, 17.1, 22, 21.3, 16.5, 13.4]},
+    {"label": "Sa 26.09.", "tmax": 24, "tmin": 7, "icon": "cloud", "pop": 0, "wind": 5, "rain": 0, "gust": 11, "wind_dir": 111, "confidence": 68, "spark": [11.8, 8.1, 5.9, 6.9, 16, 25, 24.9, 20.1, 15.9]},
+    {"label": "So 27.09.", "tmax": 26, "tmin": 9, "icon": "cloud", "pop": 0, "wind": 5, "rain": 0, "gust": 14, "wind_dir": 102, "confidence": 65, "spark": [13.8, 9.9, 8.6, 10, 19, 27.6, 27, 22.5, 20.3]},
+    {"label": "Mo 28.09.", "tmax": 28, "tmin": 12, "icon": "suncloud", "pop": 0, "wind": 5, "rain": 0, "gust": 18, "wind_dir": 107, "confidence": 68, "spark": [20.1, 18.3, 14.4, 12.4, 21.7, 29, 28.1, 22.8, 19.4]},
+    {"label": "Di 29.09.", "tmax": 29, "tmin": 14, "icon": "suncloud", "pop": 0, "wind": 8, "rain": 0, "gust": 25, "wind_dir": 99, "confidence": 68, "spark": [18.4, 17.2, 15.8, 19.7, 26.1, 27.4, 26.6, 21.6, 19]},
+    {"label": "Mi 30.09.", "tmax": 27, "tmin": 14, "icon": "suncloud", "pop": 0, "wind": 7, "rain": 0.1, "gust": 18, "wind_dir": 91, "confidence": 56, "spark": [17.8, 17.1, 17.6, 18.3, 24.4, 27, 23.7, 19.1, 16.2]},
+    {"label": "Do 01.10.", "tmax": 25, "tmin": 14, "icon": "cloud", "pop": 0, "wind": 7, "rain": 3.8, "gust": 14, "wind_dir": 102, "confidence": 55, "spark": [16.1, 16.5, 16.5]}
+  ],
+  "hours": [
+    {"label": "Jetzt", "temp": 13, "pop": 0, "wind": 11, "icon": "ovc"},
+    {"label": "08:00", "temp": 14, "pop": 0, "wind": 11, "icon": "ovc"},
+    {"label": "09:00", "temp": 15, "pop": 0, "wind": 11, "icon": "ovc"},
+    {"label": "10:00", "temp": 15, "pop": 0, "wind": 11, "icon": "ovc"},
+    {"label": "11:00", "temp": 15, "pop": 3, "wind": 7, "icon": "ovc"},
+    {"label": "12:00", "temp": 16, "pop": 0, "wind": 11, "icon": "ovc"},
+    {"label": "13:00", "temp": 18, "pop": 0, "wind": 14, "icon": "ovc"},
+    {"label": "14:00", "temp": 18, "pop": 0, "wind": 14, "icon": "ovc"},
+    {"label": "15:00", "temp": 18, "pop": 0, "wind": 14, "icon": "ovc"},
+    {"label": "16:00", "temp": 18, "pop": 0, "wind": 14, "icon": "ovc"},
+    {"label": "17:00", "temp": 17, "pop": 0, "wind": 11, "icon": "suncloud"},
+    {"label": "18:00", "temp": 16, "pop": 0, "wind": 11, "icon": "sun"}
+  ]
+}
