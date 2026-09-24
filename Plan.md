@@ -1,6 +1,6 @@
 # Plan
 
-Stand: 17.09.2026 · veröffentlicht: 0.12.0 · API v1.5
+Stand: 24.09.2026 · veröffentlicht: 0.12.0 · API v1.5
 
 Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die API liefert, steht in [`docs/API.md`](docs/API.md) — dort nachsehen, bevor ein Punkt umgesetzt wird (siehe `AGENTS.md`). Erledigtes abhaken und die Version dazuschreiben.
 
@@ -14,7 +14,7 @@ Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die AP
 | 6 | Entity-IDs nach den Einstellungen des Nutzers | veröffentlicht | 0.10.0 |
 | 7 | Diagnose-Download | veröffentlicht | 0.11.0 |
 | 8 | Irreführende englische Namen | veröffentlicht | 0.12.0 |
-| 9 | Zeitstempel `time` in `hours` nutzen | wartet auf die API | – |
+| 9 | Zeitstempel `time` in `hours` nutzen | verworfen — Rückrechnung bestätigt und ausreichend | – |
 | – | ETag / `If-None-Match` | verworfen | – |
 
 ## 1. Niederschlag und Prognose-Sensoren korrigieren
@@ -163,23 +163,19 @@ Sichtbar geworden am neuen Sensor aus 0.8.0: Er heißt in einer deutschen Instan
 
 **Nebenbefund:** `.ruff.toml` im Wurzelverzeichnis hält fest, dass `homeassistant` als First-Party sortiert wird. Ohne die Datei meldet ruff I001 für `config_flow.py` und `coordinator.py` und will die Leerzeile vor dem `homeassistant`-Block entfernen — das wäre falsch, die übrigen vier Module trennen ihn ebenso ab wie der HA-Core selbst. Der Code blieb unverändert.
 
-## 9. Zeitstempel `time` in `hours` nutzen — wartet auf die API
+## 9. Zeitstempel `time` in `hours` nutzen — verworfen (24.09.2026)
 
-**Stand:** Der Betreiber hat das Feld am 17.09.2026 auf unsere Anregung hin zugesagt, **live ist es noch nicht**. Neben `label` soll in jedem `hours`-Eintrag `time` stehen: ISO 8601 mit Offset, z. B. `"2026-10-25T02:00:00+02:00"`. `label` bleibt unverändert.
+Der Betreiber hat am 17.09.2026 auf unsere Anregung hin zugesagt, neben `label` in jedem `hours`-Eintrag ein Feld `time` mitzuliefern (ISO 8601 mit Offset, z. B. `"2026-10-25T02:00:00+02:00"`). Am 24.09.2026 war es noch nicht live.
 
-**Was es bringt:** Das Rückrechnen in `_hourly_datetimes()` entfällt — an 363 Tagen im Jahr ohnehin unauffällig, aber in den zwei Umstellungsnächten die einzige Quelle, die den Zeitpunkt ohne Annahme kennt. Der Offset kommt dann von der API statt aus unserer Ableitung über `Europe/Berlin`.
+**Warum wir es nicht brauchen:** Angeregt hatten wir es, solange unklar war, wie die API die Zeitumstellung beschriftet. Seit der Antwort vom 17.09.2026 ist das geklärt, und `_hourly_datetimes()` verkraftet beide Umstellungsnächte nachweislich (Punkt 4). `time` würde das Ergebnis nur in diesen zwei Nächten berühren, und selbst dort bleibt die Slot-Struktur: ein einziger gemittelter 02:00-Eintrag im Oktober, keiner im März. Der Gewinn — eine Stunde Unschärfe an einem Eintrag, einmal im Jahr — trägt keinen zweiten Codepfad samt Rückfallebene.
 
-**Was es nicht bringt:** Die Slot-Struktur bleibt (siehe Punkt 4). Der eine 02:00-Eintrag im Oktober trägt einen Zeitstempel, nicht zwei; im März fehlt 02:00 auch im Zeitstempel.
+**Auch `current.obs_time` ersetzt es nicht:** Das ist die Uhrzeit der letzten Stationsmessung (`"07:50"`, nur `HH:MM`, Datum getrennt in `obs_date`, kein Offset). Es beschreibt die Messung, nicht die zwölf Vorhersagestunden. Den Tagesanker liefert bereits `meta.generated` mit Datum und Offset.
 
-**Umsetzung, wenn das Feld da ist:**
-- [ ] Gegen eine echte Antwort prüfen, wie das Feld tatsächlich aussieht — Name, Format, Offset, und ob es an jedem Eintrag steht (auch am ersten, „Jetzt"). **Erst dann Code schreiben**, nicht gegen die Ankündigung (siehe `AGENTS.md`, „Die API ist die Referenz").
-- [ ] `time` bevorzugen, `_hourly_datetimes()` als **Rückfallebene** behalten: Ein fehlendes oder unlesbares Feld darf die Stundenvorhersage nicht kosten, und alte Antworten im Server-Cache haben es noch nicht.
-- [ ] `docs/API.md` und diesen Punkt nachziehen, CHANGELOG-Eintrag, Release
-
-**Entscheidung: nicht auf Verdacht implementieren.** Das Format ist angekündigt, nicht gemessen — genau die Art Annahme, die in diesem Repo schon zweimal falsch war. Bis dahin bleibt die Rückrechnung, die beide Umstellungsnächte nachweislich verkraftet.
+**Folge:** Taucht `time` in der Antwort auf, wird es wie jedes andere ungenutzte Feld ignoriert. Beim Betreiber ist nichts zurückzunehmen.
 
 ## Verworfen
 
+- **Feld `time` in `hours`:** siehe Punkt 9 — die Rückrechnung ist bestätigt und reicht.
 - **ETag / `If-None-Match`:** Bei unserem Takt kommt ein 304 praktisch nie vor (Station alle paar Minuten, Server-Cache 5 Minuten, Abruf frühestens alle 5 Minuten). Kein Gewinn für zusätzliche Fehlerpfade.
 - **`alerts`:** siehe Punkt 3 — die DWD-Integration kann es besser.
 - **`rain`:** siehe Punkt 5 — Home Assistant rechnet die Summen selbst.
@@ -199,13 +195,12 @@ Sichtbar geworden am neuen Sensor aus 0.8.0: Er heißt in einer deutschen Instan
 
 ## Außerhalb des Codes
 
-- [ ] **HACS-Standardkatalog:** [hacs/default#10787](https://github.com/hacs/default/pull/10787) ist offen, alle Checks grün, `mergeable`, keine Reviewer-Rückfrage. Davor stehen 904 ältere offene Nicht-Draft-PRs (17.09.2026) — genau die Sortierung, auf die der hacs-bot verlinkt. Die Position bewegt sich kaum, weil etwa so viele PRs nachkommen wie gemergt werden (203 Merges in 30 Tagen). Streng der Reihe nach wird aber nicht gearbeitet: zuletzt gemergte Katalog-PRs lagen 5–11 Wochen zwischen Erstellung und Merge, die 904 sind also Obergrenze, nicht Wartezeit. Nicht kommentieren — der Bot bittet ausdrücklich darum.
+- [ ] **HACS-Standardkatalog:** [hacs/default#10787](https://github.com/hacs/default/pull/10787) ist offen, kein Entwurf, alle Checks grün, `mergeable`. Der PR zeigt `CHANGES_REQUESTED` — das ist die automatische Prüfung des hacs-bot vom 09.09.2026 wegen „HACS" im damaligen Repo-Namen `kraichtal-wetter-hacs`. Längst erledigt: Das Repo heißt `t0bn1k/ha-kraichtal-wetter`, der PR wurde elf Minuten nach der Prüfung auf den neuen Namen umgestellt. Der Status bleibt stehen, bis ein Maintainer ihn verwirft; eine menschliche Rückfrage gibt es nicht (geprüft 24.09.2026). Davor stehen 904 ältere offene Nicht-Draft-PRs (17.09.2026) — genau die Sortierung, auf die der hacs-bot verlinkt. Die Position bewegt sich kaum, weil etwa so viele PRs nachkommen wie gemergt werden (203 Merges in 30 Tagen). Streng der Reihe nach wird aber nicht gearbeitet: zuletzt gemergte Katalog-PRs lagen 5–11 Wochen zwischen Erstellung und Merge, die 904 sind also Obergrenze, nicht Wartezeit. Nicht kommentieren — der Bot bittet ausdrücklich darum.
 - [ ] **Nach dem Merge:** Installationsanleitung vom benutzerdefinierten Repository auf die Katalogsuche umstellen und den HACS-Badge von „Custom" auf „Default" ziehen. Sterne- und Installations-Badge stehen seit 17.09.2026 im README (`AGENTS.md`); der Installations-Badge füllt sich von selbst, sobald `kraichtal_wetter` in den HA-Analytics auftaucht.
 - **Icon in HACS:** fehlt, ist bekannt und nicht am Repo zu lösen (`AGENTS.md`).
 - [x] **Anfrage an den API-Betreiber** (gestellt und beantwortet am 17.09.2026). Zwei Fragen in einem Schreiben, das bewusst **nicht** im Repo liegt — es ist ein Brief, kein Projektdokument. Beide Antworten stehen in [`docs/API.md`](docs/API.md), beide offenen Punkte sind damit erledigt:
-  1. **Beschriftung der wiederholten Stunde:** ein einziges `"02:00"`, kein doppeltes — 24 feste Slots pro Kalendertag, zwei Instanzen werden gemittelt (Punkt 4). Die Anregung, je Eintrag einen eindeutigen Zeitpunkt mitzuliefern, ist angenommen und wird als Feld `time` umgesetzt (Punkt 9).
+  1. **Beschriftung der wiederholten Stunde:** ein einziges `"02:00"`, kein doppeltes — 24 feste Slots pro Kalendertag, zwei Instanzen werden gemittelt (Punkt 4). Die Anregung, je Eintrag einen eindeutigen Zeitpunkt mitzuliefern, hat der Betreiber als Feld `time` angenommen; wir nutzen es nicht (Punkt 9).
   2. **`*_today` gilt nur für die restlichen Stunden:** bestätigt, samt Mechanismus (Punkt 1). Der Betreiber schärft die Beschreibung in seiner Doku nach.
-  - Offen bleibt nur die Ankündigung: Sobald `time` live ist, greift Punkt 9.
 
 ## Testdaten beschaffen
 
@@ -215,7 +210,7 @@ Eine echte Antwort, der Key steht nur im Header und landet nicht in der Datei:
 curl -s -H "X-API-Key: DEIN_KEY" "https://kraichtal-wetter.de/dashboard/api.php?section=current,days,hours,alerts,rain&pretty=1" > /tmp/kw.json
 ```
 
-Eine Antwort aus der Nacht der Zeitumstellung (25.10.2026, 02:00–03:00) wird **nicht mehr gebraucht** — die Beschriftungen sind seit dem 17.09.2026 vom Betreiber beschrieben (Punkt 4). Nützlich wäre sie höchstens noch als Gegenprobe, sobald das Feld `time` live ist.
+Eine Antwort aus der Nacht der Zeitumstellung (25.10.2026, 02:00–03:00) wird **nicht mehr gebraucht** — die Beschriftungen sind seit dem 17.09.2026 vom Betreiber beschrieben (Punkt 4).
 
 ## Ohne laufende Instanz prüfen
 
