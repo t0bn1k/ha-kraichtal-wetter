@@ -2,6 +2,22 @@
 
 Alle signifikanten Änderungen an dieser Integration werden hier festgehalten.
 
+## [0.12.2] - 2026-09-24
+### ✅ Getestet
+- 🧪 **Die Integration hat jetzt eine Testsuite.** 101 Tests laufen bei jedem
+  Push gegen einen echten Home-Assistant-Core. Sie decken unter anderem die
+  Stundenvorhersage in beiden Nächten der Zeitumstellung ab, alle Sensoren,
+  die Prüfung des API-Keys und dass der Key nie im Log oder im Diagnose-Download
+  landet. An der Integration selbst ändert sich nichts.
+- 🧪 Gegenprobe mit absichtlich eingebauten Fehlern: Die vier Fehler aus 0.12.0
+  und 15 weitere werden erkannt.
+
+### 📝 Dokumentation
+- 📝 README: Hinweis auf die Testsuite für alle, die beitragen möchten.
+- 📝 Ein Kommentar im Code nannte das angekündigte API-Feld `time` noch als
+  künftigen Ersatz für die Rückrechnung der Stundenzeiten. Es wird bewusst
+  nicht genutzt (seit 24.09.2026 entschieden).
+
 ## [0.12.1] - 2026-09-24
 ### 🐛 Behoben
 - 🕒 **Ein geändertes Abfrageintervall gilt jetzt sofort.** Bisher speicherte
