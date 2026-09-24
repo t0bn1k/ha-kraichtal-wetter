@@ -68,17 +68,18 @@ Beim Release: `manifest.json` (`version`) und der CHANGELOG-Eintrag müssen zur 
 
 ### Wo die Version überall steht
 
-Vor dem Tag, im Release-PR:
+Alles im Release-PR, **schon im Endstand** — nach dem Merge bleibt nur der Tag:
 
 1. `custom_components/kraichtal_wetter/manifest.json` → `"version"`
 2. `CHANGELOG.md` → neuer Eintrag `## [x.y.z] - JJJJ-MM-TT` ganz oben (Format genau so, `release.yml` sucht danach)
-3. `Plan.md` → Kopfzeile `Stand: … · veröffentlicht: … · in Arbeit: x.y.z`, Tabellenzeile des Vorhabens mit `x.y.z` in der Spalte Release, im Abschnitt die Checkbox `- [ ] Release x.y.z`
+3. `Plan.md` → Kopfzeile `Stand: TT.MM.JJJJ · veröffentlicht: x.y.z`, Tabellenzeile des Vorhabens auf „veröffentlicht" mit `x.y.z` in der Spalte Release, im Abschnitt die Checkbox bereits abgehakt: `- [x] Release x.y.z (TT.MM.JJJJ)`
 4. `README.md` → Upgrade-Hinweis „Upgrade auf x.y.z …" **nur**, wenn Nutzer nach dem Update etwas tun oder wissen müssen — nicht bei jedem Release
 
 Nach dem Merge:
 
 5. Annotierter Tag auf den Merge-Commit: `git tag -a vx.y.z -m "vx.y.z: <Titel>"`, dann pushen — `release.yml` baut das Release
-6. `Plan.md` nachziehen: Kopfzeile auf `veröffentlicht: x.y.z` (ohne „in Arbeit"), Tabellenstand auf „veröffentlicht", Checkbox `- [x] Release x.y.z (TT.MM.JJJJ)`
+
+Das Datum in CHANGELOG und `Plan.md` ist das geplante Release-Datum. Bisher wurde immer am selben Tag gemergt und getaggt. Verschiebt sich der Tag, beide Daten vorher im PR anpassen — oder, falls schon gemergt, mit einem kleinen Nachtrag. Schlägt `release.yml` fehl, steht im Plan „veröffentlicht" ohne Release: dann Fehler beheben und neu taggen, nicht den Plan zurückdrehen.
 
 ### Changelog mit Icons
 
