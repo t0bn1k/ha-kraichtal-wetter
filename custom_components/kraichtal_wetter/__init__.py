@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 from datetime import timedelta
 
@@ -159,7 +161,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # configured before that was enforced still carries its old value — the
     # schema never sees it again. Lift it here so no install keeps polling
     # faster than the API's five-minute cache can answer.
-    stored_interval = entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
+    # The setup form stores the interval in `data`, the options flow in
+    # `options`; the latter wins once the user has opened the options.
+    stored_interval = entry.options.get(
+        CONF_SCAN_INTERVAL, entry.data.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
+    )
     scan_interval = max(stored_interval, MIN_SCAN_INTERVAL)
     if scan_interval != stored_interval:
         _LOGGER.warning(

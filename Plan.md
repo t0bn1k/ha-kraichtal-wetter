@@ -1,6 +1,6 @@
 # Plan
 
-Stand: 24.09.2026 · veröffentlicht: 0.12.0 · API v1.5
+Stand: 24.09.2026 · veröffentlicht: 0.12.0, in Arbeit: 0.12.1 · API v1.5
 
 Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die API liefert, steht in [`docs/API.md`](docs/API.md) — dort nachsehen, bevor ein Punkt umgesetzt wird (siehe `AGENTS.md`). Erledigtes abhaken und die Version dazuschreiben.
 
@@ -15,6 +15,8 @@ Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die AP
 | 7 | Diagnose-Download | veröffentlicht | 0.11.0 |
 | 8 | Irreführende englische Namen | veröffentlicht | 0.12.0 |
 | 9 | Zeitstempel `time` in `hours` nutzen | verworfen — Rückrechnung bestätigt und ausreichend | – |
+| 10 | Fehler aus der Code-Durchsicht | umgesetzt | 0.12.1 |
+| 11 | Tests im Repo | geplant | – |
 | – | ETag / `If-None-Match` | verworfen | – |
 
 ## 1. Niederschlag und Prognose-Sensoren korrigieren
@@ -172,6 +174,27 @@ Der Betreiber hat am 17.09.2026 auf unsere Anregung hin zugesagt, neben `label` 
 **Auch `current.obs_time` ersetzt es nicht:** Das ist die Uhrzeit der letzten Stationsmessung (`"07:50"`, nur `HH:MM`, Datum getrennt in `obs_date`, kein Offset). Es beschreibt die Messung, nicht die zwölf Vorhersagestunden. Den Tagesanker liefert bereits `meta.generated` mit Datum und Offset.
 
 **Folge:** Taucht `time` in der Antwort auf, wird es wie jedes andere ungenutzte Feld ignoriert. Beim Betreiber ist nichts zurückzunehmen.
+
+## 10. Fehler aus der Code-Durchsicht (24.09.2026)
+
+- [x] Options-Flow als `OptionsFlowWithReload` — ein neues Intervall galt erst nach einem Neustart
+- [x] Intervall aus der Einrichtung (`entry.data`) wird gelesen — bisher nur `entry.options`, jede Installation lief mit 300 s
+- [x] API-Key in Einrichtung und Reauth gegen die API prüfen (`invalid_auth`, `cannot_connect`, `unknown`); Reauth auf `_get_reauth_entry()` / `async_update_reload_and_abort()`
+- [x] Abruffehler im Client nur noch auf `debug` — der Coordinator meldet Ausfall und Erholung selbst
+- [x] `ContentTypeError` als „API returned no JSON" statt „HTTP error 200"
+- [x] README: falsches Versprechen „Key jederzeit unter Konfiguration ändern" korrigiert
+- [x] 26 Prüfungen gegen HA 2026.9.3, Gegenprobe mit 0.12.0
+- [ ] Release 0.12.1
+
+**Idee, nicht umgesetzt:** Ein Reconfigure-Schritt, mit dem man den Key auch ohne Ablehnung durch die API tauschen kann. Das README hat ihn versprochen, gebraucht hat ihn bisher niemand. `_async_validate_key()` wäre wiederverwendbar.
+
+**Zurückgestellt:** `hass.data` → `entry.runtime_data`. Moderner, aber berührt alle Plattformen und die Diagnose, ohne dass Nutzer etwas davon merken — passt besser zu Punkt 11, wenn Tests es absichern.
+
+## 11. Tests im Repo — geplant
+
+Die Prüfungen bisher liefen ad hoc in einer lokalen venv und sind nicht eingecheckt. Ziel: `tests/` mit `pytest-homeassistant-custom-component` und ein CI-Job. Zuerst die heiklen Stellen: Zeitumstellung in `_hourly_datetimes()`, Redaktion in `diagnostics.py`, Migration der Entity-IDs, Key-Prüfung und Intervall aus 0.12.1.
+
+**Merke für die Einrichtung:** Das Paket bringt ein eigenes `custom_components` mit (`testing_config`), das unseres verdeckt. In der `conftest.py` den Repo-Pfad an `custom_components.__path__` anhängen, dazu die Fixture `enable_custom_integrations` autouse. `MockConfigEntry.start_reauth_flow()` gibt es, am echten `ConfigEntry` heißt es `async_start_reauth()`.
 
 ## Verworfen
 

@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import logging
 from typing import Any
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
-from aiohttp import ClientResponseError, ClientTimeout
+from aiohttp import ClientResponseError, ClientTimeout, ContentTypeError
 
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import UpdateFailed
@@ -102,6 +104,11 @@ class KraichtalWetterClient:
             return await self.async_get_data()
         except UpdateFailed:
             raise
+        except ContentTypeError:
+            # A subclass of ClientResponseError, raised by `response.json()`
+            # after a 2xx — a maintenance page, say. Caught first, or it would
+            # surface as a baffling "HTTP error 200".
+            raise UpdateFailed("API returned no JSON") from None
         except ClientResponseError as err:
             # Never log `err` itself and never chain it via `from err`: its
             # string form carries the request URL. The key no longer rides in
@@ -114,13 +121,17 @@ class KraichtalWetterClient:
                 )
                 raise ConfigEntryAuthFailed("Invalid API key") from None
 
+            # Debug only: the coordinator logs the UpdateFailed message itself,
+            # once when the API goes down and once when it recovers. Logging at
+            # error here would repeat it every scan_interval for the whole
+            # outage.
             meaning = HTTP_STATUS_MEANINGS.get(err.status)
-            _LOGGER.error(
+            _LOGGER.debug(
                 "Kraichtal Wetter HTTP error: %s %s", err.status, meaning or err.message
             )
             raise UpdateFailed(
                 f"HTTP {err.status}: {meaning}" if meaning else f"HTTP error {err.status}"
             ) from None
         except Exception as err:  # noqa: BLE001
-            _LOGGER.error("Kraichtal Wetter update failed: %s", err)
+            _LOGGER.debug("Kraichtal Wetter update failed: %s", err)
             raise UpdateFailed(f"Update failed: {err}") from None

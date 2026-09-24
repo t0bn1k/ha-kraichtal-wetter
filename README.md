@@ -165,8 +165,8 @@ hours_to_show: 24
 - Die Integration erscheint in Home Assistant als `Kraichtal Wetter`.
 - Nutzer geben nur einen API-Key ein; die API-URL ist fest in der Integration hinterlegt.
 - Alle Entitäten werden als Teil desselben Geräts in der Integrationen-Ansicht angezeigt.
-- Der API-Key kann jederzeit über Einstellungen → Geräte & Dienste → Kraichtal Wetter → Konfiguration geändert werden.
-- Das Abfrageintervall kann über die Optionen (Drei-Punkte-Menü → Optionen) angepasst werden — **mindestens 300 Sekunden**. Die API hält ihre Antwort serverseitig fünf Minuten vor; häufigere Abfragen liefern dieselben Daten und belasten nur den Betreiber. Ein niedrigerer Wert wird abgelehnt, ein früher gespeicherter beim Start auf 300 Sekunden angehoben.
+- Der API-Key wird bei der Einrichtung gegen die API geprüft; ein abgelehnter Key wird direkt am Formular gemeldet. Lehnt die API einen hinterlegten Key später ab, fragt Home Assistant unter Einstellungen → Geräte & Dienste nach einem neuen — auch der wird vor dem Speichern geprüft.
+- Das Abfrageintervall kann über die Optionen (Drei-Punkte-Menü → Optionen) angepasst werden — **mindestens 300 Sekunden**. Die API hält ihre Antwort serverseitig fünf Minuten vor; häufigere Abfragen liefern dieselben Daten und belasten nur den Betreiber. Ein niedrigerer Wert wird abgelehnt, ein früher gespeicherter beim Start auf 300 Sekunden angehoben. Ein geänderter Wert gilt sofort, ohne Neustart.
 - Der Sensor **Warnungen** zeigt nur, **wie viele** DWD-Warnungen gerade gelten. Für die Warnungen im Detail — Text, Verhaltenshinweise, Beginn und Ende — ist die in Home Assistant mitgelieferte Integration [Deutscher Wetterdienst (DWD) Weather Warnings](https://www.home-assistant.io/integrations/dwd_weather_warnings/) die bessere Wahl. Sie holt die Warnungen direkt beim DWD und trennt aktuelle Warnstufe und Vorwarnstufe.
 - **Nicht jede Wetterlage, die Home Assistant kennt, kann diese Station liefern.**
   Hagel und Sturm stecken bei der Quelle in den Warn- bzw. Windfeldern und nicht

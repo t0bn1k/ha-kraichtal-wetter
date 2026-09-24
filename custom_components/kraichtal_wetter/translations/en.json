@@ -20,9 +20,13 @@
         }
       }
     },
+    "error": {
+      "invalid_auth": "The API key was rejected. Check it for typos, or request a new one using the application form.",
+      "cannot_connect": "Could not reach the Kraichtal Wetter API. Try again later.",
+      "unknown": "Unexpected error while checking the API key. Details are in the log."
+    },
     "abort": {
       "already_configured": "Kraichtal Wetter is already configured.",
-      "entry_not_found": "Configuration entry not found.",
       "reauth_successful": "API key updated successfully."
     }
   },
