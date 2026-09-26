@@ -208,7 +208,7 @@ Der Betreiber hat am 17.09.2026 auf unsere Anregung hin zugesagt, neben `label` 
 
 ## 12. GitHub-Hilfen: Issue-Vorlagen, Wochentest, Dependabot (26.09.2026)
 
-**Warum:** Fehlerberichte kamen bisher als freier Text, ohne Diagnose-Datei oder Versionsangabe — genau das, was einen Fehler erst einordnen lässt. Ein Bruch durch eine neue HA-Version fiel bisher erst auf, wenn jemand `requirements_test.txt` von Hand anhebt; ein wöchentlicher Testlauf ohne Pin zeigt das vorher an. Dependabot übernimmt das Anheben der Actions- und Test-Pins selbst, gemergt wird weiterhin von Hand.
+**Warum:** Ein Fehlerbericht wäre bisher als freier Text gekommen, ohne Diagnose-Datei oder Versionsangabe — genau das, was einen Fehler erst einordnen lässt. Das Formular fragt beides ab, bevor das erste Issue eintrifft. Ein Bruch durch eine neue HA-Version fiel bisher erst auf, wenn jemand `requirements_test.txt` von Hand anhebt; ein wöchentlicher Testlauf ohne Pin zeigt das vorher an. Dependabot übernimmt das Anheben der Actions- und Test-Pins selbst, gemergt wird weiterhin von Hand.
 
 - [x] `.github/ISSUE_TEMPLATE/bug_report.yml`, `feature_request.yml`, `config.yml` — Issue-Forms statt Markdown-Vorlagen, mit Hinweis auf den Diagnose-Sensor **API-Status** bzw. `docs/API.md`
 - [x] `.github/workflows/tests.yml`: `schedule`-Trigger (montags 04:00 UTC) und neuer Job `pytest-latest`, nur bei `schedule`/`workflow_dispatch`, gegen die ungepinnte neueste `pytest-homeassistant-custom-component`
