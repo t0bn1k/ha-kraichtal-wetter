@@ -145,7 +145,7 @@ Die Dokumentation ist ausdrücklich: Bei 401/403 hilft kein erneuter Versuch. Ge
 
 ## Fair use
 
-Die Antwort wird serverseitig fünf Minuten zwischengespeichert; häufiger abzufragen liefert dieselben Daten (erkennbar an `meta.cached`). Empfehlung der Doku: `current` alle 1–5 Minuten, `days` und `alerts` alle 15–30 Minuten.
+Die Antwort wird serverseitig fünf Minuten zwischengespeichert; häufiger abzufragen liefert dieselben Daten (erkennbar an `meta.cached`). Empfehlung der Doku: `current` alle 1–5 Minuten, `hours`, `days` und `alerts` alle 15–30 Minuten, `climate`, `rain` und `models` ein- bis zweimal täglich.
 
 Die Integration erzwingt deshalb ein Mindestintervall von **300 Sekunden** (`MIN_SCAN_INTERVAL`), sowohl in beiden Dialogen als auch beim Start für Bestandseinträge.
 

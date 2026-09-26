@@ -1,0 +1,4 @@
+# The oldest Home Assistant this integration claims to support ("homeassistant"
+# in hacs.json). 0.13.317 = 2026.3.1 — there is no plugin release for 2026.3.0.
+# Raise it together with hacs.json, never on its own.
+pytest-homeassistant-custom-component==0.13.317
