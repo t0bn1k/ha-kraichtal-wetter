@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: API-Key beantragen
+    url: https://kraichtal-wetter.de/dashboard/apply.php
+    about: Ohne eigenen Key läuft die Integration nicht — hier lässt er sich anfragen.
+  - name: API-Dokumentation
+    url: https://kraichtal-wetter.de/dashboard/api-doku.html
+    about: Offizielle Referenz für alle Felder, die die API liefert.

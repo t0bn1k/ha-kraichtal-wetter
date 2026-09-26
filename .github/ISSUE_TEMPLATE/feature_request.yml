@@ -1,0 +1,29 @@
+name: Funktion vorschlagen
+description: Einen Wunsch oder eine neue Funktion für die Integration vorschlagen.
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Umgesetzt werden kann nur, was die API tatsächlich liefert. Was die Integration davon
+        nutzt, bewusst nicht nutzt und was sich für Erweiterungen anbietet, steht in
+        [`docs/API.md`](https://github.com/t0bn1k/ha-kraichtal-wetter/blob/main/docs/API.md);
+        die vollständige Referenz ist die
+        [offizielle API-Dokumentation](https://kraichtal-wetter.de/dashboard/api-doku.html).
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Wunsch / Anwendungsfall
+      description: Was möchtest du erreichen, und warum?
+    validations:
+      required: true
+
+  - type: input
+    id: api-field
+    attributes:
+      label: Betroffenes API-Feld (falls bekannt)
+      description: Siehe API-Dokumentation, z. B. `current.station_today.wind_max`.
+    validations:
+      required: false
