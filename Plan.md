@@ -18,6 +18,7 @@ Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die AP
 | 10 | Fehler aus der Code-Durchsicht | veröffentlicht | 0.12.1 |
 | 11 | Tests im Repo | veröffentlicht | 0.12.2 |
 | 12 | GitHub-Hilfen: Issue-Vorlagen, Wochentest, Dependabot | erledigt — ohne Release | – |
+| 13 | Test gegen die Mindestversion | erledigt — ohne Release | – |
 | – | ETag / `If-None-Match` | verworfen | – |
 
 ## 1. Niederschlag und Prognose-Sensoren korrigieren
@@ -216,6 +217,14 @@ Der Betreiber hat am 17.09.2026 auf unsere Anregung hin zugesagt, neben `label` 
 - [x] `push` in `tests.yml` und `validate.yml` auf `main` beschränkt — PR-Branches liefen bisher doppelt
 - [x] `AGENTS.md` nachgezogen (CI/Release, Tests → Versionen)
 - [x] Keine Versionsänderung, kein Release — reine CI-/Repo-Pflege
+
+## 13. Test gegen die Mindestversion (26.09.2026)
+
+**Warum:** `hacs.json` verspricht HA 2026.3, getestet wurde nur gegen 2026.9.3 und neuer. HACS bietet die Integration aber jedem ab 2026.3 an — für 2026.3 bis 2026.8 hatte das niemand geprüft, auch nicht `async_regenerate_entity_id()`, das es erst seit 2026.3 gibt.
+
+- [x] Lokal geprüft: alle 101 Tests grün gegen 2026.3.1 und 2026.3.4 — das Minimum stimmt, am Code war nichts zu ändern
+- [x] `requirements_test_min.txt` (0.13.317 = 2026.3.1, frühestes Plugin-Release der Reihe) und Job `pytest-minimum` in `tests.yml`
+- [x] `AGENTS.md`: Minimum nur zusammen mit `hacs.json` ändern
 
 ## Verworfen
 

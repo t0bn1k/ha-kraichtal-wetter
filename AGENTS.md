@@ -7,6 +7,7 @@ Home-Assistant-Custom-Integration für die Kraichtal-Wetter-API. Kein Build-Syst
 ## Domain & Manifest
 
 - Domain: `kraichtal_wetter` · HA-Minimum: `2026.3` · `iot_class: cloud_polling`
+- Das Minimum steht in `hacs.json` (`homeassistant`) und wird in der CI getestet (`requirements_test_min.txt`). Nur beide zusammen ändern.
 - Plattformen: `sensor`, `weather`
 - Keine externen Abhängigkeiten (`requirements: []`)
 
@@ -62,7 +63,7 @@ Wenn eine neue Funktion eine bisher ungenutzte Sektion braucht, gehört sie in `
 
 - `.github/workflows/release.yml` — Tag `v*.*.*` erzeugt GitHub Release mit automatisch extrahiertem Changelog-Eintrag.
 - `.github/workflows/validate.yml` — HACS-Action und Hassfest (Push auf `main`, PR, nächtlich). Voraussetzung für die Aufnahme in den HACS-Standardkatalog.
-- `.github/workflows/tests.yml` — ruff und pytest gegen den Pin (Push auf `main`, PR). Push ist auf `main` beschränkt, weil Branches ihren Lauf über den PR bekommen — sonst liefe jeder PR-Commit doppelt.
+- `.github/workflows/tests.yml` — ruff und pytest gegen den Pin, dazu pytest gegen die Mindestversion aus `hacs.json` (Push auf `main`, PR). Push ist auf `main` beschränkt, weil Branches ihren Lauf über den PR bekommen — sonst liefe jeder PR-Commit doppelt.
 - `.github/workflows/tests-latest.yml` — pytest wöchentlich (und auf Zuruf) gegen die neueste Plugin-Version, siehe „Tests → Versionen". Bewusst ein eigener Workflow: Rot heißt dort „nächste HA-Version bricht etwas", rot bei „Tests" heißt immer „`main` ist kaputt".
 - `.github/dependabot.yml` — nur GitHub Actions, wöchentlich, kein Auto-Merge. `requirements_test.txt` bleibt bewusst Handarbeit: Das Plugin veröffentlicht auch Versionen, die HA-Betas pinnen (0.13.358–0.13.362 = 2026.9.0b0–b6), und Dependabot würde den Test-Pin in einer Betawoche auf eine Beta heben.
 - `.github/ISSUE_TEMPLATE/` — Issue-Forms für Fehlerberichte und Funktionswünsche, mit Verweis auf den Diagnose-Sensor **API-Status** bzw. `docs/API.md`.
@@ -138,6 +139,7 @@ Plan.md                  # Umsetzungsplan: Reihenfolge, Stand, Entscheidungen
 lovelace/                # Beispiel-Dashboards
 tests/                   # pytest-Suite, fixtures/response.json ist eine echte API-Antwort
 requirements_test.txt    # Test-Abhängigkeiten, pinnt damit auch die HA-Version
+requirements_test_min.txt  # dasselbe für die Mindestversion aus hacs.json
 pytest.ini               # asyncio-Modus, Testpfad
 ```
 
@@ -150,6 +152,7 @@ python3.14 -m venv .venv && .venv/bin/pip install -r requirements_test.txt
 
 - **Harness:** `pytest-homeassistant-custom-component` startet einen echten HA-Core je Test. Netzwerk ist gesperrt (`pytest-socket`); die API wird über `aioclient_mock` beantwortet, nicht über gepatchte Methoden — so laufen Header, URL und Fehlerpfade wie in echt.
 - **Versionen:** Jede Plugin-Version passt zu genau einer HA-Version (0.13.366 = 2026.9.3). In `requirements_test.txt` beide zusammen anheben. `tests-latest.yml` prüft wöchentlich gegen die neueste Plugin-Version — **das kann auch eine HA-Beta sein**, die Zusammenfassung des Laufs nennt die getestete Version. Rot dort heißt: Die nächste HA-Version bricht etwas, `main` ist nicht kaputt. Zum Anheben des Pins nur eine Plugin-Version nehmen, die eine finale HA-Version pinnt (`pip show homeassistant` oder die `requires_dist` auf PyPI). Verlangt die neueste Version ein neueres Python, schlägt schon die Installation fehl, statt still eine ältere zu nehmen — dann `python-version` in beiden Test-Workflows anheben.
+- **Mindestversion:** Der Job `pytest-minimum` testet gegen `requirements_test_min.txt` (0.13.317 = 2026.3.1; für 2026.3.0 gibt es kein Plugin-Release). Er hält das Versprechen aus `hacs.json` ein: HACS bietet die Integration jedem ab dieser Version an. Wird er rot, weil der Code etwas Neueres braucht, entweder den Code anpassen oder das Minimum in `hacs.json` und `requirements_test_min.txt` gemeinsam anheben — dann gehört es in den CHANGELOG, weil Nutzer älterer Versionen keine Updates mehr bekommen.
 - **`custom_components` wird verdeckt:** Das Plugin bringt ein eigenes, reguläres `custom_components`-Paket mit, das unser Namespace-Paket überdeckt. `tests/conftest.py` hängt deshalb den Repo-Pfad an `custom_components.__path__`. Nicht entfernen, sonst findet kein Test die Integration.
 - **Erwartungswerte zur Zeitumstellung** in `tests/test_hourly.py` sind die Tabellen aus `docs/API.md`, vom Betreiber bestätigt. Schlägt dort etwas fehl, zuerst die Doku prüfen, nicht den Test anpassen.
 - **Die Tests sind gegen eingebaute Fehler geprüft (24.09.2026):** alle vier Fehler aus 0.12.0 und 15 gezielte Mutationen, von der Rückrechnung über die State-Classes bis zur Redaktion. Einzige überlebende Mutation: `async_migrate_entry` bei jeder Version — verhaltensgleich, weil HA die Funktion nur bei abweichender Version aufruft.

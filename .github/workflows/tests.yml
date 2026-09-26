@@ -32,3 +32,24 @@ jobs:
 
       - name: Pytest
         run: pytest --timeout=60
+
+  pytest-minimum:
+    name: Pytest (Mindestversion)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          # Home Assistant 2026.3 already requires Python 3.14.
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: requirements_test_min.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements_test_min.txt
+
+      - name: Pytest
+        run: pytest --timeout=60
