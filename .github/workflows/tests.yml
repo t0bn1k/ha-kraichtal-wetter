@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           # Home Assistant 2026.9 requires Python 3.14.2 or newer.
           python-version: "3.14"
@@ -45,7 +45,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           # Same Python version as the pinned job above. Raise it here too
           # once a newer Home Assistant release requires a newer Python.
