@@ -2,6 +2,9 @@ name: Validate
 
 on:
   push:
+    # Branches get their run through the pull request; running on push as
+    # well would test every PR commit twice.
+    branches: [main]
   pull_request:
   schedule:
     - cron: "0 0 * * *"
