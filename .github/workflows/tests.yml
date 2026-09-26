@@ -4,6 +4,10 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+  schedule:
+    # Weekly, so a breaking change in a new Home Assistant release shows up
+    # here before someone bumps the pin in requirements_test.txt.
+    - cron: "0 4 * * 1"
 
 jobs:
   pytest:
@@ -26,6 +30,38 @@ jobs:
 
       - name: Ruff
         run: ruff check .
+
+      - name: Pytest
+        run: pytest --timeout=60
+
+  pytest-latest:
+    name: Pytest (neueste HA-Version)
+    runs-on: ubuntu-latest
+    # Only on the weekly schedule (and on demand) — this job intentionally
+    # ignores the pin, so it has no place gating push/PR runs.
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          # Same Python version as the pinned job above. Raise it here too
+          # once a newer Home Assistant release requires a newer Python.
+          python-version: "3.14"
+
+      - name: Install dependencies (unpinned pytest-homeassistant-custom-component)
+        run: pip install --upgrade pytest-homeassistant-custom-component
+
+      - name: Record installed Home Assistant version
+        run: |
+          {
+            echo "### Home Assistant version under test"
+            echo '```'
+            pip show homeassistant | grep -E "^(Name|Version):"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Pytest
         run: pytest --timeout=60

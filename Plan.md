@@ -1,6 +1,6 @@
 # Plan
 
-Stand: 24.09.2026 · veröffentlicht: 0.12.2 · API v1.5
+Stand: 26.09.2026 · veröffentlicht: 0.12.2 · API v1.5
 
 Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die API liefert, steht in [`docs/API.md`](docs/API.md) — dort nachsehen, bevor ein Punkt umgesetzt wird (siehe `AGENTS.md`). Erledigtes abhaken und die Version dazuschreiben.
 
@@ -17,6 +17,7 @@ Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die AP
 | 9 | Zeitstempel `time` in `hours` nutzen | verworfen — Rückrechnung bestätigt und ausreichend | – |
 | 10 | Fehler aus der Code-Durchsicht | veröffentlicht | 0.12.1 |
 | 11 | Tests im Repo | veröffentlicht | 0.12.2 |
+| 12 | GitHub-Hilfen: Issue-Vorlagen, Wochentest, Dependabot | erledigt — ohne Release | – |
 | – | ETag / `If-None-Match` | verworfen | – |
 
 ## 1. Niederschlag und Prognose-Sensoren korrigieren
@@ -204,6 +205,16 @@ Der Betreiber hat am 17.09.2026 auf unsere Anregung hin zugesagt, neben `label` 
 - Die Diagnose muss einen Key, der nur in der alten URL steht, auch in Fehlermeldungen finden. Das war ungetestet, jetzt nicht mehr.
 
 **Nächster Schritt, wenn gewünscht:** `hass.data` → `entry.runtime_data` (Punkt 10, zurückgestellt) — jetzt durch Tests abgesichert.
+
+## 12. GitHub-Hilfen: Issue-Vorlagen, Wochentest, Dependabot (26.09.2026)
+
+**Warum:** Ein Fehlerbericht wäre bisher als freier Text gekommen, ohne Diagnose-Datei oder Versionsangabe — genau das, was einen Fehler erst einordnen lässt. Das Formular fragt beides ab, bevor das erste Issue eintrifft. Ein Bruch durch eine neue HA-Version fiel bisher erst auf, wenn jemand `requirements_test.txt` von Hand anhebt; ein wöchentlicher Testlauf ohne Pin zeigt das vorher an. Dependabot übernimmt das Anheben der Actions- und Test-Pins selbst, gemergt wird weiterhin von Hand.
+
+- [x] `.github/ISSUE_TEMPLATE/bug_report.yml`, `feature_request.yml`, `config.yml` — Issue-Forms statt Markdown-Vorlagen, mit Hinweis auf den Diagnose-Sensor **API-Status** bzw. `docs/API.md`
+- [x] `.github/workflows/tests.yml`: `schedule`-Trigger (montags 04:00 UTC) und neuer Job `pytest-latest`, nur bei `schedule`/`workflow_dispatch`, gegen die ungepinnte neueste `pytest-homeassistant-custom-component`
+- [x] `.github/dependabot.yml`: `github-actions` und `pip` (`requirements_test.txt`), wöchentlich, `chore`-Commit-Präfix
+- [x] `AGENTS.md` nachgezogen (CI/Release, Tests → Versionen)
+- [x] Keine Versionsänderung, kein Release — reine CI-/Repo-Pflege
 
 ## Verworfen
 

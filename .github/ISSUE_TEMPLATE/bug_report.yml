@@ -1,0 +1,77 @@
+name: Fehler melden
+description: Etwas an der Integration funktioniert nicht wie erwartet.
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Wirf vor der Beschreibung einen Blick auf den Diagnose-Sensor **API-Status** am Gerät
+        (`Einstellungen → Geräte & Dienste → Kraichtal Wetter → Gerät`). Er zeigt den Grund des
+        letzten Abruffehlers im Klartext — oft lässt sich das Problem schon dort einordnen
+        (siehe [README](https://github.com/t0bn1k/ha-kraichtal-wetter#readme)).
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Was ist passiert?
+      description: Beschreibe den Fehler möglichst genau.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Was hast du stattdessen erwartet?
+    validations:
+      required: true
+
+  - type: input
+    id: ha-version
+    attributes:
+      label: Home-Assistant-Version
+      description: Zu finden unter `Einstellungen → Info`.
+      placeholder: "z. B. 2026.9.3"
+    validations:
+      required: true
+
+  - type: input
+    id: integration-version
+    attributes:
+      label: Version von Kraichtal Wetter
+      placeholder: "z. B. 0.12.2"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install-method
+    attributes:
+      label: Installationsweg
+      options:
+        - HACS
+        - Manuell
+    validations:
+      required: true
+
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnose-Datei
+      description: |
+        `Einstellungen → Geräte & Dienste → Kraichtal Wetter → ⋯ → Diagnose herunterladen` —
+        die heruntergeladene JSON-Datei hier per Drag & Drop anhängen. Dein API-Key steht
+        **nicht** darin, er wird beim Download herausgefiltert.
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log-Auszug
+      description: |
+        `Einstellungen → Geräte & Dienste → Kraichtal Wetter → ⋯ → Debug-Protokollierung aktivieren`,
+        den Fehler auslösen, danach die Protokollierung wieder deaktivieren — das Protokoll wird
+        dann automatisch heruntergeladen. Relevanten Auszug hier einfügen.
+      render: shell
+    validations:
+      required: false
