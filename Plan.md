@@ -208,11 +208,12 @@ Der Betreiber hat am 17.09.2026 auf unsere Anregung hin zugesagt, neben `label` 
 
 ## 12. GitHub-Hilfen: Issue-Vorlagen, Wochentest, Dependabot (26.09.2026)
 
-**Warum:** Ein Fehlerbericht wäre bisher als freier Text gekommen, ohne Diagnose-Datei oder Versionsangabe — genau das, was einen Fehler erst einordnen lässt. Das Formular fragt beides ab, bevor das erste Issue eintrifft. Ein Bruch durch eine neue HA-Version fiel bisher erst auf, wenn jemand `requirements_test.txt` von Hand anhebt; ein wöchentlicher Testlauf ohne Pin zeigt das vorher an. Dependabot übernimmt das Anheben der Actions- und Test-Pins selbst, gemergt wird weiterhin von Hand.
+**Warum:** Ein Fehlerbericht wäre bisher als freier Text gekommen, ohne Diagnose-Datei oder Versionsangabe — genau das, was einen Fehler erst einordnen lässt. Das Formular fragt beides ab, bevor das erste Issue eintrifft. Ein Bruch durch eine neue HA-Version fiel bisher erst auf, wenn jemand `requirements_test.txt` von Hand anhebt; ein wöchentlicher Testlauf ohne Pin zeigt das vorher an. Dependabot hält die Actions aktuell, gemergt wird weiterhin von Hand.
 
 - [x] `.github/ISSUE_TEMPLATE/bug_report.yml`, `feature_request.yml`, `config.yml` — Issue-Forms statt Markdown-Vorlagen, mit Hinweis auf den Diagnose-Sensor **API-Status** bzw. `docs/API.md`
-- [x] `.github/workflows/tests.yml`: `schedule`-Trigger (montags 04:00 UTC) und neuer Job `pytest-latest`, nur bei `schedule`/`workflow_dispatch`, gegen die ungepinnte neueste `pytest-homeassistant-custom-component`
-- [x] `.github/dependabot.yml`: `github-actions` und `pip` (`requirements_test.txt`), wöchentlich, `chore`-Commit-Präfix
+- [x] `.github/workflows/tests-latest.yml`: eigener Workflow, montags 04:00 UTC und auf Zuruf, installiert genau die neueste Plugin-Version von PyPI — passt das Python nicht, schlägt er fehl statt still eine ältere zu testen
+- [x] `.github/dependabot.yml`: nur `github-actions`, wöchentlich, `chore`-Commit-Präfix. `pip` bewusst nicht: Das Plugin pinnt zeitweise HA-Betas (0.13.358–0.13.362 = 2026.9.0b0–b6)
+- [x] `push` in `tests.yml` und `validate.yml` auf `main` beschränkt — PR-Branches liefen bisher doppelt
 - [x] `AGENTS.md` nachgezogen (CI/Release, Tests → Versionen)
 - [x] Keine Versionsänderung, kein Release — reine CI-/Repo-Pflege
 

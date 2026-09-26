@@ -1,0 +1,49 @@
+name: Tests (neueste HA-Version)
+
+# Separate from tests.yml on purpose: a red run here is an early warning about
+# an upcoming Home Assistant release, not a broken main. A red "Tests" run
+# always means the pinned suite failed.
+
+on:
+  schedule:
+    - cron: "0 4 * * 1"
+  workflow_dispatch:
+
+jobs:
+  pytest-latest:
+    name: Pytest (neueste HA-Version)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          # Keep in step with tests.yml. If the newest release needs a newer
+          # Python, the install step below fails instead of quietly falling
+          # back to an older release.
+          python-version: "3.14"
+
+      - name: Install newest pytest-homeassistant-custom-component
+        run: |
+          # Resolve the newest release first and install exactly that one. A
+          # plain "pip install --upgrade" would silently pick the newest
+          # release this Python supports and stay green on an old version.
+          version=$(curl -sf https://pypi.org/pypi/pytest-homeassistant-custom-component/json \
+            | python -c "import json, sys; print(json.load(sys.stdin)['info']['version'])")
+          pip install "pytest-homeassistant-custom-component==${version}"
+
+      - name: Record versions under test
+        run: |
+          # Releases also pin Home Assistant betas, so the summary says which
+          # one this run actually tested.
+          {
+            echo "### Versions under test"
+            echo '```'
+            pip show pytest-homeassistant-custom-component homeassistant | grep -E "^(Name|Version):"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Pytest
+        run: pytest --timeout=60

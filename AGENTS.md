@@ -61,9 +61,10 @@ Wenn eine neue Funktion eine bisher ungenutzte Sektion braucht, gehört sie in `
 ## CI / Release
 
 - `.github/workflows/release.yml` — Tag `v*.*.*` erzeugt GitHub Release mit automatisch extrahiertem Changelog-Eintrag.
-- `.github/workflows/validate.yml` — HACS-Action und Hassfest (Push, PR, nächtlich). Voraussetzung für die Aufnahme in den HACS-Standardkatalog.
-- `.github/workflows/tests.yml` — ruff und pytest (Push, PR), zusätzlich wöchentlich (und auf Zuruf) der Job `pytest-latest` gegen die jeweils neueste `pytest-homeassistant-custom-component`/HA-Version, ohne Pin.
-- `.github/dependabot.yml` — hebt Actions in allen Workflows und die Test-Abhängigkeit (`requirements_test.txt`) wöchentlich an; ein Bump von `pytest-homeassistant-custom-component` hebt HA mit an und erfüllt damit oben die Regel „beide zusammen anheben". PRs werden von Hand gemergt, kein Auto-Merge.
+- `.github/workflows/validate.yml` — HACS-Action und Hassfest (Push auf `main`, PR, nächtlich). Voraussetzung für die Aufnahme in den HACS-Standardkatalog.
+- `.github/workflows/tests.yml` — ruff und pytest gegen den Pin (Push auf `main`, PR). Push ist auf `main` beschränkt, weil Branches ihren Lauf über den PR bekommen — sonst liefe jeder PR-Commit doppelt.
+- `.github/workflows/tests-latest.yml` — pytest wöchentlich (und auf Zuruf) gegen die neueste Plugin-Version, siehe „Tests → Versionen". Bewusst ein eigener Workflow: Rot heißt dort „nächste HA-Version bricht etwas", rot bei „Tests" heißt immer „`main` ist kaputt".
+- `.github/dependabot.yml` — nur GitHub Actions, wöchentlich, kein Auto-Merge. `requirements_test.txt` bleibt bewusst Handarbeit: Das Plugin veröffentlicht auch Versionen, die HA-Betas pinnen (0.13.358–0.13.362 = 2026.9.0b0–b6), und Dependabot würde den Test-Pin in einer Betawoche auf eine Beta heben.
 - `.github/ISSUE_TEMPLATE/` — Issue-Forms für Fehlerberichte und Funktionswünsche, mit Verweis auf den Diagnose-Sensor **API-Status** bzw. `docs/API.md`.
 
 Beim Release: `manifest.json` (`version`) und der CHANGELOG-Eintrag müssen zur Tag-Version passen, sonst greift die Changelog-Extraktion in `release.yml` nicht.
@@ -148,7 +149,7 @@ python3.14 -m venv .venv && .venv/bin/pip install -r requirements_test.txt
 ```
 
 - **Harness:** `pytest-homeassistant-custom-component` startet einen echten HA-Core je Test. Netzwerk ist gesperrt (`pytest-socket`); die API wird über `aioclient_mock` beantwortet, nicht über gepatchte Methoden — so laufen Header, URL und Fehlerpfade wie in echt.
-- **Versionen:** Jede Plugin-Version passt zu genau einer HA-Version (0.13.366 = 2026.9.3). In `requirements_test.txt` beide zusammen anheben. Der wöchentliche Job `pytest-latest` (`tests.yml`) prüft ungepinnt gegen die jeweils neueste Version und darf dabei rot werden, ohne dass `main` kaputt ist — das ist dann ein Vorbote auf die nächste HA-Version, kein Bug im Code.
+- **Versionen:** Jede Plugin-Version passt zu genau einer HA-Version (0.13.366 = 2026.9.3). In `requirements_test.txt` beide zusammen anheben. `tests-latest.yml` prüft wöchentlich gegen die neueste Plugin-Version — **das kann auch eine HA-Beta sein**, die Zusammenfassung des Laufs nennt die getestete Version. Rot dort heißt: Die nächste HA-Version bricht etwas, `main` ist nicht kaputt. Zum Anheben des Pins nur eine Plugin-Version nehmen, die eine finale HA-Version pinnt (`pip show homeassistant` oder die `requires_dist` auf PyPI). Verlangt die neueste Version ein neueres Python, schlägt schon die Installation fehl, statt still eine ältere zu nehmen — dann `python-version` in beiden Test-Workflows anheben.
 - **`custom_components` wird verdeckt:** Das Plugin bringt ein eigenes, reguläres `custom_components`-Paket mit, das unser Namespace-Paket überdeckt. `tests/conftest.py` hängt deshalb den Repo-Pfad an `custom_components.__path__`. Nicht entfernen, sonst findet kein Test die Integration.
 - **Erwartungswerte zur Zeitumstellung** in `tests/test_hourly.py` sind die Tabellen aus `docs/API.md`, vom Betreiber bestätigt. Schlägt dort etwas fehl, zuerst die Doku prüfen, nicht den Test anpassen.
 - **Die Tests sind gegen eingebaute Fehler geprüft (24.09.2026):** alle vier Fehler aus 0.12.0 und 15 gezielte Mutationen, von der Rückrechnung über die State-Classes bis zur Redaktion. Einzige überlebende Mutation: `async_migrate_entry` bei jeder Version — verhaltensgleich, weil HA die Funktion nur bei abweichender Version aufruft.
