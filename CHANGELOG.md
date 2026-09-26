@@ -2,6 +2,27 @@
 
 Alle signifikanten Änderungen an dieser Integration werden hier festgehalten.
 
+## [0.12.3] - 2026-09-26
+### 🐛 Behoben
+- 🔗 **Der Link „Besuchen" auf der Geräteseite öffnet jetzt die Webseite**
+  kraichtal-wetter.de. Bisher führte er auf den API-Endpunkt, und der Browser
+  zeigte nur eine Fehlermeldung.
+
+### 🔒 Sicherheit
+- 🔑 **Bei sehr alten Installationen stand der API-Key im Geräte-Link.** Wer vor
+  0.4.4 eingerichtet hat, hat den Key noch in der gespeicherten Adresse, und
+  der Link hat sie unverändert übernommen. Der neue Link enthält keinen Key.
+  Nach dem Update überschreibt Home Assistant den alten Eintrag von selbst.
+
+### 🔧 Geändert
+- 🧹 Die Integration legt ihre Laufzeitdaten so ab, wie es Home Assistant
+  heute vorsieht (`entry.runtime_data` statt `hass.data`). Für Nutzer ändert
+  sich nichts.
+
+### ✅ Getestet
+- 🧪 Die Tests laufen jetzt auch gegen die älteste unterstützte
+  Home-Assistant-Version 2026.3, nicht nur gegen die aktuelle. Beide sind grün.
+
 ## [0.12.2] - 2026-09-24
 ### ✅ Getestet
 - 🧪 **Die Integration hat jetzt eine Testsuite.** 101 Tests laufen bei jedem

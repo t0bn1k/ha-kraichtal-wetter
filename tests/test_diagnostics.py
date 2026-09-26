@@ -52,7 +52,7 @@ async def test_key_only_in_stored_url(hass: HomeAssistant, mock_api) -> None:
     entry = _entry(hass, {"api_url": f"{DEFAULT_API_URL}?key={API_KEY}&pretty=1"})
     await setup_entry(hass, entry)
     # The key is only known from the URL, and must still be found in free text.
-    coordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
+    coordinator = entry.runtime_data
     coordinator.last_update_success = False
     coordinator.last_exception = UpdateFailed(f"echo of {API_KEY}")
 
@@ -77,7 +77,7 @@ async def test_legacy_key_field(hass: HomeAssistant, mock_api) -> None:
 
 async def test_key_in_error_message(hass: HomeAssistant, config_entry: MockConfigEntry, mock_api) -> None:
     await setup_entry(hass, config_entry)
-    coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
+    coordinator = config_entry.runtime_data
     coordinator.last_update_success = False
     coordinator.last_exception = UpdateFailed(f"Update failed: {DEFAULT_API_URL}?key={API_KEY}")
 

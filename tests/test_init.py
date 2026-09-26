@@ -11,10 +11,16 @@ from pytest_homeassistant_custom_component.test_util.aiohttp import AiohttpClien
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import CONF_SCAN_INTERVAL
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .conftest import API_KEY, setup_entry
-from custom_components.kraichtal_wetter.const import DEFAULT_API_URL, DOMAIN
+from custom_components.kraichtal_wetter.const import (
+    DEFAULT_API_URL,
+    DOMAIN,
+    WEBSITE_URL,
+)
 
 
 def _entry(hass: HomeAssistant, *, version: int = 2, data=None, options=None) -> MockConfigEntry:
@@ -30,17 +36,33 @@ def _entry(hass: HomeAssistant, *, version: int = 2, data=None, options=None) ->
 
 
 def _interval(hass: HomeAssistant, entry: MockConfigEntry) -> float:
-    return hass.data[DOMAIN][entry.entry_id]["coordinator"].update_interval.total_seconds()
+    return entry.runtime_data.update_interval.total_seconds()
 
 
 async def test_setup_and_unload(hass: HomeAssistant, config_entry: MockConfigEntry, mock_api) -> None:
     await setup_entry(hass, config_entry)
     assert config_entry.state is ConfigEntryState.LOADED
-    assert set(hass.data[DOMAIN][config_entry.entry_id]) == {"coordinator", "client", "entry"}
+    assert isinstance(config_entry.runtime_data, DataUpdateCoordinator)
 
     assert await hass.config_entries.async_unload(config_entry.entry_id)
     assert config_entry.state is ConfigEntryState.NOT_LOADED
-    assert config_entry.entry_id not in hass.data[DOMAIN]
+
+
+async def test_device_links_the_website_never_the_api(
+    hass: HomeAssistant, device_registry: dr.DeviceRegistry, mock_api
+) -> None:
+    """The device page's "Visit" link opens the website.
+
+    Up to 0.12.2 it was the stored API URL: a 401 in the browser, and for an
+    entry from before 0.4.4 the key in plain sight — the URL still carries it,
+    and the device registry would have stored it.
+    """
+    entry = _entry(hass, data={"api_url": f"{DEFAULT_API_URL}?key={API_KEY}"})
+    await setup_entry(hass, entry)
+
+    (device,) = dr.async_entries_for_config_entry(device_registry, entry.entry_id)
+    assert device.configuration_url == WEBSITE_URL
+    assert API_KEY not in repr(device)
 
 
 @pytest.mark.parametrize(

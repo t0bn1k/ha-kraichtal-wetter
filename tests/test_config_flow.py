@@ -18,7 +18,7 @@ from custom_components.kraichtal_wetter.const import DEFAULT_API_URL, DOMAIN
 
 
 def _coordinator(hass: HomeAssistant, entry: MockConfigEntry):
-    return hass.data[DOMAIN][entry.entry_id]["coordinator"]
+    return entry.runtime_data
 
 
 def _default(result, field: str):

@@ -15,7 +15,6 @@ from homeassistant.core import HomeAssistant
 
 from .conftest import respond_with, setup_entry
 from custom_components.kraichtal_wetter import weather as kw_weather
-from custom_components.kraichtal_wetter.const import DOMAIN
 
 ENTITY_ID = "weather.kraichtal_wetter"
 
@@ -32,7 +31,7 @@ async def _forecast(hass: HomeAssistant, kind: str) -> list[dict]:
 
 
 async def _refresh(hass: HomeAssistant, entry: MockConfigEntry) -> None:
-    await hass.data[DOMAIN][entry.entry_id]["coordinator"].async_refresh()
+    await entry.runtime_data.async_refresh()
     await hass.async_block_till_done()
 
 

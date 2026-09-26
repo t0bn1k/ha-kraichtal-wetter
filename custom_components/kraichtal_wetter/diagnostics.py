@@ -3,10 +3,10 @@ from __future__ import annotations
 from typing import Any
 
 from homeassistant.components.diagnostics import REDACTED, async_redact_data
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from .const import CONF_API_KEY, CONF_API_URL, DEFAULT_API_URL, DOMAIN
+from . import KraichtalWetterConfigEntry
+from .const import CONF_API_KEY, CONF_API_URL, DEFAULT_API_URL
 from .coordinator import REQUESTED_SECTIONS, _split_api_key
 
 # Every name an API key has ever been stored under. `async_setup_entry` still
@@ -32,10 +32,10 @@ def _redactor(api_key: str | None):
 
 
 async def async_get_config_entry_diagnostics(
-    hass: HomeAssistant, entry: ConfigEntry
+    hass: HomeAssistant, entry: KraichtalWetterConfigEntry
 ) -> dict[str, Any]:
     """Return diagnostics for a config entry."""
-    coordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
+    coordinator = entry.runtime_data
 
     # Versions before 0.4.4 stored the key in the URL's query string. Run it
     # through the splitter the client uses rather than trusting or dropping it:

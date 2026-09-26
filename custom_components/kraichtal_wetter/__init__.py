@@ -23,6 +23,8 @@ from .coordinator import KraichtalWetterClient
 
 _LOGGER = logging.getLogger(__name__)
 
+type KraichtalWetterConfigEntry = ConfigEntry[DataUpdateCoordinator[dict]]
+
 # Entity ids earlier versions left behind, per sensor `key`. 0.5.0 renamed
 # every entity to its *English* name, assuming ids were language-independent;
 # they are not — Home Assistant derives them from the name in the language of
@@ -152,7 +154,7 @@ async def async_migrate_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     return True
 
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+async def async_setup_entry(hass: HomeAssistant, entry: KraichtalWetterConfigEntry) -> bool:
     api_url = entry.data.get(CONF_API_URL, DEFAULT_API_URL)
     # Backwards compatibility: older installs may have stored the API key as
     # 'api_key' or 'apikey'. Prefer the configured `CONF_API_KEY` (now 'key').
@@ -192,11 +194,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # and lets ConfigEntryAuthFailed through so HA can start the reauth flow.
     await coordinator.async_config_entry_first_refresh()
 
-    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {
-        "coordinator": coordinator,
-        "client": client,
-        "entry": entry,
-    }
+    entry.runtime_data = coordinator
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
@@ -209,8 +207,5 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     return True
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
-    if unload_ok:
-        hass.data[DOMAIN].pop(entry.entry_id)
-    return unload_ok
+async def async_unload_entry(hass: HomeAssistant, entry: KraichtalWetterConfigEntry) -> bool:
+    return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
