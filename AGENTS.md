@@ -56,7 +56,8 @@ Wenn eine neue Funktion eine bisher ungenutzte Sektion braucht, gehört sie in `
 - **`scan_interval`**: Default 300 s, **Minimum 300 s** (`MIN_SCAN_INTERVAL`). Die API cached serverseitig fünf Minuten — häufiger abzufragen liefert dieselbe Antwort. Beide Flows lehnen kleinere Werte ab; `async_setup_entry` hebt zusätzlich Bestandseinträge an, die das Schema nie wieder sieht.
   - **Gespeichert an zwei Stellen:** Die Einrichtung legt den Wert in `entry.data` ab, der Options-Flow in `entry.options`. Gelesen wird `options` → `data` → Default, in `async_setup_entry` wie im Options-Flow. Bis 0.12.0 las das Setup nur `options`, ein bei der Einrichtung gewählter Wert blieb wirkungslos.
   - **Der Options-Flow ist `OptionsFlowWithReload`**: Das Intervall wird nur in `async_setup_entry` gelesen, ohne Neuladen gälte ein neuer Wert erst nach einem Neustart.
-- **hass.data**: `hass.data[DOMAIN][entry.entry_id]` speichert `{"coordinator", "client", "entry"}`.
+- **Laufzeitdaten**: `entry.runtime_data` ist der Coordinator (seit 0.12.3; vorher `hass.data[DOMAIN][entry.entry_id]`). Der Typ `KraichtalWetterConfigEntry` steht in `__init__.py`. `hass.data` nutzt nur noch die ID-Migration (`_PENDING_ID_MIGRATION`), weil sie vor dem Setup läuft.
+- **Geräte-Link**: `configuration_url` ist fest die Webseite (`WEBSITE_URL`), gebaut in `entity.py → device_info()`. Nie die gespeicherte `api_url`: Im Browser gibt die nur 401, und bei Einträgen von vor 0.4.4 steckt der Key darin — er landete so bis 0.12.2 in der Geräte-Registry.
 - **UI-Sprache**: Deutsch. `strings.json` ist nur Quelle — zur Laufzeit lädt HA `translations/de.json` / `translations/en.json`; beide müssen mitgepflegt werden.
 
 ## CI / Release
@@ -128,6 +129,7 @@ custom_components/kraichtal_wetter/
 ├── const.py             # DOMAIN, Konstanten
 ├── coordinator.py       # KraichtalWetterClient (HTTP)
 ├── diagnostics.py       # Diagnose-Download am Config-Entry, Key redigiert
+├── entity.py            # device_info() — das eine Gerät aller Entitäten
 ├── sensor.py            # 23 Messwert-Sensoren + Diagnose-Sensor API-Status
 ├── weather.py           # WeatherEntity + Forecast
 ├── strings.json         # Quelle der UI-Texte (nicht zur Laufzeit geladen)

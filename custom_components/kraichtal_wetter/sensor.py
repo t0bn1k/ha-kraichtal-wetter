@@ -18,10 +18,13 @@ from homeassistant.const import (
     UnitOfSpeed,
     UnitOfTemperature,
 )
-from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import CONF_API_URL, DOMAIN
+from . import KraichtalWetterConfigEntry
+from .entity import device_info
+
+# Every entity reads the coordinator's data; none polls on its own.
+PARALLEL_UPDATES = 0
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -257,9 +260,8 @@ SENSOR_TYPES = [
 ]
 
 
-async def async_setup_entry(hass, entry, async_add_entities):
-    data = hass.data[DOMAIN][entry.entry_id]
-    coordinator = data["coordinator"]
+async def async_setup_entry(hass, entry: KraichtalWetterConfigEntry, async_add_entities):
+    coordinator = entry.runtime_data
     entities: list[SensorEntity] = [
         KraichtalWetterSensor(coordinator, entry, description) for description in SENSOR_TYPES
     ]
@@ -296,13 +298,7 @@ class KraichtalWetterSensor(CoordinatorEntity, SensorEntity):
         super().__init__(coordinator)
         self.entity_description = description
         self._attr_unique_id = f"kraichtal_wetter_{description.key}"
-        self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, entry.entry_id)},
-            name="Kraichtal Wetter",
-            manufacturer="Kraichtal Wetter",
-            model="Kraichtal Wetter Station",
-            configuration_url=entry.data.get(CONF_API_URL, ""),
-        )
+        self._attr_device_info = device_info(entry)
 
     @property
     def native_value(self):
@@ -339,13 +335,7 @@ class KraichtalWetterApiStatusSensor(CoordinatorEntity, SensorEntity):
     def __init__(self, coordinator, entry) -> None:
         super().__init__(coordinator)
         self._attr_unique_id = "kraichtal_wetter_api_status"
-        self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, entry.entry_id)},
-            name="Kraichtal Wetter",
-            manufacturer="Kraichtal Wetter",
-            model="Kraichtal Wetter Station",
-            configuration_url=entry.data.get(CONF_API_URL, ""),
-        )
+        self._attr_device_info = device_info(entry)
 
     @property
     def available(self) -> bool:

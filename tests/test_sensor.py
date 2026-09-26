@@ -28,7 +28,7 @@ def _state(hass: HomeAssistant, registry: er.EntityRegistry, key: str):
 
 
 async def _refresh(hass: HomeAssistant, entry: MockConfigEntry) -> None:
-    await hass.data[DOMAIN][entry.entry_id]["coordinator"].async_refresh()
+    await entry.runtime_data.async_refresh()
     await hass.async_block_till_done()
 
 

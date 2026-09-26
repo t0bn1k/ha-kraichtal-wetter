@@ -15,11 +15,11 @@ from homeassistant.const import (
     UnitOfTemperature,
 )
 from homeassistant.core import callback
-from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import dt as dt_util
 
-from .const import CONF_API_URL, DOMAIN
+from . import KraichtalWetterConfigEntry
+from .entity import device_info
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -29,6 +29,9 @@ _LOGGER = logging.getLogger(__name__)
 API_TIME_ZONE = dt_util.get_time_zone("Europe/Berlin")
 
 _HOUR = timedelta(hours=1)
+
+# The entity reads the coordinator's data; it never polls on its own.
+PARALLEL_UPDATES = 0
 
 # Maps the API's icon names onto Home Assistant weather conditions. Only the
 # values in homeassistant.components.weather.ATTR_CONDITION_* are valid; an
@@ -164,9 +167,8 @@ def _hourly_datetimes(generated: datetime, labels: list[object]) -> list[datetim
     return times
 
 
-async def async_setup_entry(hass, entry, async_add_entities):
-    coordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
-    async_add_entities([KraichtalWetterWeather(coordinator, entry)], True)
+async def async_setup_entry(hass, entry: KraichtalWetterConfigEntry, async_add_entities):
+    async_add_entities([KraichtalWetterWeather(entry.runtime_data, entry)], True)
 
 
 class KraichtalWetterWeather(CoordinatorEntity, WeatherEntity):
@@ -187,13 +189,7 @@ class KraichtalWetterWeather(CoordinatorEntity, WeatherEntity):
         self._attr_unique_id = "kraichtal_wetter_forecast"
         self._forecast_cache: list[Forecast] | None = None
         self._hourly_cache: list[Forecast] | None = None
-        self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, entry.entry_id)},
-            name="Kraichtal Wetter",
-            manufacturer="Kraichtal Wetter",
-            model="Kraichtal Wetter Station",
-            configuration_url=entry.data.get(CONF_API_URL, ""),
-        )
+        self._attr_device_info = device_info(entry)
 
     def _current(self) -> dict:
         data = self.coordinator.data

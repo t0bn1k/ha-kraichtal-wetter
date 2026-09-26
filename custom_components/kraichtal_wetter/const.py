@@ -14,6 +14,11 @@ PLATFORMS = ["sensor", "weather"]
 # Default Kraichtal Wetter URL (hardcoded per request)
 DEFAULT_API_URL = "https://kraichtal-wetter.de/dashboard/api.php"
 
+# The "Visit" link on the device page. Deliberately not the API URL: that
+# only answers 401 in a browser, and an entry from before 0.4.4 still stores
+# the key in its URL, which would end up in the link and the device registry.
+WEBSITE_URL = "https://kraichtal-wetter.de"
+
 # Where users request their own API key. Passed into the config flow as a
 # description placeholder rather than written into the translations: hassfest
 # rejects a literal URL in any translated string.

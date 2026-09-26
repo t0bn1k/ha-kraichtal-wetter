@@ -1,6 +1,6 @@
 # Plan
 
-Stand: 26.09.2026 · veröffentlicht: 0.12.2 · API v1.5
+Stand: 26.09.2026 · veröffentlicht: 0.12.3 · API v1.5
 
 Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die API liefert, steht in [`docs/API.md`](docs/API.md) — dort nachsehen, bevor ein Punkt umgesetzt wird (siehe `AGENTS.md`). Erledigtes abhaken und die Version dazuschreiben.
 
@@ -19,6 +19,7 @@ Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die AP
 | 11 | Tests im Repo | veröffentlicht | 0.12.2 |
 | 12 | GitHub-Hilfen: Issue-Vorlagen, Wochentest, Dependabot | erledigt — ohne Release | – |
 | 13 | Test gegen die Mindestversion | erledigt — ohne Release | – |
+| 14 | Geräte-Link, `runtime_data`, `PARALLEL_UPDATES` | veröffentlicht | 0.12.3 |
 | – | ETag / `If-None-Match` | verworfen | – |
 
 ## 1. Niederschlag und Prognose-Sensoren korrigieren
@@ -190,7 +191,7 @@ Der Betreiber hat am 17.09.2026 auf unsere Anregung hin zugesagt, neben `label` 
 
 **Idee, nicht umgesetzt:** Ein Reconfigure-Schritt, mit dem man den Key auch ohne Ablehnung durch die API tauschen kann. Das README hat ihn versprochen, gebraucht hat ihn bisher niemand. `_async_validate_key()` wäre wiederverwendbar.
 
-**Zurückgestellt:** `hass.data` → `entry.runtime_data`. Moderner, aber berührt alle Plattformen und die Diagnose, ohne dass Nutzer etwas davon merken — passt besser zu Punkt 11, wenn Tests es absichern.
+**Zurückgestellt, erledigt in Punkt 14:** `hass.data` → `entry.runtime_data`. Moderner, aber berührt alle Plattformen und die Diagnose, ohne dass Nutzer etwas davon merken — passt besser zu Punkt 11, wenn Tests es absichern.
 
 ## 11. Tests im Repo (24.09.2026)
 
@@ -205,7 +206,7 @@ Der Betreiber hat am 17.09.2026 auf unsere Anregung hin zugesagt, neben `label` 
 - Das Vorwärtszählen in UTC in `_hourly_datetimes()` ist bei den bestätigten Label-Reihen wirkungsgleich mit lokalem Zählen — die Beschriftung korrigiert jeden Schritt. Entscheidend ist UTC beim **Rückwärtszählen** für „Jetzt“, das keine Beschriftung hat: Wer während des zweiten Durchlaufs von 02:00 im Oktober abruft, bekäme lokal gezählt einen Zeitstempel zwei Stunden zu früh. Dafür gibt es jetzt einen eigenen Test.
 - Die Diagnose muss einen Key, der nur in der alten URL steht, auch in Fehlermeldungen finden. Das war ungetestet, jetzt nicht mehr.
 
-**Nächster Schritt, wenn gewünscht:** `hass.data` → `entry.runtime_data` (Punkt 10, zurückgestellt) — jetzt durch Tests abgesichert.
+**Nächster Schritt, wenn gewünscht:** `hass.data` → `entry.runtime_data` (Punkt 10, zurückgestellt) — jetzt durch Tests abgesichert. Umgesetzt in Punkt 14.
 
 ## 12. GitHub-Hilfen: Issue-Vorlagen, Wochentest, Dependabot (26.09.2026)
 
@@ -225,6 +226,17 @@ Der Betreiber hat am 17.09.2026 auf unsere Anregung hin zugesagt, neben `label` 
 - [x] Lokal geprüft: alle 101 Tests grün gegen 2026.3.1 und 2026.3.4 — das Minimum stimmt, am Code war nichts zu ändern
 - [x] `requirements_test_min.txt` (0.13.317 = 2026.3.1, frühestes Plugin-Release der Reihe) und Job `pytest-minimum` in `tests.yml`
 - [x] `AGENTS.md`: Minimum nur zusammen mit `hacs.json` ändern
+
+## 14. Geräte-Link, `runtime_data`, `PARALLEL_UPDATES` (26.09.2026)
+
+**Warum:** Der Link „Besuchen" auf der Geräteseite war die gespeicherte `api_url`. Im Browser gibt die nur 401, und bei Einträgen von vor 0.4.4 steckt der Key im Query-String — der Link trug ihn damit in die Geräte-Registry und auf die Geräteseite. `runtime_data` war seit Punkt 10 zurückgestellt und ist jetzt durch die Tests aus Punkt 11 und 13 abgesichert.
+
+- [x] `configuration_url` fest auf `https://kraichtal-wetter.de` (`WEBSITE_URL`), `DeviceInfo` einmal in `entity.py` statt dreimal kopiert
+- [x] `hass.data[DOMAIN]` → `entry.runtime_data` (Coordinator), Typ `KraichtalWetterConfigEntry`; `client` und `entry` lagen dort ungenutzt
+- [x] `PARALLEL_UPDATES = 0` in `sensor.py` und `weather.py`
+- [x] Test: Geräte-Link ist die Webseite, auch bei einem Eintrag mit Key in der URL; Gegenprobe mit dem alten Link schlägt fehl
+- [x] 102 Tests grün gegen 2026.9.3 und 2026.3.1
+- [x] Release 0.12.3 (26.09.2026)
 
 ## Verworfen
 
