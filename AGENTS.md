@@ -110,6 +110,8 @@ Beide stehen im README-Kopf. Der Sterne-Badge liest GitHub direkt und ist sofort
 
 Der Installations-Badge liest `https://analytics.home-assistant.io/custom_integrations.json` unter `$.kraichtal_wetter.total`. Dort ist die Domain noch **nicht** enthalten — die Liste erfasst Integrationen, die auf Instanzen mit Analytics-Opt-in laufen, praktisch also erst nach Aufnahme in den HACS-Standardkatalog. Bis dahin zeigt der Badge grau „no result"; er springt ohne weiteres Zutun auf eine Zahl um, sobald die Domain in der Datei auftaucht. Bewusst so eingebaut statt später nachgerüstet (Stand 17.09.2026).
 
+**Seit dem 07.10.2026 steht er im README auskommentiert**, weil „no result" wie ein Defekt wirkt. Nach der Aufnahme in den Katalog den Kommentar um die Zeile entfernen. Neu im Kopf: Tests-Badge (`tests.yml`) und ein statischer Hinweis „Entwickelt mit Claude Code" — reine Selbstauskunft, passend zu den `Co-Authored-By`-Zeilen in den Commits.
+
 Die Zahl sind gemeldete **aktive Installationen**, keine Downloads — daher das Label „Installationen".
 
 Ein GitHub-Downloadzähler (`img.shields.io/github/downloads/.../total`) hilft nicht: Er zählt nur hochgeladene Release-Assets, und unsere Releases tragen keine. Das ließe sich nur mit `zip_release` in `hacs.json` plus einem Zip-Asset in `release.yml` ändern — was den Installationsweg umstellt und deshalb nicht gemacht wurde.

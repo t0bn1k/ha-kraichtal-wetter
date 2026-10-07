@@ -3,9 +3,13 @@
 [![HACS Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![Release](https://img.shields.io/github/v/release/t0bn1k/ha-kraichtal-wetter?style=for-the-badge)](https://github.com/t0bn1k/ha-kraichtal-wetter/releases)
 [![Sterne](https://img.shields.io/github/stars/t0bn1k/ha-kraichtal-wetter?style=for-the-badge&label=Sterne&color=41BDF5)](https://github.com/t0bn1k/ha-kraichtal-wetter/stargazers)
+<!-- Installationen-Badge: erst nach Aufnahme in den HACS-Standardkatalog einschalten, vorher zeigt er nur "no result"
 [![Installationen](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fanalytics.home-assistant.io%2Fcustom_integrations.json&query=%24.kraichtal_wetter.total&label=Installationen&color=41BDF5&style=for-the-badge)](https://analytics.home-assistant.io/)
+-->
 [![Lizenz](https://img.shields.io/github/license/t0bn1k/ha-kraichtal-wetter?style=for-the-badge)](https://github.com/t0bn1k/ha-kraichtal-wetter/blob/main/LICENSE)
 [![Validate](https://img.shields.io/github/actions/workflow/status/t0bn1k/ha-kraichtal-wetter/validate.yml?style=for-the-badge&label=validate)](https://github.com/t0bn1k/ha-kraichtal-wetter/actions/workflows/validate.yml)
+[![Tests](https://img.shields.io/github/actions/workflow/status/t0bn1k/ha-kraichtal-wetter/tests.yml?style=for-the-badge&label=tests)](https://github.com/t0bn1k/ha-kraichtal-wetter/actions/workflows/tests.yml)
+[![Entwickelt mit Claude Code](https://img.shields.io/badge/Entwickelt%20mit-Claude%20Code-41BDF5?style=for-the-badge)](https://claude.com/claude-code)
 
 Kraichtal Wetter ist eine Home Assistant Custom Integration, die aktuelle Wetterdaten aus der Kraichtal Wetter API als Sensoren und als `weather`-Entität bereitstellt.
 
