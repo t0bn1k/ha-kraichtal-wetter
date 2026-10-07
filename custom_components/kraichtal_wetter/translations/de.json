@@ -93,6 +93,46 @@
       "rain_today": {
         "name": "Prognose Resttag Niederschlag"
       },
+      "pop_today": {
+        "name": "Prognose heute Regenwahrscheinlichkeit",
+        "state_attributes": {
+          "confidence": {
+            "name": "Einigkeit der Modelle"
+          }
+        }
+      },
+      "tmax_tomorrow": {
+        "name": "Prognose morgen Tmax",
+        "state_attributes": {
+          "confidence": {
+            "name": "Einigkeit der Modelle"
+          }
+        }
+      },
+      "tmin_tomorrow": {
+        "name": "Prognose morgen Tmin",
+        "state_attributes": {
+          "confidence": {
+            "name": "Einigkeit der Modelle"
+          }
+        }
+      },
+      "rain_tomorrow": {
+        "name": "Prognose morgen Niederschlag",
+        "state_attributes": {
+          "confidence": {
+            "name": "Einigkeit der Modelle"
+          }
+        }
+      },
+      "pop_tomorrow": {
+        "name": "Prognose morgen Regenwahrscheinlichkeit",
+        "state_attributes": {
+          "confidence": {
+            "name": "Einigkeit der Modelle"
+          }
+        }
+      },
       "warnings": {
         "name": "Warnungen"
       },

@@ -1,6 +1,6 @@
 # Plan
 
-Stand: 26.09.2026 · veröffentlicht: 0.12.3 · API v1.5
+Stand: 07.10.2026 · veröffentlicht: 0.12.3 · API v1.5
 
 Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die API liefert, steht in [`docs/API.md`](docs/API.md) — dort nachsehen, bevor ein Punkt umgesetzt wird (siehe `AGENTS.md`). Erledigtes abhaken und die Version dazuschreiben.
 
@@ -20,6 +20,7 @@ Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die AP
 | 12 | GitHub-Hilfen: Issue-Vorlagen, Wochentest, Dependabot | erledigt — ohne Release | – |
 | 13 | Test gegen die Mindestversion | erledigt — ohne Release | – |
 | 14 | Geräte-Link, `runtime_data`, `PARALLEL_UPDATES` | veröffentlicht | 0.12.3 |
+| 15 | Tagesvorhersage heute/morgen als Sensoren | umgesetzt, nicht veröffentlicht | – |
 | – | ETag / `If-None-Match` | verworfen | – |
 
 ## 1. Niederschlag und Prognose-Sensoren korrigieren
@@ -237,6 +238,17 @@ Der Betreiber hat am 17.09.2026 auf unsere Anregung hin zugesagt, neben `label` 
 - [x] Test: Geräte-Link ist die Webseite, auch bei einem Eintrag mit Key in der URL; Gegenprobe mit dem alten Link schlägt fehl
 - [x] 102 Tests grün gegen 2026.9.3 und 2026.3.1
 - [x] Release 0.12.3 (26.09.2026)
+
+## 15. Tagesvorhersage heute/morgen als Sensoren (07.10.2026)
+
+**Warum:** Morgen ist bisher nur über die Tagesvorhersage der Wetter-Entität erreichbar — eine Automation braucht dafür `weather.get_forecasts` und ein Template. Dasselbe Argument wie bei den „Prognose Resttag"-Sensoren (siehe „Entschieden"): Für eine Bedingung ist ein einzelner Zustand der einfache Weg. Typisch: Frost morgen (Pflanzen reinholen), Regen morgen (Bewässerung heute auslassen). Kein neuer Abruf, `days` kommt schon mit.
+
+- [x] `days[0].pop`, `days[1].tmax`/`.tmin`/`.rain`/`.pop` als Sensoren, ohne State-Class (Prognosen)
+- [x] `confidence` des jeweiligen Tages als Attribut — laut Doku die Einigkeit der Modelle; die Vorhersage der Wetter-Entität hat dafür kein Feld
+- [x] `section` in der Sensor-Beschreibung, Array-Indizes in der Dot-Notation; unique_ids der Bestandssensoren unverändert
+- [x] Bewusst **nicht** `days[0].tmax`/`.tmin`/`.rain`: Für heute gibt es „Prognose Resttag", und `days[0].tmin` schließt laut Doku die vergangene Nacht ein
+- [x] Tests: Werte aller Sensoren aus der Fixture, Tag 0 und 1 nicht vertauscht, kurzes `days`-Array ergibt `unknown`, State-Classes, deutsche IDs
+- [ ] Release
 
 ## Verworfen
 

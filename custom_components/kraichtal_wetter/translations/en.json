@@ -93,6 +93,46 @@
       "rain_today": {
         "name": "Forecast rest of day precipitation"
       },
+      "pop_today": {
+        "name": "Forecast today precipitation probability",
+        "state_attributes": {
+          "confidence": {
+            "name": "Model agreement"
+          }
+        }
+      },
+      "tmax_tomorrow": {
+        "name": "Forecast tomorrow max temperature",
+        "state_attributes": {
+          "confidence": {
+            "name": "Model agreement"
+          }
+        }
+      },
+      "tmin_tomorrow": {
+        "name": "Forecast tomorrow min temperature",
+        "state_attributes": {
+          "confidence": {
+            "name": "Model agreement"
+          }
+        }
+      },
+      "rain_tomorrow": {
+        "name": "Forecast tomorrow precipitation",
+        "state_attributes": {
+          "confidence": {
+            "name": "Model agreement"
+          }
+        }
+      },
+      "pop_tomorrow": {
+        "name": "Forecast tomorrow precipitation probability",
+        "state_attributes": {
+          "confidence": {
+            "name": "Model agreement"
+          }
+        }
+      },
       "warnings": {
         "name": "Warnings"
       },
