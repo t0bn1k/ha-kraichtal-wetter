@@ -1,6 +1,6 @@
 # Plan
 
-Stand: 07.10.2026 · veröffentlicht: 0.12.3 · API v1.5
+Stand: 07.10.2026 · veröffentlicht: 0.13.0 · API v1.5
 
 Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die API liefert, steht in [`docs/API.md`](docs/API.md) — dort nachsehen, bevor ein Punkt umgesetzt wird (siehe `AGENTS.md`). Erledigtes abhaken und die Version dazuschreiben.
 
@@ -20,7 +20,7 @@ Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die AP
 | 12 | GitHub-Hilfen: Issue-Vorlagen, Wochentest, Dependabot | erledigt — ohne Release | – |
 | 13 | Test gegen die Mindestversion | erledigt — ohne Release | – |
 | 14 | Geräte-Link, `runtime_data`, `PARALLEL_UPDATES` | veröffentlicht | 0.12.3 |
-| 15 | Tagesvorhersage heute/morgen als Sensoren | umgesetzt, nicht veröffentlicht | – |
+| 15 | Tagesvorhersage heute/morgen als Sensoren | veröffentlicht | 0.13.0 |
 | – | ETag / `If-None-Match` | verworfen | – |
 
 ## 1. Niederschlag und Prognose-Sensoren korrigieren
@@ -248,7 +248,8 @@ Der Betreiber hat am 17.09.2026 auf unsere Anregung hin zugesagt, neben `label` 
 - [x] `section` in der Sensor-Beschreibung, Array-Indizes in der Dot-Notation; unique_ids der Bestandssensoren unverändert
 - [x] Bewusst **nicht** `days[0].tmax`/`.tmin`/`.rain`: Für heute gibt es „Prognose Resttag", und `days[0].tmin` schließt laut Doku die vergangene Nacht ein
 - [x] Tests: Werte aller Sensoren aus der Fixture, Tag 0 und 1 nicht vertauscht, kurzes `days`-Array ergibt `unknown`, State-Classes, deutsche IDs
-- [ ] Release
+- [x] 109 Tests grün gegen 2026.9.3 und 2026.3.1
+- [x] Release 0.13.0 (07.10.2026)
 
 ## Verworfen
 

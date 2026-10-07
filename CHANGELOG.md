@@ -2,6 +2,26 @@
 
 Alle signifikanten Änderungen an dieser Integration werden hier festgehalten.
 
+## [0.13.0] - 2026-10-07
+### ✨ Hinzugefügt
+- 🌡️ **Vorhersage für morgen als eigene Sensoren:** „Prognose morgen Tmax“,
+  „Prognose morgen Tmin“, „Prognose morgen Niederschlag“ und „Prognose morgen
+  Regenwahrscheinlichkeit“. Automationen wie „Frost heute Nacht? Pflanzen
+  reinholen“ oder „Regen morgen? Heute nicht gießen“ brauchen damit keine
+  Vorhersage-Abfrage und kein Template mehr. Tmin gilt für den ganzen
+  Kalendertag, schließt also die Nacht nach Mitternacht ein.
+- 🌧️ **„Prognose heute Regenwahrscheinlichkeit“** für den ganzen heutigen Tag.
+- 📊 Alle fünf tragen im Attribut „Einigkeit der Modelle“ (`confidence`), wie
+  sicher sich die Wettermodelle für diesen Tag sind, in Prozent.
+
+Wie alle Prognosen führen die neuen Sensoren keine Langzeitstatistik. Die
+Sensoren erscheinen nach dem Update von selbst, bestehende Entitäten bleiben
+unverändert.
+
+### ✅ Getestet
+- 🧪 Neue Tests stellen sicher, dass heute und morgen nicht vertauscht werden
+  und eine kürzere Vorhersage „unbekannt“ ergibt statt eines Fehlers.
+
 ## [0.12.3] - 2026-09-26
 ### 🐛 Behoben
 - 🔗 **Der Link „Besuchen" auf der Geräteseite öffnet jetzt die Webseite**
