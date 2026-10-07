@@ -57,7 +57,9 @@ Bis 0.6.x hat die Integration `rain` und `rain_today` genau andersherum behandel
 
 ### `days` → Tagesvorhersage
 
-Array mit 8 Einträgen, Index 0 = heute. Genutzt: `icon`, `tmax`, `tmin`, `pop`, `rain`, `wind`, `gust` (erwartete Spitzenböe), `wind_dir`. Nicht genutzt: `confidence`, `label`, `spark`.
+Array mit 8 Einträgen, Index 0 = heute. Genutzt: `icon`, `tmax`, `tmin`, `pop`, `rain`, `wind`, `gust` (erwartete Spitzenböe), `wind_dir`. Nicht genutzt: `label`, `spark`.
+
+Zusätzlich als Sensoren, damit Automationen ohne `weather.get_forecasts` auskommen: `days[0].pop` („Prognose heute Regenwahrscheinlichkeit“) sowie `tmax`, `tmin`, `rain` und `pop` aus `days[1]` („Prognose morgen …“). Prognosen, also ohne State-Class. `confidence` („wie einig sich die Wettermodelle sind“, %) hängt als Attribut daran — die Vorhersage der Wetter-Entität hat dafür kein Feld.
 
 `current.gust_max` gehört dagegen **nicht** an die Wetter-Entität: Es ist die stärkste Böe des bisherigen Tages, keine aktuelle. Eine aktuelle Böe liefert die API nicht.
 

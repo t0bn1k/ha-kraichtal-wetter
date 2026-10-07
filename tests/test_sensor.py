@@ -12,7 +12,7 @@ from homeassistant.helpers import entity_registry as er
 
 from .conftest import respond_with, setup_entry
 from custom_components.kraichtal_wetter.const import DOMAIN
-from custom_components.kraichtal_wetter.sensor import SENSOR_TYPES
+from custom_components.kraichtal_wetter.sensor import SENSOR_TYPES, unique_id
 
 
 def _entity_id(registry: er.EntityRegistry, key: str) -> str:
@@ -37,12 +37,58 @@ async def test_every_sensor_shows_its_field(
 ) -> None:
     await setup_entry(hass, config_entry)
 
-    current = api_response["current"]
     for description in SENSOR_TYPES:
-        value = current
+        value = api_response[description.section]
         for part in description.key.split("."):
-            value = value[part]
-        assert _state(hass, entity_registry, description.key).state == str(value), description.key
+            value = value[int(part)] if isinstance(value, list) else value[part]
+        state = hass.states.get(_entity_id_for(entity_registry, description))
+        assert state is not None, description.key
+        assert state.state == str(value), description.key
+
+
+def _entity_id_for(registry: er.EntityRegistry, description) -> str:
+    entity_id = registry.async_get_entity_id("sensor", DOMAIN, unique_id(description))
+    assert entity_id is not None, description.key
+    return entity_id
+
+
+async def test_daily_forecast_sensors_read_the_right_day(
+    hass: HomeAssistant, config_entry: MockConfigEntry, aioclient_mock: AiohttpClientMocker,
+    entity_registry: er.EntityRegistry, api_response
+) -> None:
+    """days[0] is today, days[1] tomorrow (API docs) — not the other way round.
+
+    The recorded response has pop and rain at 0 on both days, so distinct
+    values are set here to tell the two indices apart.
+    """
+    api_response["days"][0].update(pop=70, rain=4.2, confidence=55)
+    api_response["days"][1].update(pop=40, rain=2.5, confidence=83)
+    respond_with(aioclient_mock, json=api_response)
+    await setup_entry(hass, config_entry)
+
+    assert _state(hass, entity_registry, "days.0.pop").state == "70"
+    assert _state(hass, entity_registry, "days.0.pop").attributes["confidence"] == 55
+    assert _state(hass, entity_registry, "days.1.pop").state == "40"
+    assert _state(hass, entity_registry, "days.1.rain").state == "2.5"
+    assert _state(hass, entity_registry, "days.1.tmax").state == "22"
+    tmin = _state(hass, entity_registry, "days.1.tmin")
+    assert tmin.state == "6"
+    assert tmin.attributes["confidence"] == 83
+
+
+async def test_daily_forecast_sensors_without_tomorrow(
+    hass: HomeAssistant, config_entry: MockConfigEntry, aioclient_mock: AiohttpClientMocker,
+    entity_registry: er.EntityRegistry, api_response
+) -> None:
+    """A short `days` array leaves tomorrow unknown instead of failing."""
+    api_response["days"] = api_response["days"][:1]
+    respond_with(aioclient_mock, json=api_response)
+    await setup_entry(hass, config_entry)
+
+    assert _state(hass, entity_registry, "days.0.pop").state == "0"
+    tmin = _state(hass, entity_registry, "days.1.tmin")
+    assert tmin.state == "unknown"
+    assert "confidence" not in tmin.attributes
 
 
 async def test_german_entity_ids(
@@ -57,6 +103,10 @@ async def test_german_entity_ids(
     assert _entity_id(entity_registry, "rain_today") == "sensor.kraichtal_wetter_prognose_resttag_niederschlag"
     assert _entity_id(entity_registry, "station_today.wind_max") == (
         "sensor.kraichtal_wetter_station_heute_wind_max"
+    )
+    assert _entity_id(entity_registry, "days.1.tmin") == "sensor.kraichtal_wetter_prognose_morgen_tmin"
+    assert _entity_id(entity_registry, "days.0.pop") == (
+        "sensor.kraichtal_wetter_prognose_heute_regenwahrscheinlichkeit"
     )
 
 
@@ -98,6 +148,11 @@ async def test_missing_attribute_is_left_out(
         ("tmax_today", None),
         ("tmin_today", None),
         ("rain_today", None),
+        ("days.0.pop", None),
+        ("days.1.tmax", None),
+        ("days.1.tmin", None),
+        ("days.1.rain", None),
+        ("days.1.pop", None),
     ],
 )
 async def test_state_classes(

@@ -58,6 +58,7 @@ Den Schlüssel gibst du anschließend beim Einrichten der Integration ein. Er l�
 - 8-Tage-Vorhersage über `weather.kraichtal_wetter` (Temperatur, Regen, Wind und Böen)
 - Stündliche Vorhersage für die nächsten zwölf Stunden
 - Erweiterte Sensoren aus `station_today`
+- Vorhersage für morgen als einzelne Sensoren — für Automationen ohne Template
 - Gruppierte Entitäten unter einem Gerät in der Integrationen-Ansicht
 - Diagnose-Download für Fehlerberichte — ohne den eigenen API-Key
 
@@ -81,6 +82,11 @@ Anzeigenamen und Entity-IDs folgen der eingestellten Home-Assistant-Sprache; die
 | `sensor.kraichtal_wetter_prognose_resttag_tmax` | Prognose Resttag Tmax | `tmax_today` |
 | `sensor.kraichtal_wetter_prognose_resttag_tmin` | Prognose Resttag Tmin | `tmin_today` |
 | `sensor.kraichtal_wetter_prognose_resttag_niederschlag` | Prognose Resttag Niederschlag | `rain_today` |
+| `sensor.kraichtal_wetter_prognose_heute_regenwahrscheinlichkeit` | Prognose heute Regenwahrscheinlichkeit | `days[0].pop` |
+| `sensor.kraichtal_wetter_prognose_morgen_tmax` | Prognose morgen Tmax | `days[1].tmax` |
+| `sensor.kraichtal_wetter_prognose_morgen_tmin` | Prognose morgen Tmin | `days[1].tmin` |
+| `sensor.kraichtal_wetter_prognose_morgen_niederschlag` | Prognose morgen Niederschlag | `days[1].rain` |
+| `sensor.kraichtal_wetter_prognose_morgen_regenwahrscheinlichkeit` | Prognose morgen Regenwahrscheinlichkeit | `days[1].pop` |
 | `sensor.kraichtal_wetter_warnungen` | Warnungen | `warnings` |
 | `sensor.kraichtal_wetter_beobachtungsdatum` | Beobachtungsdatum | `obs_date` |
 | `sensor.kraichtal_wetter_beobachtungszeit` | Beobachtungszeit | `obs_time` |
@@ -95,7 +101,9 @@ Anzeigenamen und Entity-IDs folgen der eingestellten Home-Assistant-Sprache; die
 
 **Gemessen oder vorhergesagt?** Alles mit **„Station heute“** hat die Station tatsächlich gemessen — für „so viel hat es heute geregnet" ist `sensor.kraichtal_wetter_station_heute_niederschlag` der richtige Sensor. Die drei Sensoren **„Prognose Resttag“** sind dagegen Vorhersagen für die *verbleibenden* Stunden des Tages: Sie werden zum Abend hin kleiner und zeigen spät abends kaum mehr als die nächste Stunde. Die Vorhersage für den ganzen Tag steht in der Wetter-Entität.
 
-**Zusätzliche Attribute:** Die Außentemperatur zeigt im Attribut `source`, ob der Wert gemessen ist (`live`) oder mangels Messwert aus der Prognose stammt (`forecast`). „Station heute Tmax", „Tmin" und „Böe" tragen im Attribut `time` die Uhrzeit des Extremwerts (z. B. `15:53`), die Böe zusätzlich die Windstärke in `beaufort`. In der Oberfläche erscheinen die Attribute übersetzt („Quelle", „Uhrzeit"); in Templates gilt der englische Name, etwa `{{ state_attr('sensor.kraichtal_wetter_station_heute_tmax', 'time') }}`.
+**„Prognose heute“ und „Prognose morgen“** stammen aus der Tagesvorhersage und gelten für den ganzen Kalendertag. „Prognose morgen Tmin“ schließt also die Nacht nach Mitternacht ein — das ist der Wert für eine Frostabfrage, etwa `{{ states('sensor.kraichtal_wetter_prognose_morgen_tmin') | float(99) < 2 }}`. Wie alle Prognosen führen sie keine Langzeitstatistik.
+
+**Zusätzliche Attribute:** Die Außentemperatur zeigt im Attribut `source`, ob der Wert gemessen ist (`live`) oder mangels Messwert aus der Prognose stammt (`forecast`). „Station heute Tmax", „Tmin" und „Böe" tragen im Attribut `time` die Uhrzeit des Extremwerts (z. B. `15:53`), die Böe zusätzlich die Windstärke in `beaufort`. Die Sensoren „Prognose heute/morgen“ tragen in `confidence` („Einigkeit der Modelle“), wie einig sich die Wettermodelle für diesen Tag sind, in Prozent. In der Oberfläche erscheinen die Attribute übersetzt („Quelle", „Uhrzeit"); in Templates gilt der englische Name, etwa `{{ state_attr('sensor.kraichtal_wetter_station_heute_tmax', 'time') }}`.
 
 Der **API-Status** ist als Diagnose-Entität eingestuft und steht bei einem erfolgreichen Abruf auf `ok`. Schlägt ein Abruf fehl, zeigt er stattdessen den Grund — etwa den Klartext der API oder die Bedeutung des HTTP-Status. Er bleibt dabei bewusst verfügbar, während die übrigen Entitäten auf „nicht verfügbar" gehen: Genau dann ist die Ursache interessant. Zu finden unter `Einstellungen → Geräte & Dienste → Kraichtal Wetter → Gerät`.
 

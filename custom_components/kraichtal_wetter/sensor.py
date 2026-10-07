@@ -31,6 +31,11 @@ PARALLEL_UPDATES = 0
 class KraichtalWetterSensorEntityDescription(SensorEntityDescription):
     """Sensor description that can surface further API fields as attributes."""
 
+    # API section that `key` and the attribute fields are looked up in. Numeric
+    # parts index into arrays, so `days` + "1.tmin" is days[1]["tmin"]. Sensors
+    # outside `current` carry the section in their unique_id; those in
+    # `current` keep the bare key they have always had.
+    section: str = "current"
     # (attribute name, API field) pairs; the field uses the same dot notation
     # as `key`. Attribute names are translated under
     # entity.sensor.<translation_key>.state_attributes. A tuple rather than a
@@ -38,8 +43,9 @@ class KraichtalWetterSensorEntityDescription(SensorEntityDescription):
     attributes: tuple[tuple[str, str], ...] = ()
 
 
-# `key` addresses the API payload (dot notation for nested fields) and forms the
-# unique_id; `translation_key` selects the display name from translations/.
+# `key` addresses the API payload within `section` (dot notation for nested
+# fields) and forms the unique_id; `translation_key` selects the display name
+# from translations/.
 #
 # NOTE: Home Assistant builds the entity_id from the name in the instance's
 # own language (German is one of the languages it does that for), prefixed with
@@ -180,6 +186,58 @@ SENSOR_TYPES = [
         icon="mdi:weather-rainy",
         device_class=SensorDeviceClass.PRECIPITATION,
     ),
+    # The daily forecast (days, index 0 = today) as single states, so an
+    # automation can ask "frost tomorrow?" without weather.get_forecasts and a
+    # template. Unlike the *_today sensors above, a day covers the whole
+    # calendar day: tmin of days[1] includes the night after midnight, which
+    # is what a frost check needs. Forecasts again, so no state class.
+    #
+    # `confidence` is how far the weather models agree on that day (API docs:
+    # "Wie einig sich die Wettermodelle sind", in %). The weather entity's
+    # forecast has no field for it, hence the attribute.
+    KraichtalWetterSensorEntityDescription(
+        section="days",
+        key="0.pop",
+        translation_key="pop_today",
+        native_unit_of_measurement=PERCENTAGE,
+        icon="mdi:umbrella-outline",
+        attributes=(("confidence", "0.confidence"),),
+    ),
+    KraichtalWetterSensorEntityDescription(
+        section="days",
+        key="1.tmax",
+        translation_key="tmax_tomorrow",
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        icon="mdi:thermometer-high",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        attributes=(("confidence", "1.confidence"),),
+    ),
+    KraichtalWetterSensorEntityDescription(
+        section="days",
+        key="1.tmin",
+        translation_key="tmin_tomorrow",
+        native_unit_of_measurement=UnitOfTemperature.CELSIUS,
+        icon="mdi:thermometer-low",
+        device_class=SensorDeviceClass.TEMPERATURE,
+        attributes=(("confidence", "1.confidence"),),
+    ),
+    KraichtalWetterSensorEntityDescription(
+        section="days",
+        key="1.rain",
+        translation_key="rain_tomorrow",
+        native_unit_of_measurement=UnitOfPrecipitationDepth.MILLIMETERS,
+        icon="mdi:weather-rainy",
+        device_class=SensorDeviceClass.PRECIPITATION,
+        attributes=(("confidence", "1.confidence"),),
+    ),
+    KraichtalWetterSensorEntityDescription(
+        section="days",
+        key="1.pop",
+        translation_key="pop_tomorrow",
+        native_unit_of_measurement=PERCENTAGE,
+        icon="mdi:umbrella-outline",
+        attributes=(("confidence", "1.confidence"),),
+    ),
     KraichtalWetterSensorEntityDescription(
         key="warnings",
         translation_key="warnings",
@@ -269,23 +327,25 @@ async def async_setup_entry(hass, entry: KraichtalWetterConfigEntry, async_add_e
     async_add_entities(entities, True)
 
 
-def _resolve_current_value(data: object, key: str):
+def _resolve_value(data: object, section: str, key: str):
     if not isinstance(data, dict):
         return None
 
-    current = data.get("current")
-    if not isinstance(current, dict):
-        return None
-
-    if "." not in key:
-        return current.get(key)
-
-    value: object = current
+    value: object = data.get(section)
     for part in key.split("."):
-        if not isinstance(value, dict):
+        if isinstance(value, dict):
+            value = value.get(part)
+        elif isinstance(value, list) and part.isdigit() and int(part) < len(value):
+            value = value[int(part)]
+        else:
             return None
-        value = value.get(part)
     return value
+
+
+def unique_id(description: KraichtalWetterSensorEntityDescription) -> str:
+    if description.section == "current":
+        return f"kraichtal_wetter_{description.key}"
+    return f"kraichtal_wetter_{description.section}.{description.key}"
 
 
 class KraichtalWetterSensor(CoordinatorEntity, SensorEntity):
@@ -297,19 +357,21 @@ class KraichtalWetterSensor(CoordinatorEntity, SensorEntity):
     ) -> None:
         super().__init__(coordinator)
         self.entity_description = description
-        self._attr_unique_id = f"kraichtal_wetter_{description.key}"
+        self._attr_unique_id = unique_id(description)
         self._attr_device_info = device_info(entry)
 
     @property
     def native_value(self):
-        return _resolve_current_value(self.coordinator.data, self.entity_description.key)
+        description = self.entity_description
+        return _resolve_value(self.coordinator.data, description.section, description.key)
 
     @property
     def extra_state_attributes(self) -> dict[str, object] | None:
+        section = self.entity_description.section
         attributes = {
             name: value
             for name, api_field in self.entity_description.attributes
-            if (value := _resolve_current_value(self.coordinator.data, api_field)) is not None
+            if (value := _resolve_value(self.coordinator.data, section, api_field)) is not None
         }
         return attributes or None
 
