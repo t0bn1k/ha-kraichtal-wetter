@@ -104,13 +104,15 @@ Seit 0.8.0 tragen die Abschnittsüberschriften ein festes Icon, jeder Eintrag zu
 
 Thematisch zum Beispiel: 🌡️ Temperatur · 🌧️ Niederschlag · 💨 Wind · 🌬️ Böen · 🚨 DWD-Warnungen · 🕒 Zeit · 🌐 Übersetzung · 📝 Doku · 🧪 Tests.
 
-### Sterne- und Installations-Badge
+### Badges
 
-Beide stehen im README-Kopf. Der Sterne-Badge liest GitHub direkt und ist sofort korrekt.
+Seit dem 09.10.2026 trägt der README-Kopf nur noch drei Badges: **HACS Custom**, **Release** und **Tests** (`tests.yml`). Bewusst entfernt, weil sie Nutzern nichts sagen: Sterne, Lizenz (steht im Fuß), Validate (deckt sich für Leser mit Tests) und der Badge „Entwickelt mit Claude Code“. Die Selbstauskunft dazu steht weiter im README, als Textzeile im Fuß, passend zu den `Co-Authored-By`-Zeilen in den Commits.
+
+### Installations-Badge
 
 Der Installations-Badge liest `https://analytics.home-assistant.io/custom_integrations.json` unter `$.kraichtal_wetter.total`. Dort ist die Domain noch **nicht** enthalten — die Liste erfasst Integrationen, die auf Instanzen mit Analytics-Opt-in laufen, praktisch also erst nach Aufnahme in den HACS-Standardkatalog. Bis dahin zeigt der Badge grau „no result"; er springt ohne weiteres Zutun auf eine Zahl um, sobald die Domain in der Datei auftaucht. Bewusst so eingebaut statt später nachgerüstet (Stand 17.09.2026).
 
-**Seit dem 07.10.2026 steht er im README auskommentiert**, weil „no result" wie ein Defekt wirkt. Nach der Aufnahme in den Katalog den Kommentar um die Zeile entfernen. Neu im Kopf: Tests-Badge (`tests.yml`) und ein statischer Hinweis „Entwickelt mit Claude Code" — reine Selbstauskunft, passend zu den `Co-Authored-By`-Zeilen in den Commits.
+**Seit dem 07.10.2026 steht er im README auskommentiert**, weil „no result" wie ein Defekt wirkt. Nach der Aufnahme in den Katalog den Kommentar um die Zeile entfernen.
 
 Die Zahl sind gemeldete **aktive Installationen**, keine Downloads — daher das Label „Installationen".
 
@@ -121,6 +123,14 @@ Ein GitHub-Downloadzähler (`img.shields.io/github/downloads/.../total`) hilft n
 Die HACS-Oberfläche zeigt **nicht** die README von `main`. `HacsRepository.get_documentation()` (`custom_components/hacs/repositories/base.py`) setzt bei einer installierten Integration `target_version = installed_version` und lädt `https://raw.githubusercontent.com/<repo>/<tag>/README.md`. README-Änderungen werden dort also erst mit dem **nächsten Release** sichtbar — „Update information" in HACS hilft nicht, weil der Tag derselbe bleibt.
 
 Alle Links im README deshalb **absolut** halten. Relative Ziele wie `](LICENSE)` lösen sich in HACS gegen die Home-Assistant-URL auf und gehen ins Leere; beim Lizenz-Badge blieb außerdem das Bild leer, solange sein Linkziel relativ war.
+
+Bilder genauso: `https://raw.githubusercontent.com/t0bn1k/ha-kraichtal-wetter/main/docs/images/…`. Sie zeigen auf `main`, nicht auf einen Tag, und gelten damit auch für ältere installierte Versionen. Ein Bild deshalb nicht umbenennen oder löschen, solange eine veröffentlichte README darauf zeigt.
+
+### Aufbau der README
+
+Die README ist für **Anwender**: was die Integration kann, API-Key, Installation, Beispielkarten, Hilfe. Alles Weitere gehört nach `docs/` — Entitätentabelle, Attribute, Grenzen der Datenquelle nach `docs/ENTITAETEN.md`, API-Details nach `docs/API.md`. Upgrade-Hinweise für ältere Versionen stehen im CHANGELOG (Abschnitt „Nach dem Update zu tun“); in die README kommt ein solcher Hinweis nur für das aktuelle Release und fliegt mit dem nächsten wieder raus.
+
+Die **Kartenbilder** in `docs/images/karte-*.png` sind keine Screenshots, sondern HTML-Nachbauten der HA-Karten, gerendert mit Chrome headless aus den Werten in `tests/fixtures/response.json`. Sie zeigen nur, was die Karte mit diesen Daten tatsächlich anzeigt — z. B. Niederschlag in der Vorhersage erst ab einem Wert über 0, wie im HA-Frontend. Ändert sich eine Beispielkarte im README, das Bild mitziehen oder durch einen echten Screenshot ersetzen.
 
 ## Verzeichnisstruktur
 
@@ -139,6 +149,8 @@ custom_components/kraichtal_wetter/
 └── brand/               # 4 Brand-Icons (icon + @2x + dark_*), lokale Auslieferung seit HA 2026.3
 hacs.json                # HACS-Metadaten
 docs/API.md              # Was die Integration von der API nutzt — und was die API sonst hergibt
+docs/ENTITAETEN.md       # Alle Entitäten, Attribute, Grenzen der Datenquelle (aus der README ausgelagert)
+docs/images/             # Kartenbilder für die README
 Plan.md                  # Umsetzungsplan: Reihenfolge, Stand, Entscheidungen
 lovelace/                # Beispiel-Dashboards
 tests/                   # pytest-Suite, fixtures/response.json ist eine echte API-Antwort
@@ -188,4 +200,4 @@ Die früheren `logo*.png` waren quadratische Kopien der Icons in 512/1024 px und
 
 Fazit: Am Repo ist nichts zu tun. Sobald HACS die lokale Brands-API übernimmt, erscheint das Icon ohne Zutun. Auch die Aufnahme in den HACS-Standardkatalog ändert daran nichts — Icon-Auslieferung und Katalogliste sind getrennte Systeme.
 
-Dokumentation nur im Root-`README.md` pflegen; im Integrationsordner liegt bewusst keine zweite README mehr.
+Dokumentation im Root-`README.md` und in `docs/` pflegen; im Integrationsordner liegt bewusst keine zweite README mehr.
