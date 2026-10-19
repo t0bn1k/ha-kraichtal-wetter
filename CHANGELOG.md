@@ -2,6 +2,21 @@
 
 Alle signifikanten Änderungen an dieser Integration werden hier festgehalten.
 
+## [0.13.1] - 2026-10-19
+### ✨ Hinzugefügt
+- 🎉 **Kraichtal Wetter steht jetzt im HACS-Standardkatalog.** Neu
+  Installierende finden die Integration direkt über die Suche in HACS, das
+  Hinzufügen als benutzerdefiniertes Repository entfällt.
+
+### 📝 Dokumentation
+- 📝 README für Anwender überarbeitet: was die Integration kann, API-Key,
+  Installation, Beispielkarten. Die Beispielkarten zeigen jetzt ein Bild.
+- 📝 Entitäten, Attribute und Grenzen der Datenquelle stehen jetzt in
+  [docs/ENTITAETEN.md](https://github.com/t0bn1k/ha-kraichtal-wetter/blob/main/docs/ENTITAETEN.md).
+
+An der Integration selbst ändert sich nichts. Wer sie schon als
+benutzerdefiniertes Repository eingerichtet hat, muss nichts tun.
+
 ## [0.13.0] - 2026-10-07
 ### ✨ Hinzugefügt
 - 🌡️ **Vorhersage für morgen als eigene Sensoren:** „Prognose morgen Tmax“,

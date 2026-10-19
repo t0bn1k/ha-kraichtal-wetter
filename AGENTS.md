@@ -1,4 +1,4 @@
-# Kraichtal Wetter — HACS Custom Component
+# Kraichtal Wetter — HACS-Integration
 
 ## Repo-Übersicht
 
@@ -63,7 +63,7 @@ Wenn eine neue Funktion eine bisher ungenutzte Sektion braucht, gehört sie in `
 ## CI / Release
 
 - `.github/workflows/release.yml` — Tag `v*.*.*` erzeugt GitHub Release mit automatisch extrahiertem Changelog-Eintrag.
-- `.github/workflows/validate.yml` — HACS-Action und Hassfest (Push auf `main`, PR, nächtlich). Voraussetzung für die Aufnahme in den HACS-Standardkatalog.
+- `.github/workflows/validate.yml` — HACS-Action und Hassfest (Push auf `main`, PR, nächtlich). Voraussetzung für den HACS-Standardkatalog (aufgenommen am 19.10.2026) — wer dort rot wird, riskiert die Aufnahme.
 - `.github/workflows/tests.yml` — ruff und pytest gegen den Pin, dazu pytest gegen die Mindestversion aus `hacs.json` (Push auf `main`, PR). Push ist auf `main` beschränkt, weil Branches ihren Lauf über den PR bekommen — sonst liefe jeder PR-Commit doppelt.
 - `.github/workflows/tests-latest.yml` — pytest wöchentlich (und auf Zuruf) gegen die neueste Plugin-Version, siehe „Tests → Versionen". Bewusst ein eigener Workflow: Rot heißt dort „nächste HA-Version bricht etwas", rot bei „Tests" heißt immer „`main` ist kaputt".
 - `.github/dependabot.yml` — nur GitHub Actions, wöchentlich, kein Auto-Merge. `requirements_test.txt` bleibt bewusst Handarbeit: Das Plugin veröffentlicht auch Versionen, die HA-Betas pinnen (0.13.358–0.13.362 = 2026.9.0b0–b6), und Dependabot würde den Test-Pin in einer Betawoche auf eine Beta heben.
@@ -106,13 +106,15 @@ Thematisch zum Beispiel: 🌡️ Temperatur · 🌧️ Niederschlag · 💨 Wind
 
 ### Badges
 
-Seit dem 09.10.2026 trägt der README-Kopf nur noch drei Badges: **HACS Custom**, **Release** und **Tests** (`tests.yml`). Bewusst entfernt, weil sie Nutzern nichts sagen: Sterne, Lizenz (steht im Fuß), Validate (deckt sich für Leser mit Tests) und der Badge „Entwickelt mit Claude Code“. Die Selbstauskunft dazu steht weiter im README, als Textzeile im Fuß, passend zu den `Co-Authored-By`-Zeilen in den Commits.
+Seit dem 09.10.2026 trägt der README-Kopf nur noch drei Badges: **HACS Default** (bis 19.10.2026 „HACS Custom“), **Release** und **Tests** (`tests.yml`). Bewusst entfernt, weil sie Nutzern nichts sagen: Sterne, Lizenz (steht im Fuß), Validate (deckt sich für Leser mit Tests) und der Badge „Entwickelt mit Claude Code“. Die Selbstauskunft dazu steht weiter im README, als Textzeile im Fuß, passend zu den `Co-Authored-By`-Zeilen in den Commits.
+
+Stil seit dem 19.10.2026 einheitlich `style=flat`, der Standard von shields.io (vorher `for-the-badge`). Neue Badges im selben Stil anlegen, sonst passen sie nicht zueinander.
 
 ### Installations-Badge
 
-Der Installations-Badge liest `https://analytics.home-assistant.io/custom_integrations.json` unter `$.kraichtal_wetter.total`. Dort ist die Domain noch **nicht** enthalten — die Liste erfasst Integrationen, die auf Instanzen mit Analytics-Opt-in laufen, praktisch also erst nach Aufnahme in den HACS-Standardkatalog. Bis dahin zeigt der Badge grau „no result"; er springt ohne weiteres Zutun auf eine Zahl um, sobald die Domain in der Datei auftaucht. Bewusst so eingebaut statt später nachgerüstet (Stand 17.09.2026).
+Der Installations-Badge liest `https://analytics.home-assistant.io/custom_integrations.json` unter `$.kraichtal_wetter.total`. Die Liste erfasst Integrationen, die auf Instanzen mit Analytics-Opt-in laufen, praktisch also erst nach Aufnahme in den HACS-Standardkatalog. Fehlt die Domain dort, zeigt der Badge grau „no result"; sobald sie auftaucht, springt er ohne weiteres Zutun auf eine Zahl um.
 
-**Seit dem 07.10.2026 steht er im README auskommentiert**, weil „no result" wie ein Defekt wirkt. Nach der Aufnahme in den Katalog den Kommentar um die Zeile entfernen.
+**Seit dem 07.10.2026 steht er im README auskommentiert**, weil „no result" wie ein Defekt wirkt. Die Aufnahme in den Katalog (19.10.2026) allein reicht nicht: Den Kommentar erst entfernen, wenn `kraichtal_wetter` tatsächlich in der Datei steht — am Tag der Aufnahme war das noch nicht so. Offener Punkt in `Plan.md`, „Außerhalb des Codes".
 
 Die Zahl sind gemeldete **aktive Installationen**, keine Downloads — daher das Label „Installationen".
 
@@ -198,6 +200,6 @@ Die früheren `logo*.png` waren quadratische Kopien der Icons in 512/1024 px und
 - **Ein Brands-PR behebt das nicht.** `home-assistant/brands` nimmt seit 2026.3 keine Icons für Custom-Integrationen mehr an — unser PR dort ([#10964](https://github.com/home-assistant/brands/pull/10964), 13.08.2026) wurde eine Minute nach dem Öffnen automatisch geschlossen.
 - **Ein Issue anzulegen ist ebenfalls überflüssig.** Vier offene Meldungen decken den Fall bereits ab: hacs/integration [#5171](https://github.com/hacs/integration/issues/5171), [#5179](https://github.com/hacs/integration/issues/5179), [#5223](https://github.com/hacs/integration/issues/5223), [#5402](https://github.com/hacs/integration/issues/5402) (letzteres mit Label `issue:frontend`). Alle seit März bzw. Juli 2026 offen, bislang ohne Reaktion der Maintainer.
 
-Fazit: Am Repo ist nichts zu tun. Sobald HACS die lokale Brands-API übernimmt, erscheint das Icon ohne Zutun. Auch die Aufnahme in den HACS-Standardkatalog ändert daran nichts — Icon-Auslieferung und Katalogliste sind getrennte Systeme.
+Fazit: Am Repo ist nichts zu tun. Sobald HACS die lokale Brands-API übernimmt, erscheint das Icon ohne Zutun. Auch die Aufnahme in den HACS-Standardkatalog (19.10.2026) ändert daran nichts — Icon-Auslieferung und Katalogliste sind getrennte Systeme.
 
 Dokumentation im Root-`README.md` und in `docs/` pflegen; im Integrationsordner liegt bewusst keine zweite README mehr.
