@@ -1,6 +1,6 @@
 # Plan
 
-Stand: 07.10.2026 · veröffentlicht: 0.13.0 · API v1.5
+Stand: 19.10.2026 · veröffentlicht: 0.13.0 · API v1.5
 
 Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die API liefert, steht in [`docs/API.md`](docs/API.md) — dort nachsehen, bevor ein Punkt umgesetzt wird (siehe `AGENTS.md`). Erledigtes abhaken und die Version dazuschreiben.
 
@@ -273,8 +273,9 @@ Der Betreiber hat am 17.09.2026 auf unsere Anregung hin zugesagt, neben `label` 
 
 ## Außerhalb des Codes
 
-- [ ] **HACS-Standardkatalog:** [hacs/default#10787](https://github.com/hacs/default/pull/10787) ist offen, kein Entwurf, alle Checks grün, `mergeable`. Der PR zeigt `CHANGES_REQUESTED` — das ist die automatische Prüfung des hacs-bot vom 09.09.2026 wegen „HACS" im damaligen Repo-Namen `kraichtal-wetter-hacs`. Längst erledigt: Das Repo heißt `t0bn1k/ha-kraichtal-wetter`, der PR wurde elf Minuten nach der Prüfung auf den neuen Namen umgestellt. Der Status bleibt stehen, bis ein Maintainer ihn verwirft; eine menschliche Rückfrage gibt es nicht (geprüft 24.09.2026). Davor stehen 904 ältere offene Nicht-Draft-PRs (17.09.2026) — genau die Sortierung, auf die der hacs-bot verlinkt. Die Position bewegt sich kaum, weil etwa so viele PRs nachkommen wie gemergt werden (203 Merges in 30 Tagen). Streng der Reihe nach wird aber nicht gearbeitet: zuletzt gemergte Katalog-PRs lagen 5–11 Wochen zwischen Erstellung und Merge, die 904 sind also Obergrenze, nicht Wartezeit. Nicht kommentieren — der Bot bittet ausdrücklich darum.
-- [ ] **Nach dem Merge:** Installationsanleitung vom benutzerdefinierten Repository auf die Katalogsuche umstellen und den HACS-Badge von „Custom" auf „Default" ziehen. Sterne- und Installations-Badge stehen seit 17.09.2026 im README (`AGENTS.md`); den Installations-Badge im README wieder einschalten (seit 07.10.2026 auskommentiert, solange er nur „no result" zeigt); er füllt sich dann von selbst, sobald `kraichtal_wetter` in den HA-Analytics auftaucht.
+- [x] **HACS-Standardkatalog** (19.10.2026): [hacs/default#10787](https://github.com/hacs/default/pull/10787), eingereicht am 09.09.2026, von frenck freigegeben und gemergt — gut sechs Wochen, mitten in den geschätzten 5–11. Das `CHANGES_REQUESTED` des hacs-bot wegen „HACS" im damaligen Repo-Namen hat bis zum Merge niemand angefasst; es wurde dabei verworfen, eine Rückfrage gab es nie.
+- [x] **Nach dem Merge** (19.10.2026): HACS-Badge auf „Default", Installationsanleitung auf die Katalogsuche umgestellt, der Hinweis auf benutzerdefinierte Repositorys ist raus. In der HACS-Ansicht erscheint das erst mit dem nächsten Release (`AGENTS.md`, „README in der HACS-Ansicht").
+- [ ] **Installations-Badge einschalten**, sobald `kraichtal_wetter` in [`custom_integrations.json`](https://analytics.home-assistant.io/custom_integrations.json) steht — am 19.10.2026 noch nicht (4306 Einträge). Bis dahin bleibt er im README auskommentiert, eingeschaltet zeigte er nur „no result". Prüfen: `curl -s https://analytics.home-assistant.io/custom_integrations.json | jq .kraichtal_wetter`.
 - **Icon in HACS:** fehlt, ist bekannt und nicht am Repo zu lösen (`AGENTS.md`).
 - [x] **Anfrage an den API-Betreiber** (gestellt und beantwortet am 17.09.2026). Zwei Fragen in einem Schreiben, das bewusst **nicht** im Repo liegt — es ist ein Brief, kein Projektdokument. Beide Antworten stehen in [`docs/API.md`](docs/API.md), beide offenen Punkte sind damit erledigt:
   1. **Beschriftung der wiederholten Stunde:** ein einziges `"02:00"`, kein doppeltes — 24 feste Slots pro Kalendertag, zwei Instanzen werden gemittelt (Punkt 4). Die Anregung, je Eintrag einen eindeutigen Zeitpunkt mitzuliefern, hat der Betreiber als Feld `time` angenommen; wir nutzen es nicht (Punkt 9).
