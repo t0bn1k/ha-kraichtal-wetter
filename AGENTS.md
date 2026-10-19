@@ -102,11 +102,13 @@ Seit 0.8.0 tragen die Abschnittsüberschriften ein festes Icon, jeder Eintrag zu
 | Getestet / Bestätigt | ✅ |
 | Bekannt | ℹ️ |
 
+Muss man nach dem Update etwas tun, steht „⚠️ Nach dem Update zu tun“ **als erster Abschnitt** des Eintrags: Der Marketplace zeigt den Release-Text im Update-Eintrag, und dort soll das zuerst zu lesen sein (siehe „Marketplace ab HA 2026.11“).
+
 Thematisch zum Beispiel: 🌡️ Temperatur · 🌧️ Niederschlag · 💨 Wind · 🌬️ Böen · 🚨 DWD-Warnungen · 🕒 Zeit · 🌐 Übersetzung · 📝 Doku · 🧪 Tests.
 
 ### Badges
 
-Seit dem 09.10.2026 trägt der README-Kopf nur noch drei Badges: **HACS Default** (bis 19.10.2026 „HACS Custom“), **Release** und **Tests** (`tests.yml`). Bewusst entfernt, weil sie Nutzern nichts sagen: Sterne, Lizenz (steht im Fuß), Validate (deckt sich für Leser mit Tests) und der Badge „Entwickelt mit Claude Code“. Die Selbstauskunft dazu steht weiter im README, als Textzeile im Fuß, passend zu den `Co-Authored-By`-Zeilen in den Commits.
+Seit dem 09.10.2026 trägt der README-Kopf nur noch drei Badges: **HACS Default** (bis 19.10.2026 „HACS Custom“; verlinkt auf den Katalog `hacs/default`, den auch der Marketplace liest — nicht auf `hacs/integration`, das ab 2026.11 abgelöst ist), **Release** und **Tests** (`tests.yml`). Bewusst entfernt, weil sie Nutzern nichts sagen: Sterne, Lizenz (steht im Fuß), Validate (deckt sich für Leser mit Tests) und der Badge „Entwickelt mit Claude Code“. Die Selbstauskunft dazu steht weiter im README, als Textzeile im Fuß, passend zu den `Co-Authored-By`-Zeilen in den Commits.
 
 Stil seit dem 19.10.2026 einheitlich `style=flat`, der Standard von shields.io (vorher `for-the-badge`). Neue Badges im selben Stil anlegen, sonst passen sie nicht zueinander.
 
@@ -120,9 +122,22 @@ Die Zahl sind gemeldete **aktive Installationen**, keine Downloads — daher das
 
 Ein GitHub-Downloadzähler (`img.shields.io/github/downloads/.../total`) hilft nicht: Er zählt nur hochgeladene Release-Assets, und unsere Releases tragen keine. Das ließe sich nur mit `zip_release` in `hacs.json` plus einem Zip-Asset in `release.yml` ändern — was den Installationsweg umstellt und deshalb nicht gemacht wurde.
 
+### Marketplace ab HA 2026.11
+
+Mit Home Assistant 2026.11 ersetzt der eingebaute **Marketplace** (`Einstellungen → Marketplace`) HACS. Er liest denselben Katalog (`hacs/default`) und dieselbe `hacs.json`, unsere Aufnahme gilt also weiter; bestehende HACS-Installationen werden automatisch übernommen. Entwicklerdoku: <https://contributors.home-assistant.io/marketplace/>. Was er verlangt und wie wir es erfüllen (geprüft 19.10.2026):
+
+- **Version = Tag des neuesten veröffentlichten GitHub-Releases**, ein bloßer Tag reicht nicht. `manifest.json` → `version` muss dazu passen, ohne `version` verweigert er die Installation. Beides sichert der Release-Ablauf oben.
+- **`homeassistant` in `hacs.json`** wird je Release ausgewertet: Instanzen unterhalb des Minimums bekommen ältere, passende Releases angeboten. Alte Releases deshalb nicht löschen.
+- **Release-Notes** zeigt der Marketplace im Update-Eintrag, und zwar den Text des GitHub-Releases — bei uns der extrahierte CHANGELOG-Eintrag. Deshalb steht „⚠️ Nach dem Update zu tun“ künftig **als erster Abschnitt** eines Eintrags.
+- **`strings.json`** nutzen Custom-Integrationen laut Marketplace-Doku nicht, hassfest validiert sie aber weiterhin, wenn sie existiert (`script/hassfest/translations.py`). Sie bleibt deshalb vorerst; maßgeblich zur Laufzeit sind `translations/`, mit vollständiger `en.json`.
+- **`country`** wird vom Marketplace ignoriert, schadet nicht.
+- **Zeitverzug:** Die Katalogdaten entstehen alle 4 Stunden, der Marketplace liest sie alle 6 Stunden — ein Release erreicht Nutzer also mit bis zu ~10 Stunden Verspätung.
+- **README:** Laut Doku zeigt der Marketplace eine Beschreibung und Links zu Quellcode und Issues, keine README. Der folgende Abschnitt gilt damit nur noch für HACS bis 2026.10. Mit der ersten 2026.11-Beta prüfen, was tatsächlich angezeigt wird.
+- Der My-Button `hacs_repository` im README öffnet laut Doku das Repo im Marketplace — bleibt, weil er für beide Wege funktioniert.
+
 ### README in der HACS-Ansicht
 
-Die HACS-Oberfläche zeigt **nicht** die README von `main`. `HacsRepository.get_documentation()` (`custom_components/hacs/repositories/base.py`) setzt bei einer installierten Integration `target_version = installed_version` und lädt `https://raw.githubusercontent.com/<repo>/<tag>/README.md`. README-Änderungen werden dort also erst mit dem **nächsten Release** sichtbar — „Update information" in HACS hilft nicht, weil der Tag derselbe bleibt.
+Gilt für HACS bis HA 2026.10, siehe „Marketplace ab HA 2026.11“. Die HACS-Oberfläche zeigt **nicht** die README von `main`. `HacsRepository.get_documentation()` (`custom_components/hacs/repositories/base.py`) setzt bei einer installierten Integration `target_version = installed_version` und lädt `https://raw.githubusercontent.com/<repo>/<tag>/README.md`. README-Änderungen werden dort also erst mit dem **nächsten Release** sichtbar — „Update information" in HACS hilft nicht, weil der Tag derselbe bleibt.
 
 Alle Links im README deshalb **absolut** halten. Relative Ziele wie `](LICENSE)` lösen sich in HACS gegen die Home-Assistant-URL auf und gehen ins Leere; beim Lizenz-Badge blieb außerdem das Bild leer, solange sein Linkziel relativ war.
 
@@ -201,5 +216,7 @@ Die früheren `logo*.png` waren quadratische Kopien der Icons in 512/1024 px und
 - **Ein Issue anzulegen ist ebenfalls überflüssig.** Vier offene Meldungen decken den Fall bereits ab: hacs/integration [#5171](https://github.com/hacs/integration/issues/5171), [#5179](https://github.com/hacs/integration/issues/5179), [#5223](https://github.com/hacs/integration/issues/5223), [#5402](https://github.com/hacs/integration/issues/5402) (letzteres mit Label `issue:frontend`). Alle seit März bzw. Juli 2026 offen, bislang ohne Reaktion der Maintainer.
 
 Fazit: Am Repo ist nichts zu tun. Sobald HACS die lokale Brands-API übernimmt, erscheint das Icon ohne Zutun. Auch die Aufnahme in den HACS-Standardkatalog (19.10.2026) ändert daran nichts — Icon-Auslieferung und Katalogliste sind getrennte Systeme.
+
+**Ab HA 2026.11 erledigt sich das voraussichtlich von selbst:** HACS wird durch den Marketplace ersetzt, der in Home Assistant selbst läuft. Seine Doku nennt `brand/` im Integrationsordner als den richtigen Ort und sagt, dass Home Assistant die Bilder nach der Installation anzeigt. Ob der Marketplace das Icon auch **vor** der Installation (in Suche und Detailseite) zeigt, sagt sie nicht eindeutig — mit der ersten 2026.11-Beta ansehen und diesen Abschnitt dann umschreiben. Offener Punkt in `Plan.md`, Punkt 17.
 
 Dokumentation im Root-`README.md` und in `docs/` pflegen; im Integrationsordner liegt bewusst keine zweite README mehr.
