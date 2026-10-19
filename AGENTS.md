@@ -108,6 +108,8 @@ Thematisch zum Beispiel: 🌡️ Temperatur · 🌧️ Niederschlag · 💨 Wind
 
 Seit dem 09.10.2026 trägt der README-Kopf nur noch drei Badges: **HACS Default** (bis 19.10.2026 „HACS Custom“), **Release** und **Tests** (`tests.yml`). Bewusst entfernt, weil sie Nutzern nichts sagen: Sterne, Lizenz (steht im Fuß), Validate (deckt sich für Leser mit Tests) und der Badge „Entwickelt mit Claude Code“. Die Selbstauskunft dazu steht weiter im README, als Textzeile im Fuß, passend zu den `Co-Authored-By`-Zeilen in den Commits.
 
+Stil seit dem 19.10.2026 einheitlich `style=flat`, der Standard von shields.io (vorher `for-the-badge`). Neue Badges im selben Stil anlegen, sonst passen sie nicht zueinander.
+
 ### Installations-Badge
 
 Der Installations-Badge liest `https://analytics.home-assistant.io/custom_integrations.json` unter `$.kraichtal_wetter.total`. Die Liste erfasst Integrationen, die auf Instanzen mit Analytics-Opt-in laufen, praktisch also erst nach Aufnahme in den HACS-Standardkatalog. Fehlt die Domain dort, zeigt der Badge grau „no result"; sobald sie auftaucht, springt er ohne weiteres Zutun auf eine Zahl um.

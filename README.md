@@ -1,10 +1,10 @@
 # Kraichtal Wetter
 
-[![HACS Default](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
-[![Release](https://img.shields.io/github/v/release/t0bn1k/ha-kraichtal-wetter?style=for-the-badge)](https://github.com/t0bn1k/ha-kraichtal-wetter/releases)
-[![Tests](https://img.shields.io/github/actions/workflow/status/t0bn1k/ha-kraichtal-wetter/tests.yml?style=for-the-badge&label=tests)](https://github.com/t0bn1k/ha-kraichtal-wetter/actions/workflows/tests.yml)
+[![HACS Default](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=flat)](https://github.com/hacs/integration)
+[![Release](https://img.shields.io/github/v/release/t0bn1k/ha-kraichtal-wetter?style=flat)](https://github.com/t0bn1k/ha-kraichtal-wetter/releases)
+[![Tests](https://img.shields.io/github/actions/workflow/status/t0bn1k/ha-kraichtal-wetter/tests.yml?style=flat&label=tests)](https://github.com/t0bn1k/ha-kraichtal-wetter/actions/workflows/tests.yml)
 <!-- Installationen-Badge: erst einschalten, wenn "kraichtal_wetter" in custom_integrations.json steht, vorher zeigt er nur "no result"
-[![Installationen](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fanalytics.home-assistant.io%2Fcustom_integrations.json&query=%24.kraichtal_wetter.total&label=Installationen&color=41BDF5&style=for-the-badge)](https://analytics.home-assistant.io/)
+[![Installationen](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fanalytics.home-assistant.io%2Fcustom_integrations.json&query=%24.kraichtal_wetter.total&label=Installationen&color=41BDF5&style=flat)](https://analytics.home-assistant.io/)
 -->
 
 Bringt die Wetterstation von [kraichtal-wetter.de](https://kraichtal-wetter.de) in dein Home Assistant: aktuelle Messwerte, die Tageswerte der Station und eine Vorhersage für die nächsten Stunden und Tage.
