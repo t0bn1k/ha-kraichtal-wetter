@@ -1,6 +1,6 @@
 # Plan
 
-Stand: 19.10.2026 · veröffentlicht: 0.13.0 · API v1.5
+Stand: 19.10.2026 · veröffentlicht: 0.13.1 · API v1.5
 
 Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die API liefert, steht in [`docs/API.md`](docs/API.md) — dort nachsehen, bevor ein Punkt umgesetzt wird (siehe `AGENTS.md`). Erledigtes abhaken und die Version dazuschreiben.
 
@@ -21,6 +21,7 @@ Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die AP
 | 13 | Test gegen die Mindestversion | erledigt — ohne Release | – |
 | 14 | Geräte-Link, `runtime_data`, `PARALLEL_UPDATES` | veröffentlicht | 0.12.3 |
 | 15 | Tagesvorhersage heute/morgen als Sensoren | veröffentlicht | 0.13.0 |
+| 16 | README für Anwender, HACS-Standardkatalog | veröffentlicht | 0.13.1 |
 | – | ETag / `If-None-Match` | verworfen | – |
 
 ## 1. Niederschlag und Prognose-Sensoren korrigieren
@@ -250,6 +251,14 @@ Der Betreiber hat am 17.09.2026 auf unsere Anregung hin zugesagt, neben `label` 
 - [x] Tests: Werte aller Sensoren aus der Fixture, Tag 0 und 1 nicht vertauscht, kurzes `days`-Array ergibt `unknown`, State-Classes, deutsche IDs
 - [x] 109 Tests grün gegen 2026.9.3 und 2026.3.1
 - [x] Release 0.13.0 (07.10.2026)
+
+## 16. README für Anwender, HACS-Standardkatalog (19.10.2026)
+
+**Warum:** HACS zeigt die README des installierten Tags, nicht die von `main` (`AGENTS.md`). Ohne Release sähen Nutzer weder die überarbeitete README noch den Hinweis, dass die Integration jetzt im Katalog steht — und neu Installierende weiter die Anleitung über benutzerdefinierte Repositorys. Reines Doku-Release, am Code ändert sich nichts.
+
+- [x] README entschlackt, Entitäten nach `docs/ENTITAETEN.md`, Beispielkarten als Bild (#13)
+- [x] Aufnahme in den Katalog nachgezogen: Badge „HACS Default", Installation über die Suche (#14)
+- [x] Release 0.13.1 (19.10.2026)
 
 ## Verworfen
 
