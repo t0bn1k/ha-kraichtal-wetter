@@ -268,6 +268,7 @@ Der Betreiber hat am 17.09.2026 auf unsere Anregung hin zugesagt, neben `label` 
 - [x] README: Installation über Marketplace und HACS, HACS-Badge verlinkt auf den Katalog statt auf `hacs/integration`
 - [x] Issue-Vorlage: Installationsweg „Marketplace“
 - [x] `AGENTS.md`: Anforderungen des Marketplace, „⚠️ Nach dem Update zu tun“ als erster Abschnitt im CHANGELOG
+- [x] `manifest.json`: `categories: ["weather_alerts"]`, damit die Integration im Marketplace unter „Weather & alerts“ auftaucht (24.10.2026, Begründung in `AGENTS.md`)
 - `strings.json` bleibt vorerst: hassfest validiert sie weiterhin, wenn sie existiert.
 - [ ] Mit der ersten 2026.11-Beta: `tests-latest.yml` grün? Installation über den Marketplace auf einer Testinstanz durchspielen; Icon vor der Installation, angezeigte Beschreibung statt README und Release-Notes ansehen, danach `AGENTS.md` („Das Icon fehlt in HACS“, „README in der HACS-Ansicht“) umschreiben.
 - [ ] Mit dem nächsten Release erreicht die README-Änderung auch die HACS-Ansicht. Ein eigenes Release nur dafür ist nicht nötig.

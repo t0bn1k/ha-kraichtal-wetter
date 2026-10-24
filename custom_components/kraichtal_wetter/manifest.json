@@ -1,6 +1,9 @@
 {
   "domain": "kraichtal_wetter",
   "name": "Kraichtal Wetter",
+  "categories": [
+    "weather_alerts"
+  ],
   "codeowners": [
     "@t0bn1k"
   ],

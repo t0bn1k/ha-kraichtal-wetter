@@ -10,6 +10,7 @@ Home-Assistant-Custom-Integration für die Kraichtal-Wetter-API. Kein Build-Syst
 - Das Minimum steht in `hacs.json` (`homeassistant`) und wird in der CI getestet (`requirements_test_min.txt`). Nur beide zusammen ändern.
 - Plattformen: `sensor`, `weather`
 - Keine externen Abhängigkeiten (`requirements: []`)
+- Kategorie: `categories: ["weather_alerts"]` (seit 24.10.2026). Der Marketplace-Katalog übernimmt sie in seine Daten. Bewusst die Kategorie allein, nicht `weather_alerts.forecasts`: Die [Kategorie-Doku](https://contributors.home-assistant.io/core/integrations/categories/) nennt für Wetterstationen ausdrücklich „Weather & alerts on its own“, und wer mehr als eine Unterkategorie abdeckt (hier Messung und Vorhersage), nimmt die Kategorie. hassfest kennt das Feld für Custom-Integrationen erst seit `dev` vom 17.10.2026 (core#187008), die HACS-Action prüft die Werte.
 
 ## Die API ist die Referenz — vorab prüfen
 
