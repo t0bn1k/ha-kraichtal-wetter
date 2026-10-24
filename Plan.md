@@ -1,6 +1,6 @@
 # Plan
 
-Stand: 19.10.2026 · veröffentlicht: 0.13.1 · API v1.5
+Stand: 24.10.2026 · veröffentlicht: 0.13.1 · API v1.5
 
 Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die API liefert, steht in [`docs/API.md`](docs/API.md) — dort nachsehen, bevor ein Punkt umgesetzt wird (siehe `AGENTS.md`). Erledigtes abhaken und die Version dazuschreiben.
 
@@ -22,6 +22,7 @@ Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die AP
 | 14 | Geräte-Link, `runtime_data`, `PARALLEL_UPDATES` | veröffentlicht | 0.12.3 |
 | 15 | Tagesvorhersage heute/morgen als Sensoren | veröffentlicht | 0.13.0 |
 | 16 | README für Anwender, HACS-Standardkatalog | veröffentlicht | 0.13.1 |
+| 17 | Vorbereitung auf den Marketplace (HA 2026.11) | in Arbeit | – |
 | – | ETag / `If-None-Match` | verworfen | – |
 
 ## 1. Niederschlag und Prognose-Sensoren korrigieren
@@ -260,6 +261,18 @@ Der Betreiber hat am 17.09.2026 auf unsere Anregung hin zugesagt, neben `label` 
 - [x] Aufnahme in den Katalog nachgezogen: Badge „HACS Default", Installation über die Suche (#14)
 - [x] Release 0.13.1 (19.10.2026)
 
+## 17. Vorbereitung auf den Marketplace (HA 2026.11)
+
+**Warum:** Mit Home Assistant 2026.11 ersetzt der eingebaute Marketplace HACS. Er nutzt denselben Katalog und dieselbe `hacs.json`, unsere Aufnahme gilt also weiter, prüft aber strenger. Abgleich mit der [Entwicklerdoku](https://contributors.home-assistant.io/marketplace/) am 19.10.2026: Alle Anforderungen sind erfüllt (Release mit passender `version`, `hacs.json` mit `name` und `homeassistant`, `issue_tracker`, `brand/`, vollständige `en.json`, hassfest und HACS-Action grün). Am Code ändert sich nichts, Details in `AGENTS.md`, „Marketplace ab HA 2026.11“.
+
+- [x] README: Installation über Marketplace und HACS, HACS-Badge verlinkt auf den Katalog statt auf `hacs/integration`
+- [x] Issue-Vorlage: Installationsweg „Marketplace“
+- [x] `AGENTS.md`: Anforderungen des Marketplace, „⚠️ Nach dem Update zu tun“ als erster Abschnitt im CHANGELOG
+- [ ] `manifest.json`: `categories: ["weather_alerts"]`, damit die Integration im Marketplace unter „Weather & alerts“ auftaucht. Erst wenn das hassfest-Image das Feld kennt, voraussichtlich ab 2026.11.0; am 24.10.2026 mit 2026.10.3 noch abgelehnt (`AGENTS.md`, „Domain & Manifest“). Prüfen: Feld eintragen, Hassfest im PR muss grün sein.
+- `strings.json` bleibt vorerst: hassfest validiert sie weiterhin, wenn sie existiert.
+- [ ] Mit der ersten 2026.11-Beta: `tests-latest.yml` grün? Installation über den Marketplace auf einer Testinstanz durchspielen; Icon vor der Installation, angezeigte Beschreibung statt README und Release-Notes ansehen, danach `AGENTS.md` („Das Icon fehlt in HACS“, „README in der HACS-Ansicht“) umschreiben.
+- [ ] Mit dem nächsten Release erreicht die README-Änderung auch die HACS-Ansicht. Ein eigenes Release nur dafür ist nicht nötig.
+
 ## Verworfen
 
 - **Feld `time` in `hours`:** siehe Punkt 9 — die Rückrechnung ist bestätigt und reicht.
@@ -284,8 +297,9 @@ Der Betreiber hat am 17.09.2026 auf unsere Anregung hin zugesagt, neben `label` 
 
 - [x] **HACS-Standardkatalog** (19.10.2026): [hacs/default#10787](https://github.com/hacs/default/pull/10787), eingereicht am 09.09.2026, von frenck freigegeben und gemergt — gut sechs Wochen, mitten in den geschätzten 5–11. Das `CHANGES_REQUESTED` des hacs-bot wegen „HACS" im damaligen Repo-Namen hat bis zum Merge niemand angefasst; es wurde dabei verworfen, eine Rückfrage gab es nie.
 - [x] **Nach dem Merge** (19.10.2026): HACS-Badge auf „Default", Installationsanleitung auf die Katalogsuche umgestellt, der Hinweis auf benutzerdefinierte Repositorys ist raus. In der HACS-Ansicht erscheint das erst mit dem nächsten Release (`AGENTS.md`, „README in der HACS-Ansicht").
-- [ ] **Installations-Badge einschalten**, sobald `kraichtal_wetter` in [`custom_integrations.json`](https://analytics.home-assistant.io/custom_integrations.json) steht — am 19.10.2026 noch nicht (4306 Einträge). Bis dahin bleibt er im README auskommentiert, eingeschaltet zeigte er nur „no result". Prüfen: `curl -s https://analytics.home-assistant.io/custom_integrations.json | jq .kraichtal_wetter`.
-- **Icon in HACS:** fehlt, ist bekannt und nicht am Repo zu lösen (`AGENTS.md`).
+- [x] **Installations-Badge eingeschaltet** (24.10.2026): `kraichtal_wetter` steht jetzt in [`custom_integrations.json`](https://analytics.home-assistant.io/custom_integrations.json), am 24.10.2026 mit 1 Installation (0.13.1). Am 19.10.2026 fehlte die Domain noch; bis dahin war der Badge auskommentiert, weil er nur „no result" zeigte.
+- [x] **Im Store sichtbar** (19.10.2026): seit dem Lauf um 17:41 UTC in den HACS-Katalogdaten (`data-v2.hacs.xyz/integration/data.json`), gut neun Stunden nach dem Merge.
+- **Icon in HACS:** fehlt, ist bekannt und nicht am Repo zu lösen (`AGENTS.md`). Mit dem Marketplace ab 2026.11 voraussichtlich erledigt, siehe Punkt 17.
 - [x] **Anfrage an den API-Betreiber** (gestellt und beantwortet am 17.09.2026). Zwei Fragen in einem Schreiben, das bewusst **nicht** im Repo liegt — es ist ein Brief, kein Projektdokument. Beide Antworten stehen in [`docs/API.md`](docs/API.md), beide offenen Punkte sind damit erledigt:
   1. **Beschriftung der wiederholten Stunde:** ein einziges `"02:00"`, kein doppeltes — 24 feste Slots pro Kalendertag, zwei Instanzen werden gemittelt (Punkt 4). Die Anregung, je Eintrag einen eindeutigen Zeitpunkt mitzuliefern, hat der Betreiber als Feld `time` angenommen; wir nutzen es nicht (Punkt 9).
   2. **`*_today` gilt nur für die restlichen Stunden:** bestätigt, samt Mechanismus (Punkt 1). Der Betreiber schärft die Beschreibung in seiner Doku nach.

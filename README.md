@@ -1,11 +1,9 @@
 # Kraichtal Wetter
 
-[![HACS Default](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=flat)](https://github.com/hacs/integration)
+[![HACS Default](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=flat)](https://github.com/hacs/default)
 [![Release](https://img.shields.io/github/v/release/t0bn1k/ha-kraichtal-wetter?style=flat)](https://github.com/t0bn1k/ha-kraichtal-wetter/releases)
 [![Tests](https://img.shields.io/github/actions/workflow/status/t0bn1k/ha-kraichtal-wetter/tests.yml?style=flat&label=tests)](https://github.com/t0bn1k/ha-kraichtal-wetter/actions/workflows/tests.yml)
-<!-- Installationen-Badge: erst einschalten, wenn "kraichtal_wetter" in custom_integrations.json steht, vorher zeigt er nur "no result"
 [![Installationen](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fanalytics.home-assistant.io%2Fcustom_integrations.json&query=%24.kraichtal_wetter.total&label=Installationen&color=41BDF5&style=flat)](https://analytics.home-assistant.io/)
--->
 
 Bringt die Wetterstation von [kraichtal-wetter.de](https://kraichtal-wetter.de) in dein Home Assistant: aktuelle Messwerte, die Tageswerte der Station und eine Vorhersage für die nächsten Stunden und Tage.
 
@@ -30,13 +28,13 @@ Dort gibst du einen Namen oder Verwendungszweck an (z. B. `Home-Assistant Mülle
 
 ## Installation
 
-1. **In HACS öffnen:** Klick auf den Button, er führt direkt zur Integration.
+1. **Integration öffnen:** Klick auf den Button, er führt direkt zur Integration — ab Home Assistant 2026.11 in den Marketplace, davor in HACS.
 
-   [![In HACS öffnen](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=t0bn1k&repository=ha-kraichtal-wetter&category=integration)
+   [![Im Marketplace bzw. in HACS öffnen](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=t0bn1k&repository=ha-kraichtal-wetter&category=integration)
 
-   <sub>Ohne Button: in HACS nach „Kraichtal Wetter“ suchen.</sub>
+   <sub>Ohne Button: unter `Einstellungen → Marketplace` (ab 2026.11) bzw. in HACS nach „Kraichtal Wetter“ suchen.</sub>
 
-2. **Herunterladen** und Home Assistant neu starten.
+2. **Installieren** und Home Assistant neu starten. Der Marketplace meldet einen nötigen Neustart unter `Einstellungen → System → Reparaturen`; beim ersten Öffnen fragt er außerdem einmal nach, ob du Inhalte installieren willst, die nicht vom Home-Assistant-Projekt stammen.
 
 3. **Integration einrichten** und den API-Key eingeben:
 
@@ -47,7 +45,7 @@ Dort gibst du einen Namen oder Verwendungszweck an (z. B. `Home-Assistant Mülle
 Fertig: Unter `Einstellungen → Geräte & Dienste` erscheint das Gerät **Kraichtal Wetter** mit der Wetter-Entität und allen Sensoren.
 
 <details>
-<summary>Ohne HACS installieren</summary>
+<summary>Manuell installieren (ohne Marketplace oder HACS)</summary>
 
 1. Den Ordner `custom_components/kraichtal_wetter` aus diesem Repository in das `custom_components`-Verzeichnis deiner Home-Assistant-Konfiguration kopieren.
 2. Home Assistant neu starten.
