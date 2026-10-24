@@ -1,6 +1,6 @@
 # Plan
 
-Stand: 19.10.2026 · veröffentlicht: 0.13.1 · API v1.5
+Stand: 24.10.2026 · veröffentlicht: 0.13.1 · API v1.5
 
 Dieses Dokument hält **Reihenfolge, Stand und Entscheidungen** fest. Was die API liefert, steht in [`docs/API.md`](docs/API.md) — dort nachsehen, bevor ein Punkt umgesetzt wird (siehe `AGENTS.md`). Erledigtes abhaken und die Version dazuschreiben.
 
@@ -296,7 +296,7 @@ Der Betreiber hat am 17.09.2026 auf unsere Anregung hin zugesagt, neben `label` 
 
 - [x] **HACS-Standardkatalog** (19.10.2026): [hacs/default#10787](https://github.com/hacs/default/pull/10787), eingereicht am 09.09.2026, von frenck freigegeben und gemergt — gut sechs Wochen, mitten in den geschätzten 5–11. Das `CHANGES_REQUESTED` des hacs-bot wegen „HACS" im damaligen Repo-Namen hat bis zum Merge niemand angefasst; es wurde dabei verworfen, eine Rückfrage gab es nie.
 - [x] **Nach dem Merge** (19.10.2026): HACS-Badge auf „Default", Installationsanleitung auf die Katalogsuche umgestellt, der Hinweis auf benutzerdefinierte Repositorys ist raus. In der HACS-Ansicht erscheint das erst mit dem nächsten Release (`AGENTS.md`, „README in der HACS-Ansicht").
-- [ ] **Installations-Badge einschalten**, sobald `kraichtal_wetter` in [`custom_integrations.json`](https://analytics.home-assistant.io/custom_integrations.json) steht — am 19.10.2026 noch nicht (4306 Einträge). Bis dahin bleibt er im README auskommentiert, eingeschaltet zeigte er nur „no result". Prüfen: `curl -s https://analytics.home-assistant.io/custom_integrations.json | jq .kraichtal_wetter`.
+- [x] **Installations-Badge eingeschaltet** (24.10.2026): `kraichtal_wetter` steht jetzt in [`custom_integrations.json`](https://analytics.home-assistant.io/custom_integrations.json), am 24.10.2026 mit 1 Installation (0.13.1). Am 19.10.2026 fehlte die Domain noch; bis dahin war der Badge auskommentiert, weil er nur „no result" zeigte.
 - [x] **Im Store sichtbar** (19.10.2026): seit dem Lauf um 17:41 UTC in den HACS-Katalogdaten (`data-v2.hacs.xyz/integration/data.json`), gut neun Stunden nach dem Merge.
 - **Icon in HACS:** fehlt, ist bekannt und nicht am Repo zu lösen (`AGENTS.md`). Mit dem Marketplace ab 2026.11 voraussichtlich erledigt, siehe Punkt 17.
 - [x] **Anfrage an den API-Betreiber** (gestellt und beantwortet am 17.09.2026). Zwei Fragen in einem Schreiben, das bewusst **nicht** im Repo liegt — es ist ein Brief, kein Projektdokument. Beide Antworten stehen in [`docs/API.md`](docs/API.md), beide offenen Punkte sind damit erledigt:

@@ -108,7 +108,7 @@ Thematisch zum Beispiel: 🌡️ Temperatur · 🌧️ Niederschlag · 💨 Wind
 
 ### Badges
 
-Seit dem 09.10.2026 trägt der README-Kopf nur noch drei Badges: **HACS Default** (bis 19.10.2026 „HACS Custom“; verlinkt auf den Katalog `hacs/default`, den auch der Marketplace liest — nicht auf `hacs/integration`, das ab 2026.11 abgelöst ist), **Release** und **Tests** (`tests.yml`). Bewusst entfernt, weil sie Nutzern nichts sagen: Sterne, Lizenz (steht im Fuß), Validate (deckt sich für Leser mit Tests) und der Badge „Entwickelt mit Claude Code“. Die Selbstauskunft dazu steht weiter im README, als Textzeile im Fuß, passend zu den `Co-Authored-By`-Zeilen in den Commits.
+Seit dem 09.10.2026 trägt der README-Kopf nur noch drei Badges (seit dem 24.10.2026 vier, siehe „Installations-Badge“): **HACS Default** (bis 19.10.2026 „HACS Custom“; verlinkt auf den Katalog `hacs/default`, den auch der Marketplace liest — nicht auf `hacs/integration`, das ab 2026.11 abgelöst ist), **Release** und **Tests** (`tests.yml`). Bewusst entfernt, weil sie Nutzern nichts sagen: Sterne, Lizenz (steht im Fuß), Validate (deckt sich für Leser mit Tests) und der Badge „Entwickelt mit Claude Code“. Die Selbstauskunft dazu steht weiter im README, als Textzeile im Fuß, passend zu den `Co-Authored-By`-Zeilen in den Commits.
 
 Stil seit dem 19.10.2026 einheitlich `style=flat`, der Standard von shields.io (vorher `for-the-badge`). Neue Badges im selben Stil anlegen, sonst passen sie nicht zueinander.
 
@@ -116,7 +116,7 @@ Stil seit dem 19.10.2026 einheitlich `style=flat`, der Standard von shields.io (
 
 Der Installations-Badge liest `https://analytics.home-assistant.io/custom_integrations.json` unter `$.kraichtal_wetter.total`. Die Liste erfasst Integrationen, die auf Instanzen mit Analytics-Opt-in laufen, praktisch also erst nach Aufnahme in den HACS-Standardkatalog. Fehlt die Domain dort, zeigt der Badge grau „no result"; sobald sie auftaucht, springt er ohne weiteres Zutun auf eine Zahl um.
 
-**Seit dem 07.10.2026 steht er im README auskommentiert**, weil „no result" wie ein Defekt wirkt. Die Aufnahme in den Katalog (19.10.2026) allein reicht nicht: Den Kommentar erst entfernen, wenn `kraichtal_wetter` tatsächlich in der Datei steht — am Tag der Aufnahme war das noch nicht so. Offener Punkt in `Plan.md`, „Außerhalb des Codes".
+**Vom 07.10. bis 24.10.2026 stand er im README auskommentiert**, weil „no result" wie ein Defekt wirkt. Die Aufnahme in den Katalog (19.10.2026) allein reichte nicht, am Tag der Aufnahme fehlte die Domain noch in der Datei. Seit dem 24.10.2026 steht sie dort (anfangs mit 1 Installation), der Badge ist eingeschaltet.
 
 Die Zahl sind gemeldete **aktive Installationen**, keine Downloads — daher das Label „Installationen".
 
