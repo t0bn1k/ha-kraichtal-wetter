@@ -10,7 +10,7 @@ Home-Assistant-Custom-Integration für die Kraichtal-Wetter-API. Kein Build-Syst
 - Das Minimum steht in `hacs.json` (`homeassistant`) und wird in der CI getestet (`requirements_test_min.txt`). Nur beide zusammen ändern.
 - Plattformen: `sensor`, `weather`
 - Keine externen Abhängigkeiten (`requirements: []`)
-- **Kategorie, noch nicht gesetzt:** Vorgesehen ist `categories: ["weather_alerts"]`. Der Marketplace-Katalog übernimmt die Kategorien in seine Daten. Bewusst die Kategorie allein, nicht `weather_alerts.forecasts`: Die [Kategorie-Doku](https://contributors.home-assistant.io/core/integrations/categories/) nennt für Wetterstationen ausdrücklich „Weather & alerts on its own“, und wer mehr als eine Unterkategorie abdeckt (hier Messung und Vorhersage), nimmt die Kategorie. **Erst eintragen, wenn hassfest das Feld kennt:** Für Custom-Integrationen gibt es es seit core#187008 (`dev`, 17.10.2026). Das Image `ghcr.io/home-assistant/hassfest` aus `validate.yml` folgt aber dem stabilen Release; am 24.10.2026 (2026.10.3) schlug es mit „not a valid option at 'categories'“ fehl. Die HACS-Action kennt das Feld schon und meldet sein Fehlen nur als Warnung. Offener Punkt in `Plan.md`, Punkt 17.
+- **Kategorie:** `categories: ["weather_alerts"]` (seit 0.13.2). Der Marketplace-Katalog übernimmt sie in seine Daten. Bewusst die Kategorie allein, nicht `weather_alerts.forecasts`: Die [Kategorie-Doku](https://contributors.home-assistant.io/core/integrations/categories/) nennt für Wetterstationen ausdrücklich „Weather & alerts on its own“, und wer mehr als eine Unterkategorie abdeckt (hier Messung und Vorhersage), nimmt die Kategorie. hassfest kennt das Feld für Custom-Integrationen erst ab 2026.11 (core#187008); mit 2026.10.3 schlug es noch fehl.
 
 ## Die API ist die Referenz — vorab prüfen
 
@@ -133,12 +133,12 @@ Mit Home Assistant 2026.11 ersetzt der eingebaute **Marketplace** (`Einstellunge
 - **`strings.json`** nutzen Custom-Integrationen laut Marketplace-Doku nicht, hassfest validiert sie aber weiterhin, wenn sie existiert (`script/hassfest/translations.py`). Sie bleibt deshalb vorerst; maßgeblich zur Laufzeit sind `translations/`, mit vollständiger `en.json`.
 - **`country`** wird vom Marketplace ignoriert, schadet nicht.
 - **Zeitverzug:** Die Katalogdaten entstehen alle 4 Stunden, der Marketplace liest sie alle 6 Stunden — ein Release erreicht Nutzer also mit bis zu ~10 Stunden Verspätung.
-- **README:** Laut Doku zeigt der Marketplace eine Beschreibung und Links zu Quellcode und Issues, keine README. Der folgende Abschnitt gilt damit nur noch für HACS bis 2026.10. Mit der ersten 2026.11-Beta prüfen, was tatsächlich angezeigt wird.
+- **README:** Entgegen der Doku zeigt der Marketplace sie doch (geprüft 04.11.2026): oben die **GitHub-Repo-Beschreibung**, darunter die **README des installierten Tags** — wie bisher HACS, siehe nächster Abschnitt. Die Repo-Beschreibung (`gh repo edit --description`) ist damit Teil der Anzeige und muss aktuell bleiben.
 - Der My-Button `hacs_repository` im README öffnet laut Doku das Repo im Marketplace — bleibt, weil er für beide Wege funktioniert.
 
-### README in der HACS-Ansicht
+### README in HACS und Marketplace
 
-Gilt für HACS bis HA 2026.10, siehe „Marketplace ab HA 2026.11“. Die HACS-Oberfläche zeigt **nicht** die README von `main`. `HacsRepository.get_documentation()` (`custom_components/hacs/repositories/base.py`) setzt bei einer installierten Integration `target_version = installed_version` und lädt `https://raw.githubusercontent.com/<repo>/<tag>/README.md`. README-Änderungen werden dort also erst mit dem **nächsten Release** sichtbar — „Update information" in HACS hilft nicht, weil der Tag derselbe bleibt.
+Gilt für HACS bis HA 2026.10 und genauso für den Marketplace ab 2026.11 (dort am 04.11.2026 bestätigt: README von 0.13.1 ohne den später ergänzten Installations-Badge). Die HACS-Oberfläche zeigt **nicht** die README von `main`. `HacsRepository.get_documentation()` (`custom_components/hacs/repositories/base.py`) setzt bei einer installierten Integration `target_version = installed_version` und lädt `https://raw.githubusercontent.com/<repo>/<tag>/README.md`. README-Änderungen werden dort also erst mit dem **nächsten Release** sichtbar — „Update information" in HACS hilft nicht, weil der Tag derselbe bleibt.
 
 Alle Links im README deshalb **absolut** halten. Relative Ziele wie `](LICENSE)` lösen sich in HACS gegen die Home-Assistant-URL auf und gehen ins Leere; beim Lizenz-Badge blieb außerdem das Bild leer, solange sein Linkziel relativ war.
 
@@ -207,17 +207,10 @@ python3.14 -m venv .venv && .venv/bin/pip install -r requirements_test.txt
 
 Die früheren `logo*.png` waren quadratische Kopien der Icons in 512/1024 px und verletzten die Logo-Vorgabe (Querformat, kürzeste Seite 128–256 px bzw. 256–512 px). Ein echtes Logo müsste diesen Maßen entsprechen — keine Icon-Kopie.
 
-### Das Icon fehlt in HACS — bekannt, nicht unser Fehler
+### Icon in HACS und Marketplace
 
-**Nicht erneut untersuchen und keinen PR gegen `home-assistant/brands` öffnen.** Beides wurde bereits erledigt; hier das Ergebnis:
+**Im Marketplace (ab HA 2026.11) erscheint das Icon** aus `brand/`, auch vor der Installation (geprüft 04.11.2026). Am Repo ist nichts zu tun.
 
-- Unter *Einstellungen → Geräte & Dienste* erscheint das Icon korrekt. Home Assistant liefert seit 2026.3 lokale Brand-Bilder über `/api/brands/integration/{domain}/{image}` aus, lokale Dateien haben Vorrang vor dem CDN ([Ankündigung](https://developers.home-assistant.io/blog/2026/02/24/brands-proxy-api)). Der `brand/`-Ordner ist damit der aktuelle und richtige Mechanismus.
-- **In der HACS-Oberfläche fehlt es trotzdem.** HACS nutzt diesen Endpunkt nirgends: Im gesamten Python-Code gibt es genau eine Icon-URL, fest verdrahtet auf `https://brands.home-assistant.io/_/{domain}/icon.png` (`update.py`, `entity_picture`). Das CDN kennt unsere Domain nicht und liefert einen Platzhalter „icon not available".
-- **Ein Brands-PR behebt das nicht.** `home-assistant/brands` nimmt seit 2026.3 keine Icons für Custom-Integrationen mehr an — unser PR dort ([#10964](https://github.com/home-assistant/brands/pull/10964), 13.08.2026) wurde eine Minute nach dem Öffnen automatisch geschlossen.
-- **Ein Issue anzulegen ist ebenfalls überflüssig.** Vier offene Meldungen decken den Fall bereits ab: hacs/integration [#5171](https://github.com/hacs/integration/issues/5171), [#5179](https://github.com/hacs/integration/issues/5179), [#5223](https://github.com/hacs/integration/issues/5223), [#5402](https://github.com/hacs/integration/issues/5402) (letzteres mit Label `issue:frontend`). Alle seit März bzw. Juli 2026 offen, bislang ohne Reaktion der Maintainer.
-
-Fazit: Am Repo ist nichts zu tun. Sobald HACS die lokale Brands-API übernimmt, erscheint das Icon ohne Zutun. Auch die Aufnahme in den HACS-Standardkatalog (19.10.2026) ändert daran nichts — Icon-Auslieferung und Katalogliste sind getrennte Systeme.
-
-**Ab HA 2026.11 erledigt sich das voraussichtlich von selbst:** HACS wird durch den Marketplace ersetzt, der in Home Assistant selbst läuft. Seine Doku nennt `brand/` im Integrationsordner als den richtigen Ort und sagt, dass Home Assistant die Bilder nach der Installation anzeigt. Ob der Marketplace das Icon auch **vor** der Installation (in Suche und Detailseite) zeigt, sagt sie nicht eindeutig — mit der ersten 2026.11-Beta ansehen und diesen Abschnitt dann umschreiben. Offener Punkt in `Plan.md`, Punkt 17.
+In HACS bis 2026.10 fehlte es: HACS lädt Icons fest von `https://brands.home-assistant.io/_/{domain}/icon.png`, und `home-assistant/brands` nimmt seit 2026.3 keine Custom-Integrationen mehr an (unser PR [#10964](https://github.com/home-assistant/brands/pull/10964) wurde automatisch geschlossen). Bekannt in hacs/integration [#5171](https://github.com/hacs/integration/issues/5171), [#5179](https://github.com/hacs/integration/issues/5179), [#5223](https://github.com/hacs/integration/issues/5223), [#5402](https://github.com/hacs/integration/issues/5402). **Nicht erneut untersuchen und keinen Brands-PR öffnen.**
 
 Dokumentation im Root-`README.md` und in `docs/` pflegen; im Integrationsordner liegt bewusst keine zweite README mehr.

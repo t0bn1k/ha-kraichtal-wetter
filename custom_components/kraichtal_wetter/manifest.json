@@ -1,6 +1,9 @@
 {
   "domain": "kraichtal_wetter",
   "name": "Kraichtal Wetter",
+  "categories": [
+    "weather_alerts"
+  ],
   "codeowners": [
     "@t0bn1k"
   ],
@@ -10,5 +13,5 @@
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/t0bn1k/ha-kraichtal-wetter/issues",
   "requirements": [],
-  "version": "0.13.1"
+  "version": "0.13.2"
 }
