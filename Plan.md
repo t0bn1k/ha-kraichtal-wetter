@@ -271,7 +271,7 @@ Der Betreiber hat am 17.09.2026 auf unsere Anregung hin zugesagt, neben `label` 
 - [x] `manifest.json`: `categories: ["weather_alerts"]`, damit die Integration im Marketplace unter „Weather & alerts“ auftaucht (04.11.2026, Hassfest im PR grün).
 - `strings.json` bleibt vorerst: hassfest validiert sie weiterhin, wenn sie existiert.
 - [x] Im Marketplace angesehen (04.11.2026, HA 2026.11, 0.13.1 installiert): `tests-latest.yml` grün; **Icon** erscheint; angezeigt wird die **Repo-Beschreibung von GitHub** und darunter die **README des installierten Tags** — entgegen der Doku also doch eine README. `AGENTS.md` entsprechend umgeschrieben, GitHub-Beschreibung von „installierbar über HACS“ auf Marketplace und HACS umgestellt.
-- [ ] Release-Notes im Update-Eintrag des Marketplace prüfen — erst beim Update auf 0.13.2 sichtbar.
+- [x] Release-Notes im Update-Eintrag des Marketplace (04.11.2026, Update 0.13.1 → 0.13.2): Der CHANGELOG-Eintrag erscheint vollständig unter „Versionshinweise“, Icons und Markdown werden dargestellt.
 - [x] README-Änderung erreicht Marketplace und HACS-Ansicht mit 0.13.2.
 - [x] Release 0.13.2 (04.11.2026)
 
