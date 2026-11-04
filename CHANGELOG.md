@@ -2,6 +2,18 @@
 
 Alle signifikanten Änderungen an dieser Integration werden hier festgehalten.
 
+## [0.13.2] - 2026-11-04
+### 🔧 Geändert
+- 🏪 Im Marketplace von Home Assistant 2026.11 erscheint Kraichtal Wetter jetzt
+  in der Kategorie „Weather & alerts“.
+
+### 📝 Dokumentation
+- 📝 Die README beschreibt die Installation über den Marketplace (ab HA
+  2026.11) und weiterhin über HACS. Der Marketplace zeigt die README der
+  installierten Version, diese Fassung also erst ab diesem Update.
+
+An der Integration selbst ändert sich nichts, nach dem Update ist nichts zu tun.
+
 ## [0.13.1] - 2026-10-19
 ### ✨ Hinzugefügt
 - 🎉 **Kraichtal Wetter steht jetzt im HACS-Standardkatalog.** Neu
