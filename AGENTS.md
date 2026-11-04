@@ -129,7 +129,7 @@ Mit Home Assistant 2026.11 ersetzt der eingebaute **Marketplace** (`Einstellunge
 
 - **Version = Tag des neuesten veröffentlichten GitHub-Releases**, ein bloßer Tag reicht nicht. `manifest.json` → `version` muss dazu passen, ohne `version` verweigert er die Installation. Beides sichert der Release-Ablauf oben.
 - **`homeassistant` in `hacs.json`** wird je Release ausgewertet: Instanzen unterhalb des Minimums bekommen ältere, passende Releases angeboten. Alte Releases deshalb nicht löschen.
-- **Release-Notes** zeigt der Marketplace im Update-Eintrag, und zwar den Text des GitHub-Releases — bei uns der extrahierte CHANGELOG-Eintrag. Deshalb steht „⚠️ Nach dem Update zu tun“ künftig **als erster Abschnitt** eines Eintrags.
+- **Release-Notes** zeigt der Marketplace im Update-Eintrag, und zwar den Text des GitHub-Releases — bei uns der extrahierte CHANGELOG-Eintrag (bestätigt 04.11.2026 mit 0.13.2, Icons und Markdown werden dargestellt). Deshalb steht „⚠️ Nach dem Update zu tun“ künftig **als erster Abschnitt** eines Eintrags.
 - **`strings.json`** nutzen Custom-Integrationen laut Marketplace-Doku nicht, hassfest validiert sie aber weiterhin, wenn sie existiert (`script/hassfest/translations.py`). Sie bleibt deshalb vorerst; maßgeblich zur Laufzeit sind `translations/`, mit vollständiger `en.json`.
 - **`country`** wird vom Marketplace ignoriert, schadet nicht.
 - **Zeitverzug:** Die Katalogdaten entstehen alle 4 Stunden, der Marketplace liest sie alle 6 Stunden — ein Release erreicht Nutzer also mit bis zu ~10 Stunden Verspätung.
