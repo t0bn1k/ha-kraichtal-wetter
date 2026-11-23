@@ -72,6 +72,20 @@ Wenn eine neue Funktion eine bisher ungenutzte Sektion braucht, gehört sie in `
 
 Beim Release: `manifest.json` (`version`) und der CHANGELOG-Eintrag müssen zur Tag-Version passen, sonst greift die Changelog-Extraktion in `release.yml` nicht.
 
+### Release mit dem Skill `/release`
+
+*Seit 2026-11-23 läuft ein Release über den persönlichen Skill `/release`; er liest diesen Abschnitt („CI / Release“).*
+
+- **Konto:** `t0bn1k`, Repository `t0bn1k/ha-kraichtal-wetter`. `gh` mit `GH_TOKEN=$(gh auth token -u t0bn1k)`. Git **nicht** über
+  den Schlüsselbund (der liefert `cgksmedia`, Push → `403`), sondern je Aufruf:
+  `git -c credential.helper= -c 'credential.helper=!f() { test "$1" = get || exit 0; echo username=t0bn1k; echo "password=$(gh auth token -u t0bn1k)"; }; f' push …`.
+- **Zweig und Betreff:** `release/x.y.z`, Commit `release: x.y.z – <Titel>`, PR mit demselben Titel. **Merge-Commit** (kein
+  Squash), nach grünen Prüfungen (Tests, Validate).
+- **Prüfen vor dem PR:** `ruff` und `pytest` wie in `tests.yml`.
+- **Danach meldet der Agent:** Link aufs Release. Hochladen muss niemand; HACS bzw. der Marketplace zeigen das Update nach
+  bis zu ~10 Stunden (siehe „Marketplace ab HA 2026.11“).
+- **Nach der Auslieferung:** nichts Festes.
+
 ### Wo die Version überall steht
 
 Alles im Release-PR, **schon im Endstand** — nach dem Merge bleibt nur der Tag:
