@@ -76,7 +76,9 @@ Beim Release: `manifest.json` (`version`) und der CHANGELOG-Eintrag müssen zur 
 
 *Seit 2026-11-23 läuft ein Release über den persönlichen Skill `/release`; er liest diesen Abschnitt („CI / Release“).*
 
-- **Konto:** `t0bn1k`, Repository `t0bn1k/ha-kraichtal-wetter`. Git über den Schlüsselbund; `gh` mit `GH_TOKEN=$(gh auth token -u t0bn1k)`.
+- **Konto:** `t0bn1k`, Repository `t0bn1k/ha-kraichtal-wetter`. `gh` mit `GH_TOKEN=$(gh auth token -u t0bn1k)`. Git **nicht** über
+  den Schlüsselbund (der liefert `cgksmedia`, Push → `403`), sondern je Aufruf:
+  `git -c credential.helper= -c 'credential.helper=!f() { test "$1" = get || exit 0; echo username=t0bn1k; echo "password=$(gh auth token -u t0bn1k)"; }; f' push …`.
 - **Zweig und Betreff:** `release/x.y.z`, Commit `release: x.y.z – <Titel>`, PR mit demselben Titel. **Merge-Commit** (kein
   Squash), nach grünen Prüfungen (Tests, Validate).
 - **Prüfen vor dem PR:** `ruff` und `pytest` wie in `tests.yml`.
