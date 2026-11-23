@@ -164,6 +164,40 @@ Die README ist für **Anwender**: was die Integration kann, API-Key, Installatio
 
 Die **Kartenbilder** in `docs/images/karte-*.png` sind keine Screenshots, sondern HTML-Nachbauten der HA-Karten, gerendert mit Chrome headless aus den Werten in `tests/fixtures/response.json`. Sie zeigen nur, was die Karte mit diesen Daten tatsächlich anzeigt — z. B. Niederschlag in der Vorhersage erst ab einem Wert über 0, wie im HA-Frontend. Ändert sich eine Beispielkarte im README, das Bild mitziehen oder durch einen echten Screenshot ersetzen.
 
+## Prüfung
+
+*Für den persönlichen Agenten `pruefer` (seit 2026-11-23): Pflichtpunkte zusätzlich zu seinen allgemeinen Prüfungen. Die
+Begründungen stehen in den Abschnitten oben.*
+
+- **API-Semantik aus der Doku:** Jede Deutung eines API-Feldes ist gegen `docs/API.md` bzw. die API-Dokumentation belegt,
+  nicht aus Feldnamen oder Symbolen erraten (Abschnitt „Die API ist die Referenz“); dazu ein Test, der sie festhält.
+- **Der Key bleibt geheim:** nur im Header `X-API-Key`, nie in URL, Log, Diagnose oder `configuration_url`; Diagnose-
+  und Fehlertexte redigiert.
+- **Entity-IDs:** Ein geänderter deutscher Name in `translations/de.json` verschiebt die Entity-ID – das ist ein Bruch für
+  Nutzer und braucht „⚠️ Nach dem Update zu tun“. Neue Sensoren nicht in `_LEGACY_SENSOR_OBJECT_IDS`.
+- **Übersetzungen:** `de.json` und `en.json` beide mitgepflegt; Namen über `translation_key`, nicht `name=`.
+- **Messung vs. Prognose:** Prognosen ohne State-Class; Einheiten und Geräteklassen über HA-Enums.
+- **Ausfälle:** 401/403 → `ConfigEntryAuthFailed`, sonst `UpdateFailed`; Client loggt Abruffehler nur auf `debug`;
+  `scan_interval` nicht unter 300 s.
+- **Mindestversion:** `hacs.json` (`homeassistant`) und `requirements_test_min.txt` nur zusammen ändern.
+- **HACS/Marketplace:** README-Links und -Bilder absolut, Bilder nicht umbenennen oder löschen, solange eine
+  veröffentlichte README darauf zeigt; `hacs.json` und `manifest.json` gültig (Validate-Workflow).
+- **Stil:** wie im Abschnitt „Stil (im Code)“; `ruff` und `pytest` grün; neue Funktion → neuer Test.
+
+## Kommunikation
+
+*Für den persönlichen Agenten `kommunikation` (seit 2026-11-23).*
+
+- **Konto:** `gh` mit `GH_TOKEN=$(gh auth token -u t0bn1k)`, Repository `t0bn1k/ha-kraichtal-wetter`. Gepostet wird nur nach
+  dem OK des Nutzers.
+- **Sprache:** in der Sprache des Meldenden (Deutsch oder Englisch), „du“ wie in der Home-Assistant-Community üblich.
+- **Wertschätzend:** Eine Meldung zeigt eine Lücke der Integration, keinen Fehler des Nutzers. Bei Fehlerberichten nach dem
+  Sensor **API-Status** und der Diagnose fragen (die Issue-Forms verweisen darauf), nie nach dem API-Key.
+- **Inhalt:** Version, ob ein Update nötig ist und was danach zu tun ist; der Hinweis, dass HACS bzw. der Marketplace ein
+  neues Release mit bis zu ~10 Stunden Verzug anzeigt.
+- **Zur API selbst** (Felder, Ausfälle, Bedeutung) nichts zusagen, was nur der Betreiber entscheiden kann – stattdessen
+  sagen, dass wir nachfragen.
+
 ## Verzeichnisstruktur
 
 ```
